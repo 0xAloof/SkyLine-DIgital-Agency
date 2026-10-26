@@ -537,7 +537,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="font-display font-extrabold text-3xl text-[var(--text-primary)] tabular-nums">
                 {overview.stats.totalLeads}
               </div>
-              <div className="text-xs font-mono text-[#10B981]">
+              <div className="text-xs font-mono text-[var(--text-secondary)]">
                 {overview.stats.newLeads} New • {overview.stats.qualifiedLeads} Qualified
               </div>
             </div>
@@ -801,7 +801,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             href={waFollowupUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#25D366] text-white font-display font-bold text-xs"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl btn-whatsapp-official font-display font-bold text-xs"
                           >
                             <WhatsAppLogoIcon className="w-3.5 h-3.5" />
                             <span>WhatsApp Reply</span>
@@ -1349,7 +1349,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   className="rounded-2xl platinum-card p-4 flex items-center justify-between gap-4"
                 >
                   <div className="min-w-0 space-y-1">
-                    <div className="font-mono text-[10px] font-bold text-[#10B981]">
+                    <div className="font-mono text-[10px] font-bold text-[var(--text-primary)]">
                       ✓ {rev.verifiedOutcome} • {rev.engagementScope}
                     </div>
                     <h3 className="font-display font-bold text-sm text-[var(--text-primary)]">

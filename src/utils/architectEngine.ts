@@ -94,7 +94,7 @@ export const SKYLINE_WHATSAPP_NUMBER = '918959144686';
 export const SKYLINE_AASHIF_WHATSAPP_NUMBER = '918643002478';
 export const SKYLINE_CALL_NUMBER = '+918643002478';
 export const SKYLINE_SECONDARY_PHONE = '+91 89591 44686';
-export const SKYLINE_EMAIL = 'skylinedigital@gmail.com';
+export const SKYLINE_EMAIL = 'agencyskylinedigital@gmail.com';
 export const SKYLINE_INSTAGRAM_URL = 'https://www.instagram.com/sky_line_digital';
 
 // Structured RED Telemetry Ring Buffer (Max 100 entries)
@@ -210,9 +210,9 @@ const INDUSTRY_TRAFFIC_LAYER: Record<
   { module: string; spec: string; deliverables: string[]; metric: string; baseConvRate: number }
 > = {
   [IndustryType.LOCAL_BUSINESS]: {
-    module: 'Google Map Pack #1 Dominance + Hyper-Local Reels & QR Funnel',
+    module: 'Google Map Pack #Top Dominance + Hyper-Local Reels & QR Funnel',
     spec: 'Google Business Profile authority, local geo-fenced Meta Reels ads, and automated WhatsApp appointment/catalog booking.',
-    deliverables: ['Google Map Pack #1 Ranking', 'Smart QR Review & Catalog Bot', 'Geo-Fenced Local Reels Ads'],
+    deliverables: ['Google Map Pack #Top Ranking', 'Smart QR Review & Catalog Bot', 'Geo-Fenced Local Reels Ads'],
     metric: '+185% Walk-Ins & Direct Calls',
     baseConvRate: 0.045,
   },

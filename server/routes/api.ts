@@ -517,86 +517,197 @@ apiRouter.post('/admin/reset', requireAdminAuth, (_req, res) => {
 });
 
 // 12. SkyLine AI Assistant Server-Side Endpoints (Gemini 3.8 Flash / 3.1 Flash Lite / 3.5 Transcribe + Built-In Intent Engine)
-export const SKYLINE_SYSTEM_INSTRUCTION = `You are SkyLine AI, the official architectural assistant for SkyLine Digital Agency.
+export const SKYLINE_SYSTEM_INSTRUCTION = `You are "Sky Bot", the official AI SDR Agent for SkyLine Digital Agency.
 Answer concisely (2 to 4 sentences max) and ONLY about SkyLine Digital Agency:
-- Services: Custom Web & SaaS Apps (Next.js 15, React 19, TypeScript, Java Spring Boot, Node.js, PostgreSQL), 24/7 WhatsApp AI Bots (Official WhatsApp Cloud API), Local Business Growth (#1 Google Map Pack & Smart QR 5-Star Reviews), Meta/Google Performance Ads (Server-Side CAPI), Technical SEO/AEO, and D2C 1-Tap UPI Stores.
+- Services: Custom Web & SaaS Apps (Next.js 15, React 19, TypeScript, Java 21, Python, Node.js, PostgreSQL), 24/7 WhatsApp AI Bots (Official WhatsApp Cloud API), Local Business Growth (#Top Google Map Pack & Smart QR 5-Star Reviews), Meta/Google Performance Ads (Server-Side CAPI), Technical SEO/AEO, and D2C 1-Tap UPI Stores (like 360views.services and A&A Chocolates).
 - Pricing Tiers:
-  1) Local Business / Starter: ₹25,000 – ₹60,000
-  2) Growth Website + Automation: ₹60,000 – ₹1,50,000
-  3) Full-Stack SaaS / Ad Engine: ₹1,50,000 – ₹3,50,000+
-- Timelines: Fast-Track Build: 10–18 Days | Standard Sprint: 3–6 Weeks.
+  1) Local Business / Google Maps #Top Pack: ₹15,000 to ₹35,000
+  2) Custom Next.js Web App + WhatsApp AI Bot: ₹35,000 to ₹85,000
+  3) Multi-Tenant SaaS / ERP / Ad Engine: ₹90,000 to ₹2,50,000+
+- Student Mentorship & Project Lab (B.Tech/BCA/MCA): ₹599 to ₹3,999.
+- Timelines: Fast-Track Build: 14 to 21 Days | Standard Sprint: 3 to 5 Weeks.
 - Referral Program: 15% Direct UPI/Bank Commission on referred client deals.
-- Official Email: skylinedigital@gmail.com
-- Location: Indore, Bhopal, Madhya Pradesh, India (Serving Globally).
-- Founding Architects: Aashif Khan (Co-Founder & Lead Full-Stack / Cybersecurity Architect, Direct Call & WhatsApp: +91 86430 02478) & Sachin Sahu (Co-Founder & Lead Java Backend / Distributed Systems Architect, WhatsApp: +91 89591 44686).
-If the user asks for custom discounts, negotiations, or out-of-scope topics, politely state that a Founding Architect can tailor a custom scope and set needsHumanFallback to true.`;
+- Official Email: agencyskylinedigital@gmail.com
+- Location: Indore, Madhya Pradesh, India (Serving Globally).
+- Founding Architects: Aashif Khan (Co-Founder & Principal Systems Architect, Direct Call & WhatsApp: +91 86430 02478) & Sachin Sahu (Co-Founder & Lead Full-Stack & Growth Architect, WhatsApp: +91 89591 44686).
+- Language Rule: If the user writes in Hindi or Hinglish, reply in natural, warm Hinglish. If the user writes in English, reply in crisp, human-written English. Never use em-dashes. Always end with a short Piper-style follow-up question.`;
+
+function isHinglishMessage(raw: string): boolean {
+  const q = raw.toLowerCase();
+  const markers = [
+    'mere',
+    'mera',
+    'meri',
+    'ke liye',
+    'kharcha',
+    'kitna',
+    'aayega',
+    'kaise',
+    'kya',
+    'hai',
+    'hain',
+    'batao',
+    'chahiye',
+    'banwana',
+    'dukan',
+    'paisa',
+    'aap',
+    'karo',
+  ];
+  return markers.some((m) => q.includes(m));
+}
 
 export function evaluateLocalSkylineIntent(query: string): {
   reply: string;
   needsHumanFallback: boolean;
+  showFallbackActions: boolean;
 } {
   const q = query.toLowerCase();
+  const isHi = isHinglishMessage(query);
 
-  if (q.includes('price') || q.includes('pricing') || q.includes('cost') || q.includes('package') || q.includes('budget') || q.includes('charge')) {
+  if (
+    q.includes('human') ||
+    q.includes('talk') ||
+    q.includes('call') ||
+    q.includes('baat kar') ||
+    q.includes('negotiate') ||
+    q.includes('discount')
+  ) {
     return {
-      reply:
-        'SkyLine Digital Agency offers transparent, fixed-milestone tiers: (1) Local Business / Starter: ₹25,000 – ₹60,000, (2) Growth Website + WhatsApp Automation: ₹60,000 – ₹1,50,000, and (3) Full-Stack SaaS / Performance Ad Engine: ₹1,50,000 – ₹3,50,000+. Fast-Track launches take 10–18 Days, and you retain 100% source-code ownership.',
-      needsHumanFallback: false,
-    };
-  }
-
-  if (q.includes('local') || q.includes('map') || q.includes('clinic') || q.includes('salon') || q.includes('review') || q.includes('qr')) {
-    return {
-      reply:
-        'Our Local Business Growth Engine is built for clinics, salons, showrooms, gyms, and retail stores. We rank your business in the Top 3 of the Google Map Pack, deploy Smart QR 5-Star Review Standees, and connect a 24/7 WhatsApp appointment booking bot—delivering 3.2x more local calls and walk-ins.',
-      needsHumanFallback: false,
-    };
-  }
-
-  if (q.includes('whatsapp') || q.includes('bot') || q.includes('crm') || q.includes('demo') || q.includes('ai')) {
-    return {
-      reply:
-        'Our 24/7 Autonomous WhatsApp AI Bots (powered by the Official WhatsApp Cloud API + RAG Knowledge Base) reply to leads in under 1.2 seconds, share product catalogs, qualify budgets, and book calendar slots automatically with zero lead leakage.',
+      reply: isHi
+        ? 'Bilkul! Aap seedhe hamare Founding Architects Aashif Khan (+91 86430 02478) ya Sachin Sahu (+91 89591 44686) se WhatsApp ya Direct Call par baat kar sakte hain, ya agencyskylinedigital@gmail.com par email bhej sakte hain. Kya main aapke project ka brief note kar loon?'
+        : 'You can connect directly with our Founding Architects Aashif Khan (+91 86430 02478) and Sachin Sahu (+91 89591 44686) in Indore, Madhya Pradesh, India (Email: agencyskylinedigital@gmail.com) via WhatsApp or Direct Call below. Would you like to share your industry before jumping on a call?',
       needsHumanFallback: true,
+      showFallbackActions: true,
     };
   }
 
-  if (q.includes('founder') || q.includes('team') || q.includes('who') || q.includes('aashif') || q.includes('sachin') || q.includes('talk') || q.includes('call') || q.includes('human') || q.includes('email')) {
+  if (
+    q.includes('price') ||
+    q.includes('pricing') ||
+    q.includes('cost') ||
+    q.includes('package') ||
+    q.includes('budget') ||
+    q.includes('charge') ||
+    q.includes('kharcha') ||
+    q.includes('kitna')
+  ) {
     return {
-      reply:
-        'SkyLine Digital Agency is led by Co-Founders & Lead Architects Aashif Khan (Full-Stack Cloud & Cybersecurity Architect) and Sachin Sahu (Java 21 Backend & Distributed Systems Architect), based in Indore, Bhopal, Madhya Pradesh, India (Email: skylinedigital@gmail.com). You can connect with us directly on WhatsApp or call our Lead Architect below.',
+      reply: isHi
+        ? 'Hamare fixed-milestone packages bahut transparent hain: (1) Local Growth & Google Maps #Top Pack: ₹15,000 se ₹35,000, (2) Custom Next.js Website + WhatsApp AI Bot: ₹35,000 se ₹85,000, aur (3) Full-Stack SaaS / ERP / Performance Ad Engine: ₹90,000 se ₹2,50,000+. Har build 14 se 28 din mein launch hota hai aur 100% source-code ownership aapki hoti hai. Aapka business kis category mein aata hai?'
+        : 'SkyLine Digital Agency offers transparent, fixed-milestone tiers: (1) Local Business & Google Maps #Top Pack: ₹15,000 to ₹35,000, (2) Custom Next.js Website + WhatsApp Automation: ₹35,000 to ₹85,000, and (3) Full-Stack SaaS / Performance Ad Engine: ₹90,000 to ₹2,50,000+. Fast-Track launches take 14 to 28 days, and you retain 100% source-code ownership. Which industry is your business in?',
+      needsHumanFallback: false,
+      showFallbackActions: false,
+    };
+  }
+
+  if (
+    q.includes('local') ||
+    q.includes('map') ||
+    q.includes('clinic') ||
+    q.includes('salon') ||
+    q.includes('review') ||
+    q.includes('qr')
+  ) {
+    return {
+      reply: isHi
+        ? 'Local clinics, showrooms, aur retail stores ke liye hum Google Business Profile entity schema, local citation hubs, aur Smart QR 5-Star Review Standees deploy karte hain taaki aap Google Map Pack #Top mein rank karein, saath hi 24/7 WhatsApp appointment bot har inquiry ko 6 second mein book karta hai. Aapka clinic ya showroom kis city mein hai?'
+        : 'Our Local Business Growth Engine is built for clinics, salons, showrooms, and retail stores. We rank your business in the Google Map Pack #Top (Top 3 Local Pack), deploy Smart QR 5-Star Review Standees, and connect a 24/7 WhatsApp appointment booking bot. What city and category do you operate in?',
+      needsHumanFallback: false,
+      showFallbackActions: false,
+    };
+  }
+
+  if (
+    q.includes('whatsapp') ||
+    q.includes('bot') ||
+    q.includes('crm') ||
+    q.includes('demo') ||
+    q.includes('ai')
+  ) {
+    return {
+      reply: isHi
+        ? 'Hamare 24/7 Autonomous WhatsApp AI Bots (Official WhatsApp Cloud API) har lead ko 6 second ke andar reply karte hain, catalog/brochure share karte hain, budget qualify karte hain, aur calendar slot book kar dete hain. Aap is page par "Launch Live Interactive Prototype" button daba kar live demo test kar sakte hain. Kya aap appointment booking ya sales follow-up automate karna chahte hain?'
+        : 'Our 24/7 Autonomous WhatsApp AI Bots (powered by the Official WhatsApp Cloud API) reply to leads in under 6 seconds, share product catalogs, qualify budgets, and book calendar slots with Instant Webhook Capture. You can test the interactive simulator right now via the "Launch Live Interactive Prototype" button on our project cards. Are you looking to automate bookings or lead qualification?',
+      needsHumanFallback: false,
+      showFallbackActions: false,
+    };
+  }
+
+  if (
+    q.includes('founder') ||
+    q.includes('team') ||
+    q.includes('who') ||
+    q.includes('aashif') ||
+    q.includes('sachin') ||
+    q.includes('email')
+  ) {
+    return {
+      reply: isHi
+        ? 'SkyLine Digital Agency (Indore, Madhya Pradesh, India • agencyskylinedigital@gmail.com) ko Co-Founders Aashif Khan (Principal Systems & Cybersecurity Architect) aur Sachin Sahu (Lead Full-Stack & Growth Architect) lead karte hain. Kya aap unke saath ek strategy call schedule karna chahenge?'
+        : 'SkyLine Digital Agency is led by Co-Founders & Lead Architects Aashif Khan (Full-Stack Cloud & Cybersecurity Architect) and Sachin Sahu (Full-Stack & Growth Systems Architect), based in Indore, Madhya Pradesh, India (Email: agencyskylinedigital@gmail.com). Would you like to connect with them on WhatsApp or a direct call below?',
       needsHumanFallback: true,
+      showFallbackActions: true,
     };
   }
 
-  if (q.includes('timeline') || q.includes('fast') || q.includes('time') || q.includes('long') || q.includes('week') || q.includes('day')) {
+  if (
+    q.includes('timeline') ||
+    q.includes('fast') ||
+    q.includes('time') ||
+    q.includes('long') ||
+    q.includes('week') ||
+    q.includes('day')
+  ) {
     return {
-      reply:
-        'We deliver on fixed milestones: Fast-Track Builds launch in 10–18 Days, while comprehensive Standard Sprints (custom SaaS, multi-agent AI, and full-funnel ad engines) take 3–6 Weeks with live staging previews.',
+      reply: isHi
+        ? 'Hum fixed milestones par kaam karte hain: Fast-Track Builds 14 se 21 din mein live ho jaate hain, aur full-scale SaaS ya multi-agent AI systems 3 se 5 weeks mein deliver hote hain. Aap apna project kab tak launch karna chahte hain?'
+        : 'We deliver on fixed milestones: Fast-Track Builds launch in 14 to 21 Days, while comprehensive Standard Sprints (custom SaaS, multi-agent AI, and full-funnel ad engines) take 3 to 5 Weeks with live staging previews. What is your target launch date?',
       needsHumanFallback: false,
+      showFallbackActions: false,
     };
   }
 
-  if (q.includes('refer') || q.includes('commission') || q.includes('partner') || q.includes('15%')) {
+  if (
+    q.includes('refer') ||
+    q.includes('commission') ||
+    q.includes('partner') ||
+    q.includes('15%') ||
+    q.includes('student') ||
+    q.includes('mentor')
+  ) {
     return {
-      reply:
-        'With the SkyLine Partner Program, you earn a direct 15% commission via UPI or bank transfer for every business you introduce that signs a project with SkyLine Digital Agency.',
+      reply: isHi
+        ? 'SkyLine Partner Program mein kisi bhi client ko refer karne par aapko deal sign hote hi 15% direct UPI/bank commission milta hai. Saath hi B.Tech/BCA/MCA students ke liye 1-on-1 Engineering Mentorship Lab (₹599 se ₹3,999) bhi available hai. Aap kis program ki details chahte hain?'
+        : 'With the SkyLine Partner Program, you earn a direct 15% commission via UPI or bank transfer for every business you introduce that signs a project with us. We also offer a 1-on-1 Engineering Mentorship & Project Lab (₹599 to ₹3,999) for student builders. Which program are you interested in?',
       needsHumanFallback: false,
+      showFallbackActions: false,
     };
   }
 
-  if (q.includes('service') || q.includes('web') || q.includes('saas') || q.includes('ads') || q.includes('seo') || q.includes('upi')) {
+  if (
+    q.includes('service') ||
+    q.includes('web') ||
+    q.includes('saas') ||
+    q.includes('ads') ||
+    q.includes('seo') ||
+    q.includes('upi')
+  ) {
     return {
-      reply:
-        'We engineer 6 core systems: (1) Sub-Second Next.js Web & SaaS Apps, (2) 24/7 WhatsApp AI Bots & CRM, (3) Local Business #1 Google Map Pack & QR Reviews, (4) High-ROAS Meta & Google CAPI Ads, (5) Technical SEO & AI Search Visibility, and (6) D2C 1-Tap UPI Storefronts.',
+      reply: isHi
+        ? 'Hum 6 core systems engineer karte hain: (1) Sub-Second Next.js Web & SaaS Apps, (2) 24/7 WhatsApp AI Bots & CRM, (3) Local Business Google Map Pack #Top & QR Reviews, (4) High-ROAS Meta & Google CAPI Ads, (5) Technical SEO & AI Search Visibility, aur (6) D2C 1-Tap UPI Storefronts. Aapko inmein se kaunsa system chahiye?'
+        : 'We engineer 6 core systems: (1) Sub-Second Next.js Web & SaaS Apps, (2) 24/7 WhatsApp AI Bots & CRM, (3) Local Business Google Map Pack #Top & QR Reviews, (4) High-ROAS Meta & Google CAPI Ads, (5) Technical SEO & AI Search Visibility, and (6) D2C 1-Tap UPI Storefronts. Which of these fits your current priority?',
       needsHumanFallback: false,
+      showFallbackActions: false,
     };
   }
 
   return {
-    reply:
-      'For custom architecture specifications, tailored enterprise pricing, or a live 15-minute teardown of your business funnel, connect directly with our Founding Architects via WhatsApp or Direct Voice Call below.',
+    reply: isHi
+      ? 'Custom enterprise architecture, tailored pricing, ya 15-minute live funnel teardown ke liye aap niche diye gaye WhatsApp ya Direct Call button se seedhe hamare Founding Architects se jud sakte hain. Aapka primary business goal kya hai?'
+      : 'For custom architecture specifications, tailored enterprise pricing, or a live 15-minute teardown of your business funnel, connect directly with our Founding Architects via WhatsApp or Direct Voice Call below. What is the main business goal you are targeting this quarter?',
     needsHumanFallback: true,
+    showFallbackActions: true,
   };
 }
 
@@ -658,15 +769,15 @@ apiRouter.post('/ai/chat', async (req, res) => {
       localResult.needsHumanFallback ||
       lowerQ.includes('discount') ||
       lowerQ.includes('negotiate') ||
-      lowerQ.includes('custom') ||
+      lowerQ.includes('custom contract') ||
       lowerQ.includes('call') ||
       lowerQ.includes('human') ||
-      lowerQ.includes('founder') ||
-      lowerQ.includes('whatsapp');
+      lowerQ.includes('baat kar');
 
     res.json({
       reply: text,
       needsHumanFallback: needsFallback,
+      showFallbackActions: needsFallback,
       modelUsed: selectedModel,
     });
   } catch {

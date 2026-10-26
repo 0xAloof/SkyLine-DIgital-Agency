@@ -52,7 +52,7 @@ const DOMAIN_OPTIONS: {
     id: 'seo-content',
     label: 'Local Maps & Search SEO',
     tag: 'SEO / LOCAL',
-    desc: 'Google Map Pack #1 ranking, QR review system, and search SEO',
+    desc: 'Google Map Pack #Top ranking, QR review system, and search SEO',
   },
 ];
 
@@ -83,8 +83,8 @@ const URGENCY_OPTIONS: {
   label: string;
   sub: string;
 }[] = [
-  { id: 'standard', label: 'Standard Sprint', sub: '3 – 6 Weeks' },
-  { id: 'accelerated', label: 'Fast-Track Build', sub: '10 – 18 Days' },
+  { id: 'standard', label: 'Standard Sprint', sub: '3 to 6 Weeks' },
+  { id: 'accelerated', label: 'Fast-Track Build', sub: '10 to 18 Days' },
 ];
 
 function computeScopeBlueprint(config: {
@@ -109,13 +109,13 @@ function computeScopeBlueprint(config: {
   const estimatedWeeks =
     urgency === 'accelerated'
       ? scale === 'launch'
-        ? '10 – 14 Days'
-        : '2 – 3 Weeks'
+        ? '10 to 14 Days'
+        : '2 to 3 Weeks'
       : scale === 'launch'
-        ? '2 – 3 Weeks'
+        ? '2 to 3 Weeks'
         : scale === 'growth'
-          ? '3 – 5 Weeks'
-          : '5 – 7 Weeks';
+          ? '3 to 5 Weeks'
+          : '5 to 7 Weeks';
 
   const sprintCount =
     scale === 'launch' ? 2 : scale === 'growth' ? 3 : 5;
@@ -138,7 +138,7 @@ function computeScopeBlueprint(config: {
     recommendedStack.push('Server-Side Meta CAPI', 'Google Ads Search', 'Live ROAS Board');
   }
   if (domains.includes('seo-content')) {
-    recommendedStack.push('Google Map Pack #1', 'JSON-LD Entity Graph', 'Smart QR Standees');
+    recommendedStack.push('Google Map Pack #Top', 'JSON-LD Entity Graph', 'Smart QR Standees');
   }
 
   const primaryDeliverables: string[] = [];

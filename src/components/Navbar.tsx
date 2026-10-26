@@ -32,6 +32,7 @@ export type ActivePage =
   | 'services'
   | 'work'
   | 'who-we-are'
+  | 'how-we-deliver'
   | 'referral'
   | 'contact';
 
@@ -52,9 +53,10 @@ export const PUBLIC_NAV_TABS: {
   { id: 'home', label: 'Home', desc: 'Agency Overview & 3D Geodesic Core' },
   { id: 'services', label: 'Services', desc: '7-Track Architecture & 60s Estimator' },
   { id: 'work', label: 'Our Work', desc: 'Verified Case Studies & Client Reviews' },
-  { id: 'who-we-are', label: 'Who We Are', desc: 'Founding Architects & Delivery Roadmap' },
-  { id: 'referral', label: 'Offer & Referral', desc: '15% Partner Payout & FAQ' },
-  { id: 'contact', label: 'Contact', desc: 'Project Quote & Strategy Call Desk' },
+  { id: 'who-we-are', label: 'Who We Are', desc: 'Founding Architects & Leadership' },
+  { id: 'how-we-deliver', label: 'How We Deliver', desc: '6-Stage Engineering & Growth Delivery System' },
+  { id: 'referral', label: 'Offer & Referral', desc: '15% Partner Payout & Mentorship Lab' },
+  { id: 'contact', label: 'Contact', desc: 'Project Quote & Strategy Call' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -176,9 +178,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               href={`mailto:${SKYLINE_EMAIL}`}
               aria-label="Email SkyLine Digital Agency"
               title={SKYLINE_EMAIL}
-              className="hidden sm:inline-flex items-center justify-center min-w-[42px] min-h-[42px] rounded-full hover:scale-105 transition-transform"
+              className={`w-10 h-10 rounded-full border flex items-center justify-center shrink-0 transition-all hover:scale-105 ${
+                scrolled
+                  ? 'border-white/15 bg-white/[0.06] hover:bg-white/[0.12]'
+                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)]'
+              }`}
             >
-              <GmailBrandIcon size="md" />
+              <GmailBrandIcon size="nav" />
             </a>
 
             <button
@@ -186,10 +192,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={onToggleTheme}
               aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              className={`w-10 h-10 rounded-full inline-flex items-center justify-center cursor-pointer shrink-0 transition-colors ${
+              className={`w-10 h-10 rounded-full border flex items-center justify-center cursor-pointer shrink-0 transition-colors ${
                 scrolled
-                  ? 'border border-white/15 bg-white/[0.04] hover:bg-white/[0.1] text-zinc-200'
-                  : 'btn-platinum-secondary text-[var(--text-primary)]'
+                  ? 'border-white/15 bg-white/[0.04] hover:bg-white/[0.1] text-zinc-200'
+                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-primary)]'
               }`}
             >
               {theme === 'dark' ? (
@@ -203,10 +209,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               type="button"
               onClick={() => setMenuOpen(true)}
               aria-label="Open Navigation Menu"
-              className={`inline-flex items-center justify-center w-10 h-10 rounded-full cursor-pointer transition-colors ${
+              className={`inline-flex items-center justify-center w-10 h-10 rounded-full border cursor-pointer transition-colors ${
                 scrolled
-                  ? 'border border-white/15 bg-white/[0.04] hover:bg-white/[0.1] text-zinc-200'
-                  : 'btn-platinum-secondary text-[var(--text-primary)]'
+                  ? 'border-white/15 bg-white/[0.04] hover:bg-white/[0.1] text-zinc-200'
+                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-primary)]'
               }`}
             >
               <span className="flex flex-col gap-1 w-4">
@@ -296,7 +302,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     SkyLine Digital Agency
                   </h3>
                   <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                    From sub-second web & SaaS platforms to Google Maps #1 ranking and 24/7 WhatsApp AI bots.
+                    From sub-second web &amp; SaaS platforms to Google Maps #Top ranking and 24/7 WhatsApp AI bots.
                   </p>
                 </div>
 
@@ -353,9 +359,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </a>
                   <a
                     href={`tel:${SKYLINE_CALL_NUMBER}`}
-                    className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] rounded-xl btn-platinum-primary text-xs font-semibold cursor-pointer"
+                    className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] rounded-xl btn-call-black bg-[#000000] text-[#FFFFFF] text-xs font-semibold cursor-pointer"
                   >
-                    <PhoneCall className="w-3.5 h-3.5" />
+                    <PhoneCall className="w-3.5 h-3.5 text-[#FFFFFF]" />
                     <span>Direct Call</span>
                   </a>
                 </div>
@@ -369,7 +375,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span>PARTNER COMMISSION</span>
                   </div>
                   <p className="text-xs sm:text-sm font-semibold">
-                    Refer a client & earn a direct 15% cash payout
+                    Refer a client &amp; earn a direct 15% cash payout
                   </p>
                 </div>
                 <button
@@ -385,35 +391,55 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Bottom Bar */}
           <div className="max-w-7xl w-full mx-auto pt-4 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)] font-mono-tech">
-            <span>SKYLINE DIGITAL AGENCY • FULL-STACK, AI & GROWTH</span>
-            <span>INDORE, BHOPAL, MADHYA PRADESH, INDIA</span>
+            <span>SKYLINE DIGITAL AGENCY • FULL-STACK, AI &amp; GROWTH</span>
+            <span>INDORE, MADHYA PRADESH, INDIA</span>
           </div>
         </div>
       )}
 
       {/* Floating Bottom-Right Action Stack:
-          1) WhatsApp Green (#25D366 -> Sachin 918959144686)
-          2) Direct Call Obsidian (#141518 -> Aashif +918643002478)
-          3) SkyLine AI Assistant Launcher (Custom Branded Chat-Logo Icon) */}
+          1) BroCodes-Style Expanding WhatsApp Hover Capsule (#25D366 -> Sachin Sahu, Founder & CEO)
+          2) BroCodes-Style Expanding Direct Call Hover Capsule (#09090B -> Aashif Khan, Co-Founder & System Architect)
+          3) Sky Bot AI SDR Agent Launcher (Custom Branded Chat-Logo Icon) */}
       <div className="fixed bottom-5 right-4 sm:right-5 z-40 flex flex-col items-end gap-2.5">
         <a
           href={primaryWhatsAppUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Chat on WhatsApp with SkyLine Digital Agency"
-          title="Chat on WhatsApp"
-          className="w-12 h-12 rounded-full bg-[#18181B] text-[#F4F4F5] dark:bg-[#E4E4E7] dark:text-[#09090B] border border-[var(--border-metallic)] shadow-xl flex items-center justify-center hover:scale-105 transition-transform"
+          aria-label="Chat on WhatsApp • Sachin Sahu (Founder & CEO)"
+          title="Chat on WhatsApp • Sachin Sahu (Founder & CEO)"
+          className="group h-12 rounded-full bg-[#25D366] text-white border border-[#1DA851] shadow-2xl flex items-center px-3 hover:pr-4 hover:bg-[#1EBE5D] transition-all duration-300 overflow-hidden"
         >
-          <WhatsAppLogoIcon className="w-6 h-6" />
+          <span className="w-6 h-6 flex items-center justify-center shrink-0">
+            <WhatsAppLogoIcon className="w-6 h-6" />
+          </span>
+          <div className="max-w-0 opacity-0 group-hover:max-w-[260px] group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 overflow-hidden whitespace-nowrap text-left leading-tight">
+            <div className="font-display text-xs font-extrabold tracking-tight text-white">
+              Chat on WhatsApp • Sachin Sahu
+            </div>
+            <div className="font-mono-tech text-[10px] text-white/90 font-semibold">
+              Founder &amp; CEO
+            </div>
+          </div>
         </a>
 
         <a
           href={`tel:${SKYLINE_CALL_NUMBER}`}
-          aria-label="Call SkyLine Digital Agency"
-          title="Call Lead Architect"
-          className="w-12 h-12 rounded-full bg-[#09090B] text-[#F4F4F5] dark:bg-[#27272A] dark:text-[#F4F4F5] border border-[var(--border-metallic)] shadow-xl flex items-center justify-center hover:scale-105 transition-transform"
+          aria-label="Direct Voice Call • Aashif Khan (Co-Founder & System Architect)"
+          title="Direct Voice Call • Aashif Khan (Co-Founder & System Architect)"
+          className="group h-12 rounded-full btn-call-black bg-[#000000] text-[#FFFFFF] border border-white/20 shadow-2xl flex items-center px-3.5 hover:pr-4 transition-all duration-300 overflow-hidden"
         >
-          <PhoneCall className="w-5 h-5" />
+          <span className="w-5 h-5 flex items-center justify-center shrink-0 text-[#FFFFFF]">
+            <PhoneCall className="w-5 h-5" />
+          </span>
+          <div className="max-w-0 opacity-0 group-hover:max-w-[260px] group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 overflow-hidden whitespace-nowrap text-left leading-tight">
+            <div className="font-display text-xs font-extrabold tracking-tight text-[#FFFFFF]">
+              Direct Voice Call • Aashif Khan
+            </div>
+            <div className="font-mono-tech text-[10px] text-[#D4D4D8] font-semibold">
+              Co-Founder &amp; System Architect
+            </div>
+          </div>
         </a>
 
         <SkylineAiChatbot />

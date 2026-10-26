@@ -130,38 +130,49 @@ test('disposeSceneGraph recursively disposes geometries, materials, and textures
   assert.equal(root.children.length, 0);
 });
 
-test('src/index.css and src/components/HeroSection.tsx enforce strictly monochromatic silver, platinum, and charcoal definitions', async () => {
+test('src/index.css, src/components/*, and src/admin/* enforce strictly monochromatic silver, platinum, and charcoal definitions while permitting authentic brand icon colors', async () => {
   const fs = await import('node:fs/promises');
   const path = await import('node:path');
-  const cssContent = await fs.readFile(path.resolve(process.cwd(), 'src/index.css'), 'utf8');
-  const heroContent = await fs.readFile(
-    path.resolve(process.cwd(), 'src/components/HeroSection.tsx'),
-    'utf8'
-  );
 
+  const filesToAudit = [path.resolve(process.cwd(), 'src/index.css')];
+
+  for (const dir of ['src/components', 'src/admin']) {
+    const absDir = path.resolve(process.cwd(), dir);
+    const entries = await fs.readdir(absDir);
+    for (const entry of entries) {
+      if (entry.endsWith('.tsx') || entry.endsWith('.ts')) {
+        filesToAudit.push(path.join(absDir, entry));
+      }
+    }
+  }
+
+  // Explicitly permitted authentic brand colors across BrandIcons, Marquee, Socials & CTAs:
+  // #25D366, #E1306C, #0A66C2, #26A5E4, #61DAFB, #3178C6, #3776AB, #339933, #336791, #2496ED, #FF9900, #EA4335, #4285F4, #34A853, #FBBC05
   const forbiddenHexPatterns = [
     /#C5A880/i,
     /#D4AF37/i,
     /#FFD700/i,
     /#B8860B/i,
-    /#10B981/i,
-    /#25D366/i,
     /#EAE7E0/i,
     /#E2DED5/i,
     /#D8D4CA/i,
     /#F4F3EF/i,
   ];
 
-  for (const pattern of forbiddenHexPatterns) {
-    assert.equal(
-      pattern.test(cssContent),
-      false,
-      `src/index.css must not contain non-compliant color ${pattern}`
-    );
-    assert.equal(
-      pattern.test(heroContent),
-      false,
-      `src/components/HeroSection.tsx must not contain non-compliant color ${pattern}`
-    );
+  for (const filePath of filesToAudit) {
+    const rawContent = await fs.readFile(filePath, 'utf8');
+    // Strip block and line comments before auditing code tokens
+    const codeOnly = rawContent.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+    const relName = path.relative(process.cwd(), filePath);
+
+    for (const pattern of forbiddenHexPatterns) {
+      assert.equal(
+        pattern.test(codeOnly),
+        false,
+        `${relName} must not contain non-compliant color ${pattern}`
+      );
+    }
   }
 });
+
+

@@ -1,589 +1,438 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  PhoneCall,
-  Send,
   X,
-  ArrowRight,
-  Mic,
-  MicOff,
-  Radio,
-  Zap,
-  Volume2,
+  Send,
+  PhoneCall,
+  Loader2,
+  User,
 } from 'lucide-react';
 import {
   SKYLINE_SACHIN_WHATSAPP_NUMBER,
   SKYLINE_CALL_NUMBER,
+  SKYLINE_EMAIL,
 } from '../data/agencyData';
-import { WhatsAppLogoIcon, SkyLineAiChatIcon } from './BrandIcons';
+import {
+  SkyLineAiChatIcon,
+  WhatsAppLogoIcon,
+} from './BrandIcons';
+import { sendAiChatMessageApi, AiChatMessage } from '../api/client';
 
-interface ChatMessage {
+interface ChatTurn {
   id: string;
-  sender: 'bot' | 'user';
+  role: 'user' | 'assistant';
   text: string;
-  userQueryContext?: string;
   showFallbackActions?: boolean;
 }
 
-const QUICK_REPLY_CHIPS = [
-  'Pricing & Packages',
-  'Local Business Map Pack',
-  'WhatsApp AI Bot Demo',
-  'Talk to Founders',
+const FOCUS_PROMPT_SUGGESTIONS: string[] = [
+  'Mere business ke liye website aur bot ka kharcha kitna aayega?',
+  'How do you get local clinics into the Google Maps #Top pack?',
+  'Can I test a live demo of your WhatsApp AI bot?',
 ];
+
+function isHinglishOrHindiQuery(raw: string): boolean {
+  const q = raw.toLowerCase();
+  const hinglishMarkers = [
+    'mere',
+    'mera',
+    'meri',
+    'ke liye',
+    'kharcha',
+    'kitna',
+    'aayega',
+    'kaise',
+    'kya',
+    'hai',
+    'hain',
+    'batao',
+    'chahiye',
+    'banwana',
+    'banani',
+    'dukan',
+    'business ke',
+    'paisa',
+    'price kya',
+    'naam',
+    'aap',
+    'karo',
+  ];
+  return hinglishMarkers.some((marker) => q.includes(marker));
+}
 
 function evaluateClientFallbackIntent(query: string): {
   reply: string;
-  needsHumanFallback: boolean;
+  showFallbackActions: boolean;
 } {
   const q = query.toLowerCase();
+  const isHi = isHinglishOrHindiQuery(query);
+
+  // Explicit human / founder / enterprise custom negotiation trigger
+  if (
+    q.includes('human') ||
+    q.includes('founder') ||
+    q.includes('call') ||
+    q.includes('talk to') ||
+    q.includes('baat kar') ||
+    q.includes('negotiate') ||
+    q.includes('custom contract') ||
+    q.includes('enterprise sla')
+  ) {
+    return {
+      reply: isHi
+        ? `Bilkul! Aap seedhe hamare Founding Architects (Aashif Khan ya Sachin Sahu) se WhatsApp ya Direct Call par baat kar sakte hain. Niche diye gaye button par tap karein. Kya main aapke project ka brief unko forward kar doon?`
+        : `You can connect directly with our Founding Architects (Aashif Khan or Sachin Sahu) via WhatsApp or Direct Call using the buttons below. Would you like me to note down your industry before you connect?`,
+      showFallbackActions: true,
+    };
+  }
 
   if (
     q.includes('price') ||
-    q.includes('pricing') ||
-    q.includes('package') ||
     q.includes('cost') ||
-    q.includes('budget')
+    q.includes('budget') ||
+    q.includes('rate') ||
+    q.includes('charge') ||
+    q.includes('kharcha') ||
+    q.includes('kitna')
   ) {
     return {
-      reply:
-        'SkyLine Digital Agency offers 3 fixed-milestone tiers:\n• Local Business / Starter: ₹25,000 – ₹60,000\n• Growth Website + WhatsApp Automation: ₹60,000 – ₹1,50,000\n• Full-Stack SaaS / Performance Ad Engine: ₹1,50,000 – ₹3,50,000+\nTimelines: Fast-Track 10–18 Days | Standard Sprint 3–6 Weeks.',
-      needsHumanFallback: true,
+      reply: isHi
+        ? `Hamare fixed-scope packages bahut clear hain:\n• Local Growth & Google Maps #Top Pack: ₹15k se ₹35k\n• Custom Next.js Web App + WhatsApp AI Bot: ₹35k se ₹85k\n• Multi-Tenant SaaS, ERP & Cloud Systems: ₹90k se ₹2.5L+\n\nHar project 14 se 28 din mein deliver hota hai aur 100% source code ownership aapki hoti hai. Aapka business kis industry mein hai?`
+        : `Our transparent milestone packages are:\n• Local Growth & Google Maps #Top Pack: ₹15k to ₹35k\n• Custom Next.js Web App + WhatsApp AI Bot: ₹35k to ₹85k\n• Multi-Tenant SaaS, ERP & Cloud Systems: ₹90k to ₹2.5L+\n\nAll builds ship in 14 to 28 days with 100% source code ownership. Which industry is your business in?`,
+      showFallbackActions: false,
     };
   }
 
   if (
     q.includes('local') ||
-    q.includes('map') ||
     q.includes('clinic') ||
-    q.includes('salon') ||
-    q.includes('review')
+    q.includes('showroom') ||
+    q.includes('shop') ||
+    q.includes('map')
   ) {
     return {
-      reply:
-        'Our Local Business Map Pack Engine ranks clinics, salons, showrooms, and retail stores #1 on Google Maps, installs Smart QR 5-Star Review Standees, and automates 24/7 WhatsApp booking—driving 3.2x more daily calls and walk-ins.',
-      needsHumanFallback: true,
+      reply: isHi
+        ? `Local clinics, showrooms, aur retail stores ke liye hum 14 se 21 din mein Google Business Profile entity schema, local citation hubs, aur Smart QR 5-Star Review stands lagate hain taaki aap Google Map Pack #Top mein rank karein. Saath hi 24/7 WhatsApp booking bot har inquiry ko 6 second mein capture karta hai. Aapka clinic ya store kis city mein hai?`
+        : `For clinics, showrooms, and retail businesses, we deploy Google Business Profile entity schema, local citation hubs, and Smart QR 5-Star Review stands to rank you in the Google Map Pack #Top within 30 days, paired with a 24/7 WhatsApp booking bot. What city and category do you operate in?`,
+      showFallbackActions: false,
     };
   }
 
   if (
-    q.includes('whatsapp') ||
-    q.includes('bot') ||
     q.includes('demo') ||
+    q.includes('bot') ||
+    q.includes('whatsapp') ||
     q.includes('crm') ||
     q.includes('ai')
   ) {
     return {
-      reply:
-        'We engineer 24/7 Autonomous WhatsApp AI Bots on the Official WhatsApp Cloud API that respond in under 1.2s, share catalogs, qualify budgets, and sync appointments directly to your calendar.',
-      needsHumanFallback: true,
+      reply: isHi
+        ? `Hamara Official WhatsApp Cloud AI Bot har nayi inquiry ko 6 second ke andar reply karta hai, unka budget aur requirement puchta hai, PDF brochure bhejta hai, aur calendar slot book kar deta hai. Aap is website ke 'Our Work' ya 'Services' section mein 'Launch Live Interactive Prototype' button daba kar abhi live demo test kar sakte hain! Kya aap real estate, clinic, ya e-commerce ke liye bot dekh rahe hain?`
+        : `Our Official WhatsApp Cloud AI Bot greets inbound leads in under 6 seconds, qualifies budget and requirements, dispatches PDF brochures, and locks calendar slots automatically. You can test the live interactive simulator right now by clicking 'Launch Live Interactive Prototype' on our Services or Work cards. Are you looking to automate bookings or sales follow-ups?`,
+      showFallbackActions: false,
     };
   }
 
   if (
-    q.includes('founder') ||
-    q.includes('talk') ||
-    q.includes('aashif') ||
-    q.includes('sachin') ||
-    q.includes('call') ||
-    q.includes('human') ||
-    q.includes('location') ||
-    q.includes('email')
+    q.includes('refer') ||
+    q.includes('15%') ||
+    q.includes('commission') ||
+    q.includes('student') ||
+    q.includes('mentor')
   ) {
     return {
-      reply:
-        'SkyLine Digital Agency is founded by Aashif Khan (Full-Stack & Cybersecurity Architect) and Sachin Sahu (Java Backend & Distributed Systems Architect) in Indore, Bhopal, Madhya Pradesh, India (Official Email: skylinedigital@gmail.com). Connect directly with us below:',
-      needsHumanFallback: true,
-    };
-  }
-
-  if (q.includes('refer') || q.includes('15%') || q.includes('commission')) {
-    return {
-      reply:
-        'Our Partner Referral Program pays a direct 15% UPI/Bank commission on any referred client project as soon as their onboarding invoice clears.',
-      needsHumanFallback: false,
+      reply: isHi
+        ? `Hamare Offer & Referral page par 2 programs hain:\n1. 15% Partner Commission: Kisi bhi business ko refer karne par deal close hote hi 48 ghante mein 15% direct UPI/bank payout.\n2. 1-on-1 Engineering Mentorship & Project Lab (₹599 se ₹3,999): B.Tech/BCA/MCA students aur founders ke liye live code review aur architecture coaching.\n\nAap partner referral mein interested hain ya engineering mentorship mein?`
+        : `We run two programs on our Offer & Referral page:\n1. 15% Partner Commission: Introduce a client and receive a 15% cash payout within 48 hours of invoice settlement.\n2. 1-on-1 Engineering Mentorship & Project Lab (₹599 to ₹3,999): Live architecture and code coaching for B.Tech/BCA/MCA builders and student founders.\n\nWhich program would you like to explore?`,
+      showFallbackActions: false,
     };
   }
 
   return {
-    reply:
-      'I can connect you straight to our Founding Architects for a custom scope, discount discussion, or live technical teardown. Choose your preferred channel below:',
-    needsHumanFallback: true,
+    reply: isHi
+      ? `Main Sky Bot hoon, SkyLine Digital Agency (Indore, MP) ka AI SDR Agent. Hum sub-100ms Next.js websites, SaaS platforms, 24/7 WhatsApp booking bots, aur Google Maps #Top growth systems banate hain. Agar aap seedhe founders se baat karna chahte hain, toh niche WhatsApp ya Call चुन sakte hain. Aap abhi apne business mein kaunsa bottleneck solve karna chahte hain?`
+      : `I am Sky Bot, the AI SDR Agent for SkyLine Digital Agency in Indore, MP. We build fast Next.js web apps, SaaS platforms, 24/7 WhatsApp booking bots, and Google Maps #Top growth systems. You can also connect with our founders below if you need a custom quote. What is the main bottleneck you want to solve right now?`,
+    showFallbackActions: true,
   };
 }
 
 export const SkylineAiChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [aiMode, setAiMode] = useState<'standard' | 'fast'>('standard');
-  const [isRecordingMic, setIsRecordingMic] = useState(false);
-  const [liveVoiceActive, setLiveVoiceActive] = useState(false);
-  const [liveStatusText, setLiveStatusText] = useState<string | null>(null);
-
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatTurn[]>([
     {
-      id: 'welcome-msg',
-      sender: 'bot',
-      text: 'Welcome to SkyLine Digital Agency! Ask me about our Web/SaaS engineering, 24/7 WhatsApp AI Bots, Local Google Map Pack packages, pricing tiers, or timelines.',
-      showFallbackActions: true,
-      userQueryContext: 'Hi SkyLine Digital Agency! I would like to discuss a project.',
+      id: 'welcome-1',
+      role: 'assistant',
+      text: 'Hi! I am Sky Bot, SkyLine Digital Agency’s AI SDR Agent. Ask me about project pricing, 24/7 WhatsApp bots, or Google Map Pack #Top growth (in English or Hinglish). What are you building right now?',
+      showFallbackActions: false,
     },
   ]);
 
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const liveWsRef = useRef<WebSocket | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isTyping, isOpen]);
+  }, [messages, loading, isOpen]);
 
-  useEffect(() => {
-    return () => {
-      liveWsRef.current?.close();
-    };
-  }, []);
-
-  const speakReply = (text: string) => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      try {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.04;
-        window.speechSynthesis.speak(utterance);
-      } catch {
-        // Ignore speech synthesis errors on headless browsers
-      }
-    }
-  };
-
-  const sendMessage = async (rawText: string, speakResponse = false) => {
+  const sendMessage = async (rawText: string) => {
     const trimmed = rawText.trim();
-    if (!trimmed || isTyping) return;
+    if (!trimmed || loading) return;
 
-    const userMsg: ChatMessage = {
-      id: `user-${Date.now()}`,
-      sender: 'user',
+    const userTurn: ChatTurn = {
+      id: `u-${Date.now()}`,
+      role: 'user',
       text: trimmed,
     };
 
-    const nextHistory = [...messages, userMsg].map((m) => ({
-      role: m.sender === 'user' ? ('user' as const) : ('model' as const),
-      text: m.text,
-    }));
-
-    setMessages((prev) => [...prev, userMsg]);
+    const nextMessages = [...messages, userTurn];
+    setMessages(nextMessages);
     setInput('');
-    setIsTyping(true);
+    setIsInputFocused(false);
+    setLoading(true);
 
     try {
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: trimmed,
-          messages: nextHistory,
-          mode: aiMode,
-        }),
+      const historyPayload: AiChatMessage[] = nextMessages
+        .slice(-6)
+        .map((m) => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          text: m.text,
+        }));
+
+      const res = await sendAiChatMessageApi({
+        message: trimmed,
+        mode: 'fast',
+        history: historyPayload,
       });
 
-      if (response.ok) {
-        const data = (await response.json()) as {
-          reply?: string;
-          needsHumanFallback?: boolean;
-        };
-        const fallback = evaluateClientFallbackIntent(trimmed);
-        const replyText = data.reply || fallback.reply;
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `bot-${Date.now()}`,
-            sender: 'bot',
-            text: replyText,
-            userQueryContext: trimmed,
-            showFallbackActions: data.needsHumanFallback ?? true,
-          },
-        ]);
-        if (speakResponse || liveVoiceActive) {
-          speakReply(replyText);
-        }
-      } else {
-        const fallback = evaluateClientFallbackIntent(trimmed);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `bot-${Date.now()}`,
-            sender: 'bot',
-            text: fallback.reply,
-            userQueryContext: trimmed,
-            showFallbackActions: true,
-          },
-        ]);
-      }
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `a-${Date.now()}`,
+          role: 'assistant',
+          text: res.reply,
+          showFallbackActions: Boolean(res.showFallbackActions),
+        },
+      ]);
     } catch {
       const fallback = evaluateClientFallbackIntent(trimmed);
       setMessages((prev) => [
         ...prev,
         {
-          id: `bot-${Date.now()}`,
-          sender: 'bot',
+          id: `a-${Date.now()}`,
+          role: 'assistant',
           text: fallback.reply,
-          userQueryContext: trimmed,
-          showFallbackActions: true,
+          showFallbackActions: fallback.showFallbackActions,
         },
       ]);
     } finally {
-      setIsTyping(false);
+      setLoading(false);
     }
   };
 
-  // Microphone Audio Transcription via /api/ai/transcribe (gemini-3.5-transcribe)
-  const toggleMicRecording = async () => {
-    if (isRecordingMic) {
-      mediaRecorderRef.current?.stop();
-      setIsRecordingMic(false);
-      return;
-    }
-
-    if (!navigator.mediaDevices?.getUserMedia) {
-      void sendMessage('Pricing & Packages', true);
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
-      };
-
-      recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64 =
-            typeof reader.result === 'string' ? reader.result.split(',')[1] || '' : '';
-          if (!base64) return;
-          setIsTyping(true);
-          try {
-            const res = await fetch('/api/ai/transcribe', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                audioBase64: base64,
-                mimeType: blob.type || 'audio/webm',
-              }),
-            });
-            if (res.ok) {
-              const data = (await res.json()) as { transcript?: string };
-              if (data.transcript) {
-                setIsTyping(false);
-                void sendMessage(data.transcript, true);
-                return;
-              }
-            }
-          } catch {
-            // Fallback
-          }
-          setIsTyping(false);
-        };
-        reader.readAsDataURL(blob);
-      };
-
-      mediaRecorderRef.current = recorder;
-      recorder.start();
-      setIsRecordingMic(true);
-    } catch {
-      void sendMessage('Pricing & Packages', true);
-    }
-  };
-
-  // Real-Time Gemini 3.8 Live Voice WebSocket Toggle (/ws/ai-live)
-  const toggleLiveVoiceSession = () => {
-    if (liveVoiceActive) {
-      liveWsRef.current?.close();
-      liveWsRef.current = null;
-      setLiveVoiceActive(false);
-      setLiveStatusText(null);
-      return;
-    }
-
-    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${proto}//${window.location.host}/ws/ai-live`;
-    try {
-      const ws = new WebSocket(wsUrl);
-      liveWsRef.current = ws;
-      setLiveVoiceActive(true);
-      setLiveStatusText('Connecting to SkyLine Live Voice...');
-
-      ws.onopen = () => {
-        setLiveStatusText('Gemini 3.8 Live Voice Active — Speak or click a prompt');
-        ws.send(
-          JSON.stringify({
-            type: 'prompt',
-            text: 'Pricing & Packages overview',
-          })
-        );
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data) as {
-            type?: string;
-            text?: string;
-            needsHumanFallback?: boolean;
-          };
-          if (data.type === 'voice_reply' && data.text) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: `live-${Date.now()}`,
-                sender: 'bot',
-                text: data.text!,
-                showFallbackActions: data.needsHumanFallback ?? true,
-              },
-            ]);
-            speakReply(data.text);
-          }
-        } catch {
-          // Ignore non-JSON frames
-        }
-      };
-
-      ws.onclose = () => {
-        setLiveVoiceActive(false);
-        setLiveStatusText(null);
-      };
-    } catch {
-      setLiveVoiceActive(false);
-      setLiveStatusText(null);
-    }
-  };
+  // Routes to Sachin's active WhatsApp (918959144686)
+  const whatsappUrl = `https://wa.me/${SKYLINE_SACHIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    'Hi SkyLine Digital Agency! I was chatting with Sky Bot and would like to discuss my project.'
+  )}`;
 
   return (
     <>
-      {/* Launcher Button in Bottom-Right Floating Action Stack (Custom Branded Chat-Logo Icon — Zero Robot Icon) */}
+      {/* Floating Launcher Pill Button (Custom S+A Chat-Monogram Icon) */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        aria-label="Open SkyLine AI Assistant"
-        data-testid="skyline-ai-launcher"
-        className="h-12 pl-2 pr-4 rounded-full bg-[#09090B] text-[#F4F4F5] border border-white/20 shadow-2xl inline-flex items-center justify-center gap-2.5 hover:scale-105 transition-transform cursor-pointer"
+        aria-label={isOpen ? 'Close Sky Bot Assistant' : 'Open Sky Bot Assistant'}
+        className="inline-flex items-center gap-2.5 pl-2 pr-4 py-2 min-h-[48px] rounded-full bg-[#09090B] text-[#F4F4F5] border border-white/15 shadow-2xl hover:scale-[1.03] transition-transform cursor-pointer"
       >
         <SkyLineAiChatIcon size="sm" />
-        <span className="font-display text-xs font-bold tracking-tight whitespace-nowrap">
-          SkyLine AI
-        </span>
+        <div className="text-left leading-tight">
+          <div className="text-[11px] font-display font-bold tracking-tight flex items-center gap-1.5">
+            <span>Sky Bot</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+          </div>
+          <div className="font-mono-tech text-[9px] text-zinc-400">
+            Ask Pricing &amp; Scope
+          </div>
+        </div>
       </button>
 
-      {/* Chat Drawer / Window */}
+      {/* Chat Drawer Window */}
       {isOpen && (
         <div
           role="dialog"
-          aria-label="SkyLine AI Assistant"
-          data-testid="skyline-ai-dialog"
-          className="fixed bottom-20 sm:bottom-6 right-4 sm:right-40 z-50 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[80vh] rounded-3xl surface-card border border-[var(--border-strong)] shadow-2xl flex flex-col overflow-hidden"
+          aria-label="Sky Bot AI SDR Agent"
+          className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[78vh] rounded-3xl surface-card border border-[var(--border-metallic)] shadow-2xl flex flex-col overflow-hidden"
         >
-          {/* Header with Custom Branded <SkyLineAiChatIcon /> + Mode & Live Voice Controls */}
-          <div className="px-4 py-3.5 bg-[#09090B] text-[#F4F4F5] flex items-center justify-between gap-2 border-b border-white/10">
+          {/* Top Header — Zero Model Names, Clean Piper-Style SDR Header */}
+          <div className="p-4 bg-[#09090B] text-[#F4F4F5] flex items-center justify-between gap-2 border-b border-white/10">
             <div className="flex items-center gap-2.5">
-              <SkyLineAiChatIcon size="md" />
+              <SkyLineAiChatIcon size="sm" />
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-display font-bold text-sm text-white">
-                    SkyLine AI Assistant
+                <div className="font-display text-sm font-bold flex items-center gap-1.5">
+                  <span>Sky Bot</span>
+                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-[9px] font-mono-tech uppercase text-zinc-200">
+                    Online
                   </span>
-                  <span className="w-2 h-2 rounded-full bg-[#E4E4E7]" />
                 </div>
                 <div className="text-[10px] font-mono-tech text-zinc-400">
-                  {aiMode === 'fast' ? 'Flash-Lite Low-Latency' : 'Gemini 3.8 Flash Core'}
+                  SkyLine AI SDR Agent
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              {/* Fast vs Standard Mode Toggle */}
-              <button
-                type="button"
-                onClick={() =>
-                  setAiMode((prev) => (prev === 'standard' ? 'fast' : 'standard'))
-                }
-                title="Toggle Fast vs Standard AI Mode"
-                className={`px-2.5 py-1 rounded-full font-mono-tech text-[10px] font-bold inline-flex items-center gap-1 cursor-pointer border transition-colors ${
-                  aiMode === 'fast'
-                    ? 'bg-white text-[#09090B] border-white'
-                    : 'bg-white/10 text-zinc-200 border-white/15 hover:bg-white/15'
-                }`}
-              >
-                <Zap className="w-3 h-3" />
-                <span>{aiMode === 'fast' ? 'Fast' : 'Pro'}</span>
-              </button>
-
-              {/* Live Voice Session Toggle */}
-              <button
-                type="button"
-                onClick={toggleLiveVoiceSession}
-                aria-label="Toggle Gemini Live Voice Mode"
-                title="Live Voice Mode"
-                className={`px-2.5 py-1 rounded-full font-mono-tech text-[10px] font-bold inline-flex items-center gap-1 cursor-pointer border transition-colors ${
-                  liveVoiceActive
-                    ? 'bg-[#E4E4E7] text-[#09090B] border-[#E4E4E7]'
-                    : 'bg-white/10 text-zinc-200 border-white/15 hover:bg-white/15'
-                }`}
-              >
-                <Radio className="w-3 h-3" />
-                <span>Live</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                aria-label="Close SkyLine AI Assistant"
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white inline-flex items-center justify-center cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close Sky Bot Window"
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Live Voice Status Banner */}
-          {liveStatusText && (
-            <div className="px-4 py-2 bg-[#18181B] text-[#E4E4E7] border-b border-white/10 flex items-center justify-between text-[11px] font-mono-tech">
-              <span className="inline-flex items-center gap-1.5">
-                <Volume2 className="w-3.5 h-3.5 text-[#E4E4E7]" />
-                <span>{liveStatusText}</span>
-              </span>
-            </div>
-          )}
-
-          {/* Quick-Reply Chips */}
-          <div className="px-4 py-2.5 bg-[var(--bg-elevated)] border-b border-[var(--border-hairline)] flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            {QUICK_REPLY_CHIPS.map((chip) => (
-              <button
-                key={chip}
-                type="button"
-                onClick={() => void sendMessage(chip)}
-                className="px-3 py-1.5 rounded-full surface-card text-[11px] font-display font-semibold text-[var(--text-primary)] hover:border-[var(--text-primary)] whitespace-nowrap cursor-pointer shrink-0 transition-colors"
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
-
-          {/* Messages Feed */}
+          {/* Messages Stream */}
           <div
-            ref={scrollContainerRef}
-            className="p-4 space-y-3.5 overflow-y-auto flex-1 max-h-[340px] bg-[var(--bg-canvas)]"
+            ref={scrollRef}
+            className="flex-1 p-4 space-y-3 overflow-y-auto max-h-[360px] bg-[var(--bg-canvas)]"
           >
-            {messages.map((msg) => {
-              const waText = encodeURIComponent(
-                `Hi SkyLine Digital Agency! My question: ${msg.userQueryContext || msg.text}`
-              );
-              const waHref = `https://wa.me/${SKYLINE_SACHIN_WHATSAPP_NUMBER}?text=${waText}`;
+            {messages.map((m) => (
+              <div
+                key={m.id}
+                className={`flex flex-col gap-2 ${
+                  m.role === 'user' ? 'items-end' : 'items-start'
+                }`}
+              >
+                <div className="flex items-start gap-2 max-w-[90%]">
+                  {m.role === 'assistant' && (
+                    <div className="mt-0.5 shrink-0">
+                      <SkyLineAiChatIcon className="w-6 h-6" />
+                    </div>
+                  )}
 
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${
-                    msg.sender === 'user' ? 'items-end' : 'items-start'
-                  }`}
-                >
                   <div
-                    className={`max-w-[88%] rounded-2xl px-4 py-3 text-xs leading-relaxed whitespace-pre-line ${
-                      msg.sender === 'user'
-                        ? 'bg-[#141518] text-[#F4F3EF] rounded-br-xs'
-                        : 'surface-card text-[var(--text-primary)] rounded-bl-xs'
+                    className={`rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line ${
+                      m.role === 'user'
+                        ? 'bg-[#09090B] text-[#F4F4F5] dark:bg-[#F4F4F5] dark:text-[#09090B] font-medium'
+                        : 'surface-card text-[var(--text-primary)]'
                     }`}
                   >
-                    {msg.text}
-
-                    {/* Mandatory Fallback Action Buttons Inside Bot Bubble */}
-                    {msg.sender === 'bot' && msg.showFallbackActions && (
-                      <div className="mt-3 pt-2.5 border-t border-[var(--border-hairline)] grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <a
-                          href={waHref}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-2 rounded-xl btn-whatsapp-official font-display font-semibold text-[11px] inline-flex items-center justify-center gap-1.5 hover:opacity-95 transition-opacity"
-                        >
-                          <WhatsAppLogoIcon className="w-3.5 h-3.5 shrink-0" />
-                          <span>Chat on WhatsApp</span>
-                          <ArrowRight className="w-3 h-3 shrink-0" />
-                        </a>
-
-                        <a
-                          href={`tel:${SKYLINE_CALL_NUMBER}`}
-                          className="px-3 py-2 rounded-xl bg-[#09090B] text-[#F4F4F5] border border-white/15 font-display font-semibold text-[11px] inline-flex items-center justify-center gap-1.5 hover:opacity-95 transition-opacity"
-                        >
-                          <PhoneCall className="w-3.5 h-3.5 text-[#E4E4E7] shrink-0" />
-                          <span>Call Lead Architect</span>
-                          <ArrowRight className="w-3 h-3 shrink-0" />
-                        </a>
-                      </div>
-                    )}
+                    {m.text}
                   </div>
-                </div>
-              );
-            })}
 
-            {isTyping && (
-              <div className="flex items-start">
-                <div className="surface-card rounded-2xl px-4 py-2.5 text-xs text-[var(--text-secondary)]">
-                  SkyLine AI is analyzing...
+                  {m.role === 'user' && (
+                    <div className="w-6 h-6 rounded-full surface-elevated flex items-center justify-center shrink-0 mt-0.5">
+                      <User className="w-3.5 h-3.5 text-[var(--text-secondary)]" />
+                    </div>
+                  )}
                 </div>
+
+                {/* Conditional Escalation Actions: ONLY rendered when showFallbackActions is true */}
+                {m.role === 'assistant' && m.showFallbackActions && (
+                  <div className="pl-8 flex flex-wrap items-center gap-2 pt-0.5">
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl btn-whatsapp-official text-[11px] font-semibold"
+                    >
+                      <WhatsAppLogoIcon className="w-3.5 h-3.5" />
+                      <span>WhatsApp Us</span>
+                    </a>
+                    <a
+                      href={`tel:${SKYLINE_CALL_NUMBER}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl btn-platinum-primary text-[11px] font-semibold"
+                    >
+                      <PhoneCall className="w-3 h-3" />
+                      <span>Call Us</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {loading && (
+              <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)] pl-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--text-primary)]" />
+                <span>Sky Bot is typing...</span>
               </div>
             )}
           </div>
 
-          {/* Input Bar with Audio Transcription Mic Button */}
+          {/* Floating Input-Focus Prompt Suggestions Tray (Shown when input is focused) */}
+          {isInputFocused && (
+            <div className="px-3.5 py-2.5 bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-bold">
+                  Ask me things like:
+                </span>
+                <button
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setIsInputFocused(false);
+                  }}
+                  className="text-[10px] font-mono-tech text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
+                >
+                  Hide
+                </button>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {FOCUS_PROMPT_SUGGESTIONS.map((promptText) => (
+                  <button
+                    key={promptText}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      void sendMessage(promptText);
+                    }}
+                    className="w-full text-left text-[11px] px-3 py-2 rounded-xl surface-card hover:bg-[var(--bg-elevated)] text-[var(--text-primary)] transition-colors cursor-pointer font-medium"
+                  >
+                    {promptText}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Input Bar */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
               void sendMessage(input);
             }}
-            className="p-3 bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] flex items-center gap-2"
+            className="p-3 bg-[var(--bg-canvas)] border-t border-[var(--border-hairline)] flex items-center gap-2"
           >
-            <button
-              type="button"
-              onClick={() => void toggleMicRecording()}
-              aria-label={isRecordingMic ? 'Stop voice recording' : 'Voice input microphone'}
-              title={isRecordingMic ? 'Stop Recording' : 'Speak your question'}
-              className={`w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
-                isRecordingMic
-                  ? 'bg-rose-500 text-white animate-pulse'
-                  : 'surface-elevated text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {isRecordingMic ? (
-                <MicOff className="w-4 h-4" />
-              ) : (
-                <Mic className="w-4 h-4" />
-              )}
-            </button>
-
             <input
               type="text"
               value={input}
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => {
+                setTimeout(() => setIsInputFocused(false), 180);
+              }}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about pricing, Map Pack, or AI bots..."
-              className="flex-1 px-3.5 py-2.5 rounded-xl surface-elevated text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--text-primary)]"
+              placeholder="Ask Sky Bot in English or Hinglish..."
+              aria-label="Ask Sky Bot a question"
+              className="flex-1 px-3.5 py-2.5 rounded-xl surface-elevated text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)]"
             />
             <button
               type="submit"
-              aria-label="Send message to SkyLine AI"
-              className="w-10 h-10 rounded-xl btn-platinum-primary inline-flex items-center justify-center shrink-0 cursor-pointer"
+              disabled={!input.trim() || loading}
+              aria-label="Send message"
+              className="w-10 h-10 rounded-xl btn-platinum-primary flex items-center justify-center disabled:opacity-40 cursor-pointer shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>
           </form>
+
+          {/* Subtle Email Footer */}
+          <div className="px-4 py-1.5 bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] flex items-center justify-between text-[10px] font-mono-tech text-[var(--text-muted)]">
+            <span>Indore, MP • 24/7 SDR Desk</span>
+            <a href={`mailto:${SKYLINE_EMAIL}`} className="hover:underline">
+              {SKYLINE_EMAIL}
+            </a>
+          </div>
         </div>
       )}
     </>

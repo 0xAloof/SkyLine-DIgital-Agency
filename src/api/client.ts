@@ -480,46 +480,27 @@ export async function createProjectApi(
   const db = getLocalFallbackDb();
   const newProject: ShowcaseProject = {
     id: `project-${Date.now().toString().slice(-5)}`,
-    statusBadge: payload.statusBadge || 'LIVE PRODUCTION',
     accentColor: payload.accentColor || 'indigo',
     category: (payload.category || 'WEB & SAAS').toUpperCase(),
     title: payload.title || 'Untitled Case Study',
-    locationTag: payload.locationTag || 'Indore • Pan-India Edge',
+    locationTag: payload.locationTag || 'Indore, MP • Pan-India Edge',
     tags: payload.tags || 'Next.js 15 • WhatsApp Cloud API • Meta CAPI',
     metricsHeadline: payload.metricsHeadline || '+165% Qualified Pipeline',
     metricsSub:
       payload.metricsSub || 'Full-stack conversion system with instant WhatsApp lead routing.',
-    architectureNodes: payload.architectureNodes || [
-      'Next.js Edge UI',
-      'WhatsApp Cloud Bot',
-      'Server CAPI',
-    ],
     accentMetric: payload.accentMetric || '99 CWV · <6s SLA',
-    imageUrl: payload.imageUrl || '',
-    fallbackSvgUrl: '/assets/hero-system-preview.svg',
+    imageUrl:
+      payload.imageUrl ||
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=80',
     problemStatement:
       payload.problemStatement ||
       'High acquisition leakage and slow manual sales follow-ups across digital channels.',
     architectureSummary:
       payload.architectureSummary ||
       'Engineered a sub-100ms Next.js platform integrated with WhatsApp Cloud API and server-side Meta CAPI attribution.',
-    impactMetrics: payload.impactMetrics || [
-      { label: 'Conversion Velocity', before: '1.4%', after: '3.8%', delta: '+171% Lift' },
-      { label: 'WhatsApp SLA', before: '8 Hours', after: '< 6 Seconds', delta: '24/7 Bot' },
-      { label: 'Mobile CWV', before: '58 / 100', after: '99 / 100', delta: '84ms TTFB' },
-    ],
-    stackPills: payload.stackPills || ['Next.js 15', 'TypeScript', 'WhatsApp Cloud API'],
-    clientType: payload.clientType || payload.locationTag || 'Enterprise Client',
-    categoryTag: (payload.categoryTag || payload.category || 'WEB & SAAS').toUpperCase(),
-    summary:
-      payload.summary ||
-      payload.architectureSummary ||
-      'Engineered a sub-100ms Next.js platform integrated with WhatsApp Cloud API and server-side Meta CAPI attribution.',
-    impactMetric: payload.impactMetric || payload.metricsHeadline || '+165% Qualified Pipeline',
-    secondaryMetric: payload.secondaryMetric || payload.accentMetric || '99 CWV · <6s SLA',
-    techStack: payload.techStack ||
-      payload.stackPills || ['Next.js 15', 'TypeScript', 'WhatsApp Cloud API'],
-    livePreviewLabel: payload.livePreviewLabel || 'Case Study',
+    liveLatency: payload.liveLatency || '68ms TTFB',
+    roasOrLift: payload.roasOrLift || '+165% Pipeline',
+    artifactId: payload.artifactId || '360-views',
   };
   db.projects.unshift(newProject);
   saveLocalFallbackDb(db);
@@ -562,41 +543,26 @@ export async function createServiceApi(
   const db = getLocalFallbackDb();
   const newService: CapabilityPillar = {
     id: `service-${Date.now().toString().slice(-5)}`,
-    index: `0${db.services.length + 1}`,
+    code: `0${db.services.length + 1}`,
     categoryLabel: (payload.categoryLabel || 'CUSTOM ARCHITECTURE').toUpperCase(),
     shortTab: payload.shortTab || 'Custom System',
-    badgeTag: payload.badgeTag || 'Enterprise SLA',
     accentColor: payload.accentColor || 'indigo',
     title: payload.title || 'Custom Engineering Pillar',
-    leadSentence: payload.leadSentence || 'High-velocity engineering and automated growth.',
-    subtitle: (payload.categoryLabel || 'CUSTOM ARCHITECTURE').toUpperCase(),
-    description:
-      payload.description ||
+    subtitle:
       payload.subtitle ||
       'Custom-engineered architecture designed for sub-second speed and measurable ROI.',
-    architectureNote: 'Next.js 15 · TypeScript · PostgreSQL · WhatsApp Cloud API',
     outcomeMetric: payload.outcomeMetric || '+150% Pipeline Conversion Velocity',
-    timeline: payload.timeline || '2–3 Weeks Delivery',
-    metrics: payload.metrics || [
-      {
-        label: 'Target Outcome',
-        value: payload.outcomeMetric || '+150%',
-        delta: payload.timeline || '2–3 Weeks',
-      },
-      { label: 'Availability SLA', value: '99.98%', delta: 'Zero-Downtime' },
-    ],
-    deliverables: payload.deliverables || [
-      {
-        name: 'Custom Architecture Blueprint',
-        spec: 'Full-stack Next.js / Node deployment with WhatsApp & CRM webhook sync',
-        impact: payload.outcomeMetric || '+150% velocity',
-      },
-    ],
-    architectureSpecs: payload.architectureSpecs || [
-      { key: 'Core Stack', val: 'Next.js 15 · TypeScript · PostgreSQL' },
-      { key: 'Performance Target', val: '99+ Lighthouse · <100ms TTFB' },
-    ],
-    previewMode: 'web-vitals',
+    timeline: payload.timeline || '2 to 3 Weeks Delivery',
+    deliverables: Array.isArray(payload.deliverables)
+      ? payload.deliverables
+      : ['Custom Next.js Architecture', 'Official WhatsApp Cloud Bot', 'Server-Side Analytics'],
+    techStack: payload.techStack || ['Next.js 15', 'TypeScript', 'PostgreSQL', 'WhatsApp Cloud API'],
+    architectureDiagram: payload.architectureDiagram || {
+      inputNode: 'Inbound Visitor Click',
+      processingNode: 'Sub-100ms Conversion & Bot Engine',
+      outputNode: 'Verified Pipeline Revenue',
+    },
+    artifactId: payload.artifactId || '360-views',
   };
   db.services.push(newService);
   saveLocalFallbackDb(db);
@@ -650,12 +616,14 @@ export async function createTestimonialApi(
     quote: payload.quote || 'Exceptional engineering velocity and measurable ROI.',
     author,
     role: payload.role || 'Founder & Director',
+    location: payload.location || 'Indore, MP',
+    accentColor: payload.accentColor || 'emerald',
     serviceTag: (payload.engagementScope || 'FULL-STACK & GROWTH SYSTEM').toUpperCase(),
     impactHighlight: payload.verifiedOutcome || '+190% Verified ROI',
     rating: 5,
     engagementScope: (payload.engagementScope || 'FULL-STACK & GROWTH SYSTEM').toUpperCase(),
     verifiedOutcome: payload.verifiedOutcome || '+190% Verified ROI',
-    relatedProjectId: payload.relatedProjectId || db.projects[0]?.id || 'proj-FinVantage',
+    relatedProjectId: payload.relatedProjectId || db.projects[0]?.id || 'proj-360-views',
   };
   db.testimonials.unshift(newReview);
   saveLocalFallbackDb(db);
@@ -701,7 +669,7 @@ export async function createFaqApi(payload: Partial<FaqItem>): Promise<FaqItem> 
     question: payload.question || 'How does the engineering sprint work?',
     answer:
       payload.answer ||
-      'We ship production-grade architectures in 2–4 weeks with weekly live staging milestones.',
+      'We ship production-grade architectures in 2 to 4 weeks with weekly live staging milestones.',
   };
   db.faqs.push(newFaq);
   saveLocalFallbackDb(db);
@@ -723,4 +691,40 @@ export async function deleteFaqApi(id: string): Promise<void> {
     db.faqs = db.faqs.filter((f) => f.id !== id);
     saveLocalFallbackDb(db);
   }
+}
+
+export interface AiChatMessage {
+  role: 'user' | 'model';
+  text: string;
+}
+
+export async function sendAiChatMessageApi(payload: {
+  message: string;
+  mode?: 'fast' | 'standard';
+  history?: AiChatMessage[];
+}): Promise<{
+  reply: string;
+  showFallbackActions: boolean;
+}> {
+  const res = await fetch('/api/ai/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: payload.message,
+      mode: payload.mode || 'fast',
+      messages: payload.history || [],
+    }),
+  });
+  if (!res.ok) {
+    throw new Error('AI chat endpoint returned error');
+  }
+  const data = (await res.json()) as {
+    reply: string;
+    needsHumanFallback?: boolean;
+    showFallbackActions?: boolean;
+  };
+  return {
+    reply: data.reply,
+    showFallbackActions: Boolean(data.showFallbackActions ?? data.needsHumanFallback),
+  };
 }

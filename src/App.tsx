@@ -40,7 +40,10 @@ function resolvePageFromHash(hash: string): PageId {
   if (clean === 'work' || clean === 'proof') {
     return 'work';
   }
-  if (clean === 'who-we-are' || clean === 'process') {
+  if (clean === 'how-we-deliver' || clean === 'process' || clean === 'roadmap') {
+    return 'how-we-deliver';
+  }
+  if (clean === 'who-we-are' || clean === 'founders') {
     return 'who-we-are';
   }
   if (clean === 'referral' || clean === 'faq') {
@@ -100,7 +103,15 @@ export function App() {
       const cms = await fetchPublicCms();
       if (cms.projects && cms.projects.length > 0) setProjects(cms.projects);
       if (cms.services && cms.services.length > 0) setServices(cms.services);
-      if (cms.testimonials && cms.testimonials.length > 0) setTestimonials(cms.testimonials);
+      if (cms.testimonials && cms.testimonials.length > 0) {
+        const mergedReviews = [
+          ...VERIFIED_REVIEWS,
+          ...cms.testimonials.filter(
+            (item) => !VERIFIED_REVIEWS.some((v) => v.id === item.id)
+          ),
+        ];
+        setTestimonials(mergedReviews);
+      }
       if (cms.faqs && cms.faqs.length > 0) setFaqs(cms.faqs);
     } catch {
       // Keep default seed if offline
@@ -254,7 +265,7 @@ export function App() {
           </>
         )}
 
-        {/* 4. WHO WE ARE PAGE: The SkyLine Doctrine + Founding Architects Cards + 3-Phase Delivery Roadmap */}
+        {/* 4. WHO WE ARE PAGE: The SkyLine Doctrine + Founding Architects Cards + 6-Phase Delivery Roadmap */}
         {activePage === 'who-we-are' && (
           <>
             <HeroSection
@@ -264,6 +275,14 @@ export function App() {
             />
             <ExecutionRoadmap onNavigate={handleNavigate} />
           </>
+        )}
+
+        {/* 4B. HOW WE DELIVER PAGE: Dedicated 6-Stage Engineering & Growth Delivery System */}
+        {activePage === 'how-we-deliver' && (
+          <ExecutionRoadmap
+            isDedicatedPage={true}
+            onNavigate={handleNavigate}
+          />
         )}
 
         {/* 5. OFFER & REFERRAL PAGE: 15% Partner Commission Program + INR Calculator + Referral Form + Common Questions (FAQ) */}

@@ -20,29 +20,55 @@ import {
   FOUNDER_PROFILES,
   HERO_ORBS,
   SKYLINE_LOCATION,
+  SKYLINE_SOCIAL_LINKS,
+  EXECUTION_ROADMAP,
+  VERIFIED_REVIEWS,
   TECH_STACK_MARQUEE_ROW_1,
   TECH_STACK_MARQUEE_ROW_2,
 } from '../data/agencyData';
 
 test('FOUNDER_PROFILES, location, and contact routing strictly match SkyLine Digital Agency specifications', () => {
-  assert.equal(SKYLINE_LOCATION, 'Indore, Bhopal, Madhya Pradesh, India');
+  assert.equal(SKYLINE_LOCATION, 'Indore, Madhya Pradesh, India');
+  assert.equal(SKYLINE_EMAIL, 'agencyskylinedigital@gmail.com');
   assert.equal(SKYLINE_WHATSAPP_NUMBER, '918959144686');
   assert.equal(SKYLINE_CALL_NUMBER, '+918643002478');
 
+  // Verify strictly 5 social links (GitHub, LinkedIn, Instagram, Telegram, X)
+  assert.deepEqual(
+    SKYLINE_SOCIAL_LINKS.map((s) => s.id),
+    ['github', 'linkedin', 'instagram', 'telegram', 'x']
+  );
+
+  // Verify 6-Stage Delivery System & 7 Verified Reviews
+  assert.equal(EXECUTION_ROADMAP.length, 6);
+  assert.equal(VERIFIED_REVIEWS.length, 7);
+
   assert.equal(FOUNDER_PROFILES.length, 2);
-  const aashif = FOUNDER_PROFILES.find((f) => f.id === 'aashif-khan');
-  const sachin = FOUNDER_PROFILES.find((f) => f.id === 'sachin-sahu');
-  assert.ok(aashif, 'Expected Aashif Khan founder profile');
-  assert.ok(sachin, 'Expected Sachin Sahu founder profile');
+  const sachin = FOUNDER_PROFILES[0];
+  const aashif = FOUNDER_PROFILES[1];
+  assert.equal(sachin.id, 'sachin-sahu');
+  assert.equal(sachin.role, 'Founder & CEO');
+  assert.equal(sachin.phone, '+91 89591 44686');
+  assert.equal(sachin.whatsappNumber, '918959144686');
+  assert.equal(sachin.email, 'Sachinsahuji06@gmail.com');
+  assert.equal(sachin.contactMode, 'whatsapp-only');
+  assert.equal('callNumber' in sachin, false);
+  assert.deepEqual(
+    sachin.projects.map((p) => p.name),
+    ['360 Views', 'ShadowBase', 'GridWeaver']
+  );
+
+  assert.equal(aashif.id, 'aashif-khan');
+  assert.equal(aashif.role, 'Co-Founder & System Architect');
   assert.equal(aashif.phone, '+91 86430 02478');
   assert.equal(aashif.whatsappNumber, '918643002478');
   assert.equal(aashif.callNumber, '+918643002478');
+  assert.equal(aashif.email, 'aashifkpp@gmail.com');
   assert.equal(aashif.contactMode, 'whatsapp-and-call');
-
-  assert.equal(sachin.phone, '+91 89591 44686');
-  assert.equal(sachin.whatsappNumber, '918959144686');
-  assert.equal(sachin.contactMode, 'whatsapp-only');
-  assert.equal('callNumber' in sachin, false);
+  assert.deepEqual(
+    aashif.projects.map((p) => p.name),
+    ['FileGuard AI', 'AI Career Guide & Mentor', 'Socialite', 'A&A Chocolates']
+  );
 
   // Verify zero student/intern tags in founder profiles
   const serializedFounders = JSON.stringify(FOUNDER_PROFILES);

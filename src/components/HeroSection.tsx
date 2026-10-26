@@ -43,6 +43,7 @@ import {
   BentoSolutionCard,
   ShowcaseProject,
   HeroOrbNode,
+  InteractiveArtifactId,
 } from '../data/agencyData';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import {
@@ -50,6 +51,7 @@ import {
   GmailBrandIcon,
   TechStackBrandIcon,
 } from './BrandIcons';
+import { InteractiveArtifactModal } from './InteractiveArtifactModal';
 import {
   GeometrySculptureMode,
   getMonochromaticPlatinumPalette,
@@ -841,7 +843,7 @@ const ArchitecturalBentoGraphic: React.FC<{ card: BentoSolutionCard }> = ({ card
           </div>
           <div className="text-[9px] text-zinc-400 flex justify-between">
             <span>24/7 AUTO-RESPONSE</span>
-            <span className="text-zinc-200">ZERO LEAD LEAKAGE</span>
+            <span className="text-zinc-200">INSTANT WEBHOOK CAPTURE</span>
           </div>
         </div>
       );
@@ -852,17 +854,17 @@ const ArchitecturalBentoGraphic: React.FC<{ card: BentoSolutionCard }> = ({ card
           <div className="flex items-center justify-between text-[10px] border-b border-zinc-800 pb-2">
             <span className="flex items-center gap-1.5 text-zinc-200">
               <TechStackBrandIcon name="Google Map Pack" className="w-3.5 h-3.5" />
-              <span>MAP PACK #1 RANKING</span>
+              <span>MAP PACK #TOP RANKING</span>
             </span>
             <span className="text-zinc-300">4.9 ★</span>
           </div>
           <div className="my-auto p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-bold text-white">Top-3 "Near Me" Pack</div>
+              <div className="text-[10px] font-bold text-white">Top 3 Local "Near Me" Pack</div>
               <div className="text-[9px] text-zinc-400">QR Review Standee + Local Citations</div>
             </div>
             <span className="px-2 py-1 rounded bg-zinc-100 text-zinc-950 text-[10px] font-bold">
-              3.2x CALLS
+              +215% CALLS
             </span>
           </div>
           <div className="text-[9px] text-zinc-400 flex justify-between">
@@ -880,7 +882,7 @@ const ArchitecturalBentoGraphic: React.FC<{ card: BentoSolutionCard }> = ({ card
               <TechStackBrandIcon name="Meta Ads" className="w-3.5 h-3.5" />
               <span>META CAPI + GOOGLE ADS</span>
             </span>
-            <span className="text-zinc-200">4.1x ROAS</span>
+            <span className="text-zinc-200">4.4x ROAS</span>
           </div>
           <div className="flex items-end gap-1.5 h-16 my-auto px-2">
             {[35, 48, 62, 75, 95].map((bar, idx) => (
@@ -904,14 +906,14 @@ const ArchitecturalBentoGraphic: React.FC<{ card: BentoSolutionCard }> = ({ card
           <div className="flex items-center justify-between text-[10px] border-b border-zinc-800 pb-2">
             <span className="flex items-center gap-1.5 text-zinc-200">
               <Search className="w-3.5 h-3.5 text-zinc-300" />
-              <span>TECHNICAL SEO & AEO</span>
+              <span>TECHNICAL SEO &amp; AEO</span>
             </span>
             <span className="text-zinc-200">+240%</span>
           </div>
           <div className="my-auto p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-300 space-y-1">
             <div className="flex justify-between">
               <span className="text-zinc-500">@type:</span>
-              <span className="text-zinc-100">"Organization & LocalBusiness"</span>
+              <span className="text-zinc-100">"Organization &amp; LocalBusiness"</span>
             </div>
             <div className="flex justify-between">
               <span className="text-zinc-500">AI Indexing:</span>
@@ -932,7 +934,7 @@ const ArchitecturalBentoGraphic: React.FC<{ card: BentoSolutionCard }> = ({ card
           <div className="flex items-center justify-between text-[10px] border-b border-zinc-800 pb-2">
             <span className="text-zinc-200">D2C STOREFRONT • 1-TAP UPI CHECKOUT ENGINE</span>
             <span className="px-2 py-0.5 rounded bg-zinc-100 text-zinc-950 font-bold">
-              +68% CONVERSION
+              +82% CONVERSION
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 my-auto">
@@ -946,11 +948,11 @@ const ArchitecturalBentoGraphic: React.FC<{ card: BentoSolutionCard }> = ({ card
             </div>
             <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
               <div className="text-[9px] text-zinc-400">MARKETPLACE FEE</div>
-              <div className="text-xs font-bold text-white mt-0.5">0% Direct Margin</div>
+              <div className="text-xs font-bold text-white mt-0.5">Direct D2C Margin</div>
             </div>
           </div>
           <div className="text-[9px] text-zinc-400 flex justify-between">
-            <span>INVENTORY & GST BILLING SYNC</span>
+            <span>INVENTORY &amp; GST BILLING SYNC</span>
             <span className="text-zinc-200">SUB-SECOND PRODUCT CATALOG</span>
           </div>
         </div>
@@ -990,14 +992,14 @@ const ArchitecturalProjectMockup: React.FC<{ project: ShowcaseProject }> = ({ pr
             <div className="col-span-7 p-3 rounded-xl bg-zinc-900 border border-zinc-800 space-y-1.5">
               <div className="flex items-center justify-between font-mono-tech text-[9px] text-zinc-400">
                 <span>GOOGLE MAP PACK RANK</span>
-                <span className="text-zinc-100">#1 ACROSS 6 CLINICS</span>
+                <span className="text-zinc-100">#TOP ACROSS 4 CLINICS</span>
               </div>
               <div className="text-xs font-semibold text-white">
                 Automated WhatsApp Slot Booking + QR Reviews
               </div>
               <div className="flex items-center gap-2 pt-1 font-mono-tech text-[9px] text-zinc-300">
                 <span className="px-2 py-0.5 rounded bg-zinc-800">4.9 ★ Rating</span>
-                <span className="px-2 py-0.5 rounded bg-zinc-800">Zero Missed Calls</span>
+                <span className="px-2 py-0.5 rounded bg-zinc-800">Instant Webhook Capture</span>
               </div>
             </div>
             <div className="col-span-5 p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-center">
@@ -1007,7 +1009,7 @@ const ArchitecturalProjectMockup: React.FC<{ project: ShowcaseProject }> = ({ pr
               </div>
             </div>
           </div>
-        ) : cat.includes('ADS') || cat.includes('COMMERCE') ? (
+        ) : cat.includes('ADS') || cat.includes('COMMERCE') || cat.includes('D2C') ? (
           <div className="grid grid-cols-12 gap-3 items-center">
             <div className="col-span-7 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
               <div className="font-mono-tech text-[9px] text-zinc-400 mb-2">
@@ -1038,7 +1040,7 @@ const ArchitecturalProjectMockup: React.FC<{ project: ShowcaseProject }> = ({ pr
                 <span>RAG AI WHATSAPP QUALIFIER</span>
               </div>
               <div className="text-xs text-zinc-200">
-                Instant brochure dispatch & automated site-visit calendar sync.
+                Instant brochure dispatch &amp; automated site-visit calendar sync.
               </div>
             </div>
             <div className="col-span-5 p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-center">
@@ -1051,9 +1053,9 @@ const ArchitecturalProjectMockup: React.FC<{ project: ShowcaseProject }> = ({ pr
         ) : (
           <div className="grid grid-cols-12 gap-3 items-center">
             <div className="col-span-7 p-3 rounded-xl bg-zinc-900 border border-zinc-800 font-mono-tech text-[10px] space-y-1">
-              <div className="text-zinc-400">Multi-Tenant Cloud Engine</div>
-              <div className="text-zinc-100">Latency: 180ms • 50k+ Daily Txns</div>
-              <div className="text-zinc-400">PostgreSQL + Redis + Razorpay Route</div>
+              <div className="text-zinc-400">High-Speed Production Platform</div>
+              <div className="text-zinc-100">Latency: 62ms • 99+ Core Web Vitals</div>
+              <div className="text-zinc-400">Next.js 15 + PostgreSQL + Edge CDN</div>
             </div>
             <div className="col-span-5 p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-center">
               <div className="font-mono-tech text-[9px] text-zinc-400">RELIABILITY</div>
@@ -1068,7 +1070,7 @@ const ArchitecturalProjectMockup: React.FC<{ project: ShowcaseProject }> = ({ pr
       <div className="flex items-center justify-between border-t border-zinc-800 pt-2.5 font-mono-tech text-[9px] text-zinc-400 z-10">
         <span>ARCHITECTURE VERIFIED</span>
         <span className="text-zinc-200 inline-flex items-center gap-1">
-          <span>INSPECT CASE STUDY</span>
+          <span>LAUNCH INTERACTIVE PROTOTYPE</span>
           <ArrowUpRight className="w-3 h-3" />
         </span>
       </div>
@@ -1084,6 +1086,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const [activeOrbIndex, setActiveOrbIndex] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<ShowcaseProject | null>(null);
+  const [activeArtifactId, setActiveArtifactId] = useState<InteractiveArtifactId | null>(null);
 
   // Auto-cycle through all 7 service orbs every 4.0 seconds when idle
   useEffect(() => {
@@ -1113,41 +1116,35 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   <div className="inline-flex items-center gap-2.5">
                     <span className="w-2 h-2 rounded-full bg-[var(--text-primary)]" />
                     <span className="font-mono-tech text-[11px] uppercase tracking-widest text-[var(--text-primary)] font-bold">
-                      SKYLINE DIGITAL AGENCY • WEB, SAAS, AI, ADS & LOCAL GROWTH
+                      SKYLINE DIGITAL AGENCY • INDORE, MP, INDIA
                     </span>
                   </div>
 
-                  {/* Monumental 3-Line Headline */}
+                  {/* Humanized Direct Headline */}
                   <div className="space-y-4">
-                    <h1 className="font-display font-extrabold tracking-[-0.04em] leading-[1.05] text-[var(--text-primary)] text-3xl sm:text-5xl xl:text-[3.55rem]">
-                      <span className="block whitespace-nowrap">WE EMPOWER</span>
-                      <span className="block mt-1 whitespace-nowrap">
-                        BUSINESS{' '}
-                        <span className="font-serif-editorial italic font-semibold text-[var(--text-secondary)]">
-                          TO
-                        </span>
-                      </span>
-                      <span className="block mt-1 whitespace-nowrap text-platinum-gradient">
-                        MOVE FORWARD.
+                    <h1 className="font-display font-extrabold tracking-[-0.03em] leading-[1.12] text-[var(--text-primary)] text-3xl sm:text-5xl xl:text-[3.35rem]">
+                      Fast Web Software, WhatsApp Automation, and{' '}
+                      <span className="font-serif-editorial italic font-semibold text-[var(--platinum-primary)]">
+                        Local Search Growth.
                       </span>
                     </h1>
 
                     {/* Subheadline */}
                     <p className="font-sans-body text-sm sm:text-base lg:text-lg text-[var(--text-secondary)] max-w-xl leading-relaxed font-normal">
-                      Full-stack software engineering, autonomous WhatsApp & AI workflows, high-ROAS Meta/Google ad funnels, and #1 Google Map Pack growth systems.
+                      We build custom web apps, SaaS platforms, 24/7 WhatsApp booking bots, and Google Maps growth systems for clinics, retail brands, and startups from our engineering desk in Indore.
                     </p>
                   </div>
 
-                  {/* Live Architectural SLA Strip (Replaces the duplicate 7-node row) */}
+                  {/* Live Architectural SLA Strip */}
                   <div className="grid grid-cols-3 gap-3 max-w-lg pt-1">
                     {[
-                      { metric: '< 0.4s', label: 'Edge SSR Latency' },
-                      { metric: '4.1x', label: 'Verified Ad ROAS' },
-                      { metric: '24/7', label: 'WhatsApp RAG AI' },
+                      { metric: '< 85ms', label: 'Edge TTFB Speed' },
+                      { metric: '4.4x', label: 'Verified Ad ROAS' },
+                      { metric: '#Top', label: 'Google Map Pack' },
                     ].map((stat) => (
                       <div
                         key={stat.label}
-                        className="p-3 rounded-2xl surface-elevated border border-[var(--border-hairline)]"
+                        className="p-3 rounded-2xl surface-elevated border border-[var(--border-hairline)] border-t border-white/15"
                       >
                         <div className="font-display text-lg sm:text-xl font-extrabold text-[var(--text-primary)]">
                           {stat.metric}
@@ -1162,6 +1159,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   {/* Action Row: Start Project + 60s Estimator + Sachin Active WhatsApp */}
                   <div className="flex flex-wrap items-center gap-3 pt-2">
                     <button
+                      type="button"
                       onClick={() => onNavigate('contact')}
                       className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full btn-platinum-primary text-xs sm:text-sm font-bold tracking-wide cursor-pointer"
                     >
@@ -1170,6 +1168,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => onNavigate('services')}
                       className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full btn-platinum-secondary text-xs sm:text-sm font-bold cursor-pointer"
                     >
@@ -1202,8 +1201,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     onSelectOrb={(idx) => setActiveOrbIndex(idx)}
                   />
 
-                  {/* Sleek Live Service Telemetry Card */}
-                  <div className="w-full surface-card rounded-3xl p-5 sm:p-6 relative overflow-hidden transition-all duration-300">
+                  {/* Sleek Live Service Telemetry Card (Clean Service Category Descriptors) */}
+                  <div className="w-full surface-card rounded-3xl p-5 sm:p-6 relative overflow-hidden transition-all duration-300 border-t border-white/15">
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                       <div className="inline-flex items-center gap-2">
                         <span className="px-2.5 py-1 rounded-full font-display text-[10px] font-extrabold uppercase tracking-widest bg-[#18181B] text-[#F4F4F5] dark:bg-[#F4F4F5] dark:text-[#09090B] shadow-xs inline-flex items-center gap-1.5">
@@ -1248,14 +1247,24 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         ))}
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => onNavigate('services')}
-                        className="inline-flex items-center gap-1 font-display text-xs font-bold text-[var(--text-primary)] hover:opacity-80 cursor-pointer shrink-0"
-                      >
-                        <span>Explore {activeOrb.label}</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveArtifactId(activeOrb.artifactId)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full btn-platinum-secondary font-mono-tech text-[10px] font-bold text-[var(--text-primary)] cursor-pointer"
+                        >
+                          <span>Launch Live Prototype</span>
+                          <ArrowUpRight className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigate('services')}
+                          className="inline-flex items-center gap-1 font-display text-xs font-bold text-[var(--text-primary)] hover:opacity-80 cursor-pointer shrink-0"
+                        >
+                          <span>Explore {activeOrb.label}</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1278,7 +1287,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <div className="flex items-center gap-2">
                   <Phone className="w-3.5 h-3.5 text-[var(--text-primary)] shrink-0" />
                   <span className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
-                    DIRECT DESK:
+                    FOUNDERS CONTACT:
                   </span>
                   <a
                     href={`tel:${SKYLINE_CALL_NUMBER}`}
@@ -1300,11 +1309,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
               <div className="flex flex-wrap items-center gap-3">
                 <button
+                  type="button"
                   onClick={() => onNavigate('referral')}
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full badge-platinum font-mono-tech text-[11px] font-semibold cursor-pointer hover:opacity-90 transition-opacity"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[var(--text-primary)]" />
-                  <span>Refer a Client & Earn 15% Commission</span>
+                  <span>Refer a Client &amp; Earn 15% Commission</span>
                 </button>
               </div>
             </div>
@@ -1317,7 +1327,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             aria-label="Technology and Growth Stack"
             className="py-5 border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)] overflow-hidden space-y-3"
           >
-            {/* Row 1: Left-scrolling Engineering Stack */}
             <div className="relative flex overflow-hidden">
               <div className="animate-marquee-left flex items-center gap-3 pr-3">
                 {[...TECH_STACK_MARQUEE_ROW_1, ...TECH_STACK_MARQUEE_ROW_1].map(
@@ -1334,7 +1343,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
             </div>
 
-            {/* Row 2: Right-scrolling Growth & Local Stack */}
             <div className="relative flex overflow-hidden">
               <div className="animate-marquee-right flex items-center gap-3 pr-3">
                 {[...TECH_STACK_MARQUEE_ROW_2, ...TECH_STACK_MARQUEE_ROW_2].map(
@@ -1362,25 +1370,27 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="max-w-7xl mx-auto">
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14">
                 <div>
-                  {/* Zero-Pill Discipline Kicker */}
-                  <div className="inline-flex items-center gap-2 mb-3">
-                    <Layers className="w-3.5 h-3.5 text-[var(--text-primary)]" />
+                  <div className="inline-flex items-center gap-2.5 mb-3">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-xs dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 flex items-center justify-center shrink-0">
+                      <Layers className="w-4 h-4 text-[var(--text-primary)]" />
+                    </div>
                     <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
-                      WHAT WE ENGINEER & SCALE
+                      WHAT WE ENGINEER &amp; SCALE
                     </span>
                   </div>
-                  <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                    Complete Digital Systems for{' '}
-                    <span className="font-serif-editorial italic font-semibold text-platinum-gradient">
-                      Every Stage.
+                  <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)] leading-[1.12]">
+                    Systems We Build and{' '}
+                    <span className="font-serif-editorial italic font-semibold text-[var(--platinum-primary)]">
+                      Run.
                     </span>
                   </h2>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-sm leading-relaxed">
-                    From local clinics & retail stores to high-growth SaaS startups—we engineer the complete system.
+                    From local clinics and retail stores to high-growth SaaS startups, we build and run the complete software and growth system.
                   </p>
                   <button
+                    type="button"
                     onClick={() => onNavigate('services')}
                     className="inline-flex items-center gap-2 px-5 py-3 rounded-full btn-platinum-primary text-xs font-bold cursor-pointer shrink-0"
                   >
@@ -1394,7 +1404,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 {BENTO_SOLUTIONS.map((card) => (
                   <div
                     key={card.id}
-                    className={`${card.spanClass} surface-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between group relative overflow-hidden`}
+                    className={`${card.spanClass} surface-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between group relative overflow-hidden border-t border-white/15`}
                   >
                     <div className="space-y-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1432,12 +1442,24 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         ))}
                       </div>
 
-                      <button
-                        onClick={() => onNavigate('services')}
-                        className="inline-flex items-center gap-1 font-display text-xs font-bold text-[var(--text-primary)] group-hover:translate-x-0.5 transition-transform cursor-pointer shrink-0"
-                      >
-                        <span>Explore Full Service -&gt;</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveArtifactId(card.artifactId)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full btn-platinum-secondary font-mono-tech text-[10px] font-bold text-[var(--text-primary)] cursor-pointer"
+                        >
+                          <span>Launch Live Prototype</span>
+                          <ArrowUpRight className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigate('services')}
+                          className="inline-flex items-center gap-1 font-display text-xs font-bold text-[var(--text-primary)] group-hover:translate-x-0.5 transition-transform cursor-pointer shrink-0"
+                        >
+                          <span>Explore Service</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1453,30 +1475,34 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       {(pageView === 'home' || pageView === 'work') && (
         <section
           id="work"
-          className="py-16 sm:py-24 px-4 sm:px-8 lg:px-12 border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)]"
+          className={`${
+            pageView === 'work' ? 'pt-28 sm:pt-32' : 'py-16 sm:py-24'
+          } pb-16 sm:pb-24 px-4 sm:px-8 lg:px-12 border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)]`}
         >
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14">
               <div>
-                {/* Zero-Pill Discipline Kicker */}
-                <div className="inline-flex items-center gap-2 mb-3">
-                  <Code2 className="w-3.5 h-3.5 text-[var(--text-primary)]" />
+                <div className="inline-flex items-center gap-2.5 mb-3">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-xs dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 flex items-center justify-center shrink-0">
+                    <Code2 className="w-4 h-4 text-[var(--text-primary)]" />
+                  </div>
                   <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
                     {pageView === 'home'
                       ? 'FEATURED CASE STUDIES PREVIEW'
-                      : 'SELECTED CASE STUDIES & DEPLOYMENTS'}
+                      : 'SELECTED CASE STUDIES & INTERACTIVE PROTOTYPES'}
                   </span>
                 </div>
-                <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                  Engineered for{' '}
-                  <span className="font-serif-editorial italic font-semibold text-platinum-gradient">
-                    Measurable ROI.
+                <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)] leading-[1.12]">
+                  Live Production Work and{' '}
+                  <span className="font-serif-editorial italic font-semibold text-[var(--platinum-primary)]">
+                    Interactive Prototypes.
                   </span>
                 </h2>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 {pageView === 'home' ? (
                   <button
+                    type="button"
                     onClick={() => onNavigate('work')}
                     className="px-5 py-3 rounded-full btn-platinum-primary text-xs font-bold cursor-pointer inline-flex items-center gap-2"
                   >
@@ -1486,16 +1512,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 ) : (
                   <>
                     <button
+                      type="button"
                       onClick={() => onNavigate('services')}
                       className="px-4 py-2.5 rounded-full btn-platinum-secondary text-xs font-bold cursor-pointer"
                     >
                       Estimate Similar Project
                     </button>
                     <button
+                      type="button"
                       onClick={() => onNavigate('contact')}
                       className="px-4 py-2.5 rounded-full btn-platinum-primary text-xs font-bold cursor-pointer"
                     >
-                      Request Live Demo
+                      Request Custom Build
                     </button>
                   </>
                 )}
@@ -1507,14 +1535,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <article
                   key={project.id}
                   onClick={() => setSelectedProject(project)}
-                  className="surface-card rounded-3xl overflow-hidden flex flex-col justify-between group cursor-pointer"
+                  className="surface-card rounded-3xl overflow-hidden flex flex-col justify-between group cursor-pointer border-t border-white/15"
                 >
-                  {/* Pure Code-Engineered Architectural Project Mockup */}
                   <div className="relative h-56 sm:h-60 overflow-hidden border-b border-[var(--border-hairline)]">
                     <ArchitecturalProjectMockup project={project} />
                   </div>
 
-                  {/* Project Body */}
                   <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-5">
                     <div className="space-y-2.5">
                       <div className="font-mono-tech text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
@@ -1528,7 +1554,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                       </p>
                     </div>
 
-                    <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-3">
+                    <div className="pt-4 border-t border-[var(--border-hairline)] space-y-3">
                       <div className="flex flex-wrap gap-1.5">
                         {(project.techStack || project.stackPills || []).map((tech: string) => (
                           <span
@@ -1540,12 +1566,36 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <span className="font-mono-tech text-xs font-semibold text-[var(--text-primary)]">
-                          {project.secondaryMetric || project.accentMetric}
-                        </span>
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveArtifactId(project.artifactId || '360-views');
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl btn-platinum-primary font-mono-tech text-[11px] font-bold cursor-pointer"
+                          >
+                            <span>Launch Live Interactive Prototype</span>
+                            <ArrowUpRight className="w-3.5 h-3.5" />
+                          </button>
+
+                          {project.liveSiteUrl && (
+                            <a
+                              href={project.liveSiteUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl btn-platinum-secondary font-mono-tech text-[11px] font-bold text-[var(--text-primary)]"
+                            >
+                              <span>Visit Live Site (360views.services)</span>
+                              <ArrowUpRight className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
+
                         <span className="inline-flex items-center gap-1 font-display text-xs font-bold text-[var(--text-primary)] group-hover:underline">
-                          <span>View Case Study</span>
+                          <span>Case Details</span>
                           <ArrowUpRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
@@ -1555,15 +1605,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               ))}
             </div>
 
-            {/* Compact CTA Banner on Home View */}
             {pageView === 'home' && (
-              <div className="mt-12 surface-card rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+              <div className="mt-12 surface-card rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 border-t border-white/15">
                 <div className="space-y-1.5 max-w-2xl">
                   <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)] font-bold">
                     READY TO SCALE YOUR REVENUE PIPELINE?
                   </div>
                   <h3 className="font-display text-xl sm:text-2xl font-extrabold text-[var(--text-primary)]">
-                    Get a Custom Architecture Blueprint & Fixed-Milestone Proposal Today.
+                    Get a Custom Architecture Blueprint &amp; Fixed-Milestone Proposal Today.
                   </h3>
                   <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
                     Use our 60-second project estimator or chat directly with our founding engineers on WhatsApp.
@@ -1582,6 +1631,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     <span>WhatsApp Us</span>
                   </a>
                   <button
+                    type="button"
                     onClick={() => onNavigate('contact')}
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full btn-platinum-primary text-xs font-bold cursor-pointer"
                   >
@@ -1597,44 +1647,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
       {/* =====================================================================
           5. DEDICATED "WHO WE ARE" SECTION (WHO-WE-ARE VIEW ONLY)
-             Senior-Led Engineering + Founding Architects Profiles
          ===================================================================== */}
       {pageView === 'who-we-are' && (
         <section
           id="who-we-are"
-          className="py-16 sm:py-24 px-4 sm:px-8 lg:px-12 border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)]"
+          className="pt-28 sm:pt-32 pb-16 sm:pb-24 px-4 sm:px-8 lg:px-12 border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)]"
         >
           <div className="max-w-7xl mx-auto space-y-16">
-            {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div className="space-y-4 max-w-3xl">
-                {/* Zero-Pill Discipline Kicker */}
-                <div className="inline-flex items-center gap-2">
-                  <Compass className="w-3.5 h-3.5 text-[var(--text-primary)]" />
+                <div className="inline-flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-xs dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 flex items-center justify-center shrink-0">
+                    <Compass className="w-4 h-4 text-[var(--text-primary)]" />
+                  </div>
                   <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
-                    WHO WE ARE • THE SKYLINE DOCTRINE & FOUNDERS
+                    WHO WE ARE • THE SKYLINE DOCTRINE &amp; FOUNDERS
                   </span>
                 </div>
 
-                <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)] leading-[1.08]">
+                <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)] leading-[1.12]">
                   Senior-Led Engineering.{' '}
-                  <span className="font-serif-editorial italic font-semibold text-platinum-gradient">
+                  <span className="font-serif-editorial italic font-semibold text-[var(--platinum-primary)]">
                     Zero Agency Bloat.
                   </span>
                 </h2>
               </div>
 
               <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-md leading-relaxed">
-                At SkyLine Digital Agency, you work directly with our founding engineers—specialists in high-concurrency Java & Spring Boot systems, full-stack Node.js/React platforms, cryptographic security, and AI growth automation.
+                At SkyLine Digital Agency, you work directly with our founding engineers in Indore, Madhya Pradesh, specializing in high-concurrency Java 21 systems, full-stack Next.js platforms, cryptographic security, and AI growth automation.
               </p>
             </div>
 
             {/* FOUNDERS & LEAD SYSTEMS ARCHITECTS */}
             <div className="space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="inline-flex items-center gap-2 font-mono-tech text-xs uppercase tracking-widest text-[var(--text-primary)] font-bold">
-                  <Terminal className="w-4 h-4 text-[var(--text-primary)]" />
-                  <span>MEET OUR FOUNDING ENGINEERS & ARCHITECTS</span>
+                <div className="inline-flex items-center gap-2.5 font-mono-tech text-xs uppercase tracking-widest text-[var(--text-primary)] font-bold">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-xs dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 flex items-center justify-center shrink-0">
+                    <Terminal className="w-4 h-4 text-[var(--text-primary)]" />
+                  </div>
+                  <span>MEET OUR FOUNDING ENGINEERS &amp; ARCHITECTS</span>
                 </div>
                 <span className="font-mono-tech text-[11px] text-[var(--text-muted)] uppercase">
                   {SKYLINE_LOCATION}
@@ -1647,10 +1698,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   return (
                     <div
                       key={founder.id}
-                      className="surface-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6 border border-[var(--border-hairline)] hover:border-[var(--border-strong)] transition-all"
+                      className="surface-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6 border border-[var(--border-hairline)] border-t border-white/15 hover:border-[var(--border-strong)] transition-all"
                     >
                       <div className="space-y-5">
-                        {/* Founder Top Identity Bar */}
                         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--border-hairline)] pb-5">
                           <div className="space-y-1.5">
                             <div className="inline-flex items-center gap-2 font-mono-tech text-[10px] font-bold uppercase tracking-wider text-[var(--text-primary)]">
@@ -1681,22 +1731,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                             {isCallSupported && founder.callNumber && (
                               <a
                                 href={`tel:${founder.callNumber}`}
-                                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full btn-platinum-primary text-[11px] font-bold"
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full btn-call-black bg-[#000000] text-[#FFFFFF] text-[11px] font-bold"
                               >
-                                <PhoneCall className="w-3.5 h-3.5" />
+                                <PhoneCall className="w-3.5 h-3.5 text-[#FFFFFF]" />
                                 <span>Call</span>
                               </a>
                             )}
                           </div>
                         </div>
 
-                        {/* Summary */}
                         <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                           {founder.summary}
                         </p>
 
-                        {/* Education & Direct Contact Metadata (Clean Numbers Only) */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl surface-elevated text-xs">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl surface-elevated border-t border-white/15 text-xs">
                           <div className="space-y-1">
                             <div className="inline-flex items-center gap-1.5 font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
                               <GraduationCap className="w-3.5 h-3.5 text-[var(--text-primary)]" />
@@ -1710,27 +1758,24 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                             </div>
                           </div>
 
-                          <div className="space-y-1.5">
-                            <div className="inline-flex items-center gap-1.5 font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                              <Phone className="w-3.5 h-3.5 text-[var(--text-primary)]" />
-                              <span>DIRECT DESK</span>
+                          <div className="space-y-1.5 flex flex-col justify-center">
+                            <div className="text-xs font-bold text-[var(--text-primary)]">
+                              {founder.phone}
                             </div>
-                            <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-primary)]">
-                              <Phone className="w-3.5 h-3.5 text-[#71717A] shrink-0" />
-                              <span>{founder.phone}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-secondary)]">
+                            <a
+                              href={`mailto:${founder.email}`}
+                              className="flex items-center gap-1.5 text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                            >
                               <GmailBrandIcon size="sm" />
                               <span className="truncate">{founder.email}</span>
-                            </div>
+                            </a>
                           </div>
                         </div>
 
-                        {/* Technical Skills & Core CS Concepts */}
                         <div className="space-y-2">
                           <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-1.5">
                             <Code2 className="w-3.5 h-3.5 text-[var(--text-primary)]" />
-                            <span>LANGUAGES, FRAMEWORKS & CORE ARCHITECTURE</span>
+                            <span>LANGUAGES, FRAMEWORKS &amp; CORE ARCHITECTURE</span>
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {[
@@ -1748,7 +1793,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                           </div>
                         </div>
 
-                        {/* Experience */}
                         <div className="space-y-2.5">
                           <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-1.5">
                             <Briefcase className="w-3.5 h-3.5 text-[var(--text-primary)]" />
@@ -1762,7 +1806,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                               >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                   <span className="font-display font-bold text-xs sm:text-sm text-[var(--text-primary)]">
-                                    {exp.role} — {exp.company}
+                                    {exp.role} • {exp.company}
                                   </span>
                                   <span className="font-mono-tech text-[10px] px-2 py-0.5 rounded badge-platinum font-semibold">
                                     {exp.period}
@@ -1781,24 +1825,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                           </div>
                         </div>
 
-                        {/* Key Engineering Projects */}
+                        {/* Key Engineering Projects with Live Interactive Prototype Triggers */}
                         <div className="space-y-2.5">
                           <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-1.5">
                             <FolderGit2 className="w-3.5 h-3.5 text-[var(--text-primary)]" />
-                            <span>SIGNATURE SYSTEMS & PROJECTS</span>
+                            <span>SIGNATURE SYSTEMS &amp; INTERACTIVE PROTOTYPES</span>
                           </div>
                           <div className="space-y-2.5">
                             {founder.projects.map((proj) => (
                               <div
                                 key={proj.name}
-                                className="p-3.5 rounded-2xl surface-elevated space-y-1.5"
+                                className="p-3.5 rounded-2xl surface-elevated space-y-2"
                               >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                   <div className="font-display font-bold text-xs sm:text-sm text-[var(--text-primary)]">
-                                    {proj.name} —{' '}
+                                    {proj.name} •{' '}
                                     <span className="font-normal text-[var(--text-secondary)]">
                                       {proj.subtitle}
                                     </span>
+                                  </div>
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    {proj.liveSiteUrl && (
+                                      <a
+                                        href={proj.liveSiteUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg btn-platinum-secondary font-mono-tech text-[10px] font-bold"
+                                      >
+                                        <span>Live Site</span>
+                                        <ArrowUpRight className="w-3 h-3" />
+                                      </a>
+                                    )}
+                                    <button
+                                      type="button"
+                                      onClick={() => setActiveArtifactId(proj.artifactId)}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg btn-platinum-primary font-mono-tech text-[10px] font-bold cursor-pointer"
+                                    >
+                                      <span>Launch Live Prototype</span>
+                                      <ArrowUpRight className="w-3 h-3" />
+                                    </button>
                                   </div>
                                 </div>
                                 <div className="font-mono-tech text-[10px] text-[#71717A] dark:text-[#A1A1AA]">
@@ -1817,11 +1882,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                           </div>
                         </div>
 
-                        {/* Certifications */}
                         <div className="space-y-2">
                           <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-1.5">
                             <Award className="w-3.5 h-3.5 text-[var(--text-primary)]" />
-                            <span>VERIFIED CERTIFICATIONS & CREDENTIALS</span>
+                            <span>VERIFIED CERTIFICATIONS &amp; CREDENTIALS</span>
                           </div>
                           <div className="grid grid-cols-1 gap-1.5">
                             {founder.certifications.map((cert) => (
@@ -1837,7 +1901,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         </div>
                       </div>
 
-                      {/* Founder Card Footer Location */}
                       <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-3 text-xs">
                         <span className="inline-flex items-center gap-1.5 font-mono-tech text-[10px] text-[var(--text-muted)]">
                           <MapPin className="w-3.5 h-3.5 text-[var(--text-primary)]" />
@@ -1855,9 +1918,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
             {/* 3 Core Doctrine Pillars */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="surface-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between space-y-6">
+              <div className="surface-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between space-y-6 border-t border-white/15 group">
                 <div className="space-y-4">
-                  <div className="w-11 h-11 rounded-2xl surface-elevated flex items-center justify-center text-[var(--text-primary)]">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-sm dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 dark:shadow-inner flex items-center justify-center text-[var(--text-primary)] group-hover:scale-105 transition-transform">
                     <Cpu className="w-5 h-5 text-[var(--text-primary)]" />
                   </div>
                   <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
@@ -1867,7 +1930,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     First-Principles Software Architecture
                   </h3>
                   <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                    We never ship sluggish page-builder templates. Every platform is engineered from scratch on Next.js 15, TypeScript, Java Spring Boot, Node.js, and PostgreSQL for sub-second speed and bank-grade reliability.
+                    We never ship sluggish page-builder templates. Every platform is engineered from scratch on Next.js 15, TypeScript, Java 21, Node.js, and PostgreSQL for sub-second speed and bank-grade reliability.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between font-mono-tech text-xs">
@@ -1876,9 +1939,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               </div>
 
-              <div className="surface-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between space-y-6">
+              <div className="surface-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between space-y-6 border-t border-white/15 group">
                 <div className="space-y-4">
-                  <div className="w-11 h-11 rounded-2xl surface-elevated flex items-center justify-center text-[var(--text-primary)]">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-sm dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 dark:shadow-inner flex items-center justify-center text-[var(--text-primary)] group-hover:scale-105 transition-transform">
                     <Zap className="w-5 h-5 text-[var(--text-primary)]" />
                   </div>
                   <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
@@ -1888,7 +1951,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     Proof Before Promises
                   </h3>
                   <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                    Use our interactive 60-second estimator or request a complimentary 15-minute technical & funnel teardown on WhatsApp—so you see exact milestones, deliverables, and ROI projections before you pay.
+                    Use our interactive 60-second estimator or request a complimentary 15-minute technical and funnel teardown on WhatsApp so you see exact milestones, deliverables, and ROI projections before you pay.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between font-mono-tech text-xs">
@@ -1897,9 +1960,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               </div>
 
-              <div className="surface-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between space-y-6">
+              <div className="surface-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between space-y-6 border-t border-white/15 group">
                 <div className="space-y-4">
-                  <div className="w-11 h-11 rounded-2xl surface-elevated flex items-center justify-center text-[var(--text-primary)]">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-sm dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 dark:shadow-inner flex items-center justify-center text-[var(--text-primary)] group-hover:scale-105 transition-transform">
                     <ShieldCheck className="w-5 h-5 text-[var(--text-primary)]" />
                   </div>
                   <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
@@ -1909,12 +1972,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     Full-Funnel Ownership
                   </h3>
                   <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                    A great website without traffic—or traffic without instant WhatsApp follow-up—leaks revenue. We unify your web platform, 24/7 WhatsApp AI bot, #1 Google Map Pack SEO, and Meta/Google CAPI ads under one roof.
+                    A great website without traffic, or traffic without instant WhatsApp follow-up, leaks revenue. We unify your web platform, 24/7 WhatsApp AI bot, Google Map Pack #Top SEO, and Meta/Google CAPI ads under one roof.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between font-mono-tech text-xs">
                   <span className="text-[var(--text-muted)]">CLIENT RIGHTS</span>
-                  <span className="font-bold text-[var(--text-primary)]">100% Source Code & Data</span>
+                  <span className="font-bold text-[var(--text-primary)]">100% Source Code &amp; Data</span>
                 </div>
               </div>
             </div>
@@ -1922,9 +1985,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {/* Live Interactive Telemetry Strip */}
             <div className="surface-card rounded-3xl p-6 sm:p-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { value: '< 0.5s', label: 'Average Edge Page Load', note: 'Next.js 15 + Redis SSR' },
-                { value: '< 1.2s', label: 'WhatsApp AI Lead Reply', note: '24/7 Official Cloud API' },
-                { value: '4.1x', label: 'Verified Blended ROAS', note: 'Server-Side Meta CAPI' },
+                { value: '< 85ms', label: 'Average Edge Page Load', note: 'Next.js 15 + Redis SSR' },
+                { value: '< 2s', label: 'WhatsApp AI Lead Reply', note: '24/7 Official Cloud API' },
+                { value: '4.4x', label: 'Verified Blended ROAS', note: 'Server-Side Meta CAPI' },
                 { value: '100%', label: 'Code & Account Ownership', note: 'Zero Lock-In Retainers' },
               ].map((stat) => (
                 <div key={stat.label} className="space-y-1">
@@ -1957,6 +2020,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="relative h-56 sm:h-64 border-b border-[var(--border-hairline)]">
               <ArchitecturalProjectMockup project={selectedProject} />
               <button
+                type="button"
                 onClick={() => setSelectedProject(null)}
                 aria-label="Close Case Study Modal"
                 className="absolute top-3 right-3 z-20 p-2 rounded-full bg-zinc-900/90 text-white hover:bg-zinc-800 border border-zinc-700 cursor-pointer"
@@ -2022,20 +2086,35 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               )}
 
               <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap gap-1.5">
-                  {(selectedProject.techStack || selectedProject.stackPills || []).map(
-                    (t: string) => (
-                      <span
-                        key={t}
-                        className="px-2.5 py-1 rounded-md surface-elevated font-mono-tech text-[10px] text-[var(--text-secondary)]"
-                      >
-                        {t}
-                      </span>
-                    )
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const artId = selectedProject.artifactId || '360-views';
+                      setSelectedProject(null);
+                      setActiveArtifactId(artId);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full btn-platinum-secondary text-xs font-bold cursor-pointer"
+                  >
+                    <span>Launch Live Interactive Prototype</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+
+                  {selectedProject.liveSiteUrl && (
+                    <a
+                      href={selectedProject.liveSiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full btn-platinum-secondary text-xs font-bold"
+                    >
+                      <span>Visit 360views.services</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
                   )}
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => {
                     setSelectedProject(null);
                     onNavigate('contact');
@@ -2050,6 +2129,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </div>
         </div>
       )}
+
+      {/* Interactive Live Artifact Sandbox Modal */}
+      <InteractiveArtifactModal
+        artifactId={activeArtifactId}
+        onClose={() => setActiveArtifactId(null)}
+      />
     </div>
   );
 };

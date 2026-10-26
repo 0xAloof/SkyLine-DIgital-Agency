@@ -22,7 +22,7 @@ const INITIAL_SEED_LEADS: LeadRecord[] = [
     contact: '+91 86430 02478',
     contactType: 'whatsapp',
     inquiryType: 'meeting',
-    budget: '₹2.5L – ₹5L',
+    budget: '₹2.5L to ₹5L',
     meetingDate: '2026-10-27',
     meetingSlot: '11:00 AM - 11:30 AM IST',
     selectedPillars: [
@@ -44,13 +44,13 @@ const INITIAL_SEED_LEADS: LeadRecord[] = [
     contact: '+91 89591 44686',
     contactType: 'whatsapp',
     inquiryType: 'inquiry',
-    budget: '₹65,000 – ₹1.2L',
+    budget: '₹65,000 to ₹1.2L',
     selectedPillars: [
       'Local Business Growth & Digitization',
       'Technical SEO & AEO Search',
     ],
     projectScope:
-      'Want #1 Google Map Pack ranking across Bhopal & Indore branches, physical Smart QR 5-Star Review Standees at reception, and automated WhatsApp slot booking.',
+      'Want #Top Google Map Pack ranking across Indore branches, physical Smart QR 5-Star Review Standees at reception, and automated WhatsApp slot booking.',
     status: 'new',
     notes: 'Inbound from Local Business Growth tab.',
     source: 'Website Inquiry Form',
@@ -63,7 +63,7 @@ const INITIAL_SEED_LEADS: LeadRecord[] = [
     contact: 'karan@veloced2c.in',
     contactType: 'email',
     inquiryType: 'inquiry',
-    budget: '₹1.5L – ₹3L',
+    budget: '₹1.5L to ₹3L',
     selectedPillars: [
       'Conversion UI/UX & D2C Checkouts',
       'Performance Ads (Meta & Google)',
@@ -133,24 +133,30 @@ export function getDb(): DatabaseSchema {
       const raw = fs.readFileSync(DB_FILE_PATH, 'utf8');
       const parsed = JSON.parse(raw) as Partial<DatabaseSchema>;
       const seed = createInitialSeedDatabase();
+      const hasLatestProjects =
+        Array.isArray(parsed.projects) &&
+        parsed.projects.some((p) => p.id === 'proj-360-views' && 'artifactId' in p);
       memoryDb = {
         users: Array.isArray(parsed.users) && parsed.users.length > 0 ? parsed.users : seed.users,
         leads: Array.isArray(parsed.leads) ? parsed.leads : seed.leads,
         referrals: Array.isArray(parsed.referrals) ? parsed.referrals : seed.referrals,
-        projects:
-          Array.isArray(parsed.projects) && parsed.projects.length > 0
-            ? parsed.projects
-            : seed.projects,
+        projects: hasLatestProjects && parsed.projects ? parsed.projects : seed.projects,
         services:
-          Array.isArray(parsed.services) && parsed.services.length > 0
+          hasLatestProjects && Array.isArray(parsed.services) && parsed.services.length > 0
             ? parsed.services
             : seed.services,
         testimonials:
-          Array.isArray(parsed.testimonials) && parsed.testimonials.length > 0
+          hasLatestProjects && Array.isArray(parsed.testimonials) && parsed.testimonials.length > 0
             ? parsed.testimonials
             : seed.testimonials,
-        faqs: Array.isArray(parsed.faqs) && parsed.faqs.length > 0 ? parsed.faqs : seed.faqs,
+        faqs:
+          hasLatestProjects && Array.isArray(parsed.faqs) && parsed.faqs.length > 0
+            ? parsed.faqs
+            : seed.faqs,
       };
+      if (!hasLatestProjects) {
+        saveDb(memoryDb);
+      }
       return memoryDb;
     }
   } catch {
