@@ -18,6 +18,7 @@ import {
 } from './architectEngine';
 import {
   FOUNDER_PROFILES,
+  SHOWCASE_PROJECTS,
   HERO_ORBS,
   SKYLINE_LOCATION,
   SKYLINE_SOCIAL_LINKS,
@@ -57,6 +58,10 @@ test('FOUNDER_PROFILES, location, and contact routing strictly match SkyLine Dig
     sachin.projects.map((p) => p.name),
     ['360 Views', 'ShadowBase', 'GridWeaver']
   );
+  assert.deepEqual(
+    sachin.projects.map((p) => p.artifactId),
+    ['360-views', 'shadowbase-cdc', 'gridweaver-iot']
+  );
 
   assert.equal(aashif.id, 'aashif-khan');
   assert.equal(aashif.role, 'Co-Founder & System Architect');
@@ -69,6 +74,15 @@ test('FOUNDER_PROFILES, location, and contact routing strictly match SkyLine Dig
     aashif.projects.map((p) => p.name),
     ['FileGuard AI', 'AI Career Guide & Mentor', 'Socialite', 'A&A Chocolates']
   );
+  assert.deepEqual(
+    aashif.projects.map((p) => p.artifactId),
+    ['fileguard-security', 'ai-career-mentor', 'socialite-network', 'aa-chocolates-d2c']
+  );
+
+  assert.equal(SHOWCASE_PROJECTS.length, 9);
+  for (const cs of SHOWCASE_PROJECTS) {
+    assert.ok(cs.artifactId, `Missing artifactId on case study ${cs.id}`);
+  }
 
   // Verify zero student/intern tags in founder profiles
   const serializedFounders = JSON.stringify(FOUNDER_PROFILES);

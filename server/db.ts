@@ -135,7 +135,8 @@ export function getDb(): DatabaseSchema {
       const seed = createInitialSeedDatabase();
       const hasLatestProjects =
         Array.isArray(parsed.projects) &&
-        parsed.projects.some((p) => p.id === 'proj-360-views' && 'artifactId' in p);
+        parsed.projects.length === SHOWCASE_PROJECTS.length &&
+        parsed.projects.some((p) => p.id === 'proj-shadowbase-cdc' && 'artifactId' in p);
       memoryDb = {
         users: Array.isArray(parsed.users) && parsed.users.length > 0 ? parsed.users : seed.users,
         leads: Array.isArray(parsed.leads) ? parsed.leads : seed.leads,
