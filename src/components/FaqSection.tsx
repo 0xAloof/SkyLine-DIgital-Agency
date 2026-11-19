@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Minus, HelpCircle } from 'lucide-react';
-import { FAQ_ITEMS, SKYLINE_WHATSAPP_NUMBER, FaqItem } from '../data/agencyData';
+import { FAQ_ITEMS, SKYLINE_WHATSAPP_DIRECT_URL, FaqItem } from '../data/agencyData';
 import { WhatsAppBrandBadge } from './BrandIcons';
 
 interface FaqSectionProps {
@@ -18,20 +18,20 @@ export const FaqSection: React.FC<FaqSectionProps> = ({
     setOpenId((prev) => (prev === id ? '' : id));
   };
 
-  const whatsappDirectUrl = `https://wa.me/${SKYLINE_WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    'Hi SkyLine Digital! I have a quick question about a project.'
-  )}`;
+  const whatsappDirectUrl = SKYLINE_WHATSAPP_DIRECT_URL;
 
   return (
     <section
       id="faq"
-      className="py-20 sm:py-28 px-4 sm:px-8 lg:px-12 border-b border-[var(--border-hairline)] bg-architectural-grid"
+      className="py-20 sm:py-28 px-4 sm:px-8 lg:px-12 bg-section-alt"
     >
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 mb-3">
-              <HelpCircle className="w-3.5 h-3.5 text-[var(--text-primary)]" />
+            <div className="inline-flex items-center gap-2.5 mb-3">
+              <div className="w-8 h-8 rounded-xl heading-icon-blue flex items-center justify-center shrink-0">
+                <HelpCircle className="w-4 h-4 text-white" />
+              </div>
               <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
                 COMMON QUESTIONS
               </span>
@@ -43,8 +43,8 @@ export const FaqSection: React.FC<FaqSectionProps> = ({
               </span>
             </h2>
           </div>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xs leading-relaxed">
-            Everything you need to know about our timelines, local business packages, pricing, and 100% code ownership.
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-sm leading-relaxed">
+            Everything you need to know about our starter packages (from ₹10,000, open to negotiation), WhatsApp automation, Google Business Profile SEO, and 100% code ownership.
           </p>
         </div>
 

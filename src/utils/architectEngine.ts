@@ -258,13 +258,13 @@ const BOTTLENECK_ARCHITECTURE_OVERRIDES: Record<
 > = {
   [BottleneckType.SLOW_WEBSITE]: {
     timeline: '2–3 Weeks',
-    speedBudget: '< 85ms Edge TTFB · 99+ CWV',
+    speedBudget: 'Instant Mobile & Web Load',
     liftLabel: '+64% Landing-to-Lead Conversion',
     liftMultiplier: 1.64,
-    diagnosisPrefix: 'Eliminates mobile bounce and checkout drop-off via sub-100ms React/Next.js edge architecture.',
+    diagnosisPrefix: 'Eliminates mobile bounce and checkout drop-off via fast React/Next.js architecture.',
     webLayerTitle: 'Next.js Edge Storefront & Frictionless UPI/Funnel UI',
     webSpec: 'Zero-bloat TypeScript frontend, instant route prefetching, Swiss grid persuasion hierarchy, and 1-tap capture.',
-    webDeliverables: ['Custom React/Next.js Architecture', 'Core Web Vitals 99+ Optimization', '1-Tap UPI & Mobile-First Lead Flow'],
+    webDeliverables: ['Custom React/Next.js Architecture', 'Instant Mobile Load Optimization', '1-Tap UPI & Mobile-First Lead Flow'],
     crmLayerTitle: 'Instant WhatsApp Abandonment & Lead Recovery',
     crmSpec: 'Real-time webhook triggers instant WhatsApp follow-up within 6 seconds of form or cart intent.',
     crmDeliverables: ['WhatsApp Cloud API Trigger', 'Automated Drop-Off Recovery', 'Live Conversion Telemetry'],

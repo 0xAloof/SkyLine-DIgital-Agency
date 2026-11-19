@@ -34,10 +34,22 @@ test('FOUNDER_PROFILES, location, and contact routing strictly match SkyLine Dig
   assert.equal(SKYLINE_WHATSAPP_NUMBER, '918959144686');
   assert.equal(SKYLINE_CALL_NUMBER, '+918643002478');
 
-  // Verify strictly 5 social links (GitHub, LinkedIn, Instagram, Telegram, X)
+  // Verify 6 official verified social/contact links (LinkedIn, GitHub, Instagram, WhatsApp, Email, Phone)
   assert.deepEqual(
     SKYLINE_SOCIAL_LINKS.map((s) => s.id),
-    ['github', 'linkedin', 'instagram', 'telegram', 'x']
+    ['linkedin', 'github', 'instagram', 'whatsapp', 'email', 'phone']
+  );
+  assert.equal(
+    SKYLINE_SOCIAL_LINKS.find((s) => s.id === 'linkedin')?.url,
+    'https://www.linkedin.com/in/skyline-digital-agency-678585450'
+  );
+  assert.equal(
+    SKYLINE_SOCIAL_LINKS.find((s) => s.id === 'github')?.url,
+    'https://github.com/agencyskylinedigital-create'
+  );
+  assert.equal(
+    SKYLINE_SOCIAL_LINKS.find((s) => s.id === 'instagram')?.url,
+    'https://www.instagram.com/sky_line_digital'
   );
 
   // Verify 6-Stage Delivery System & 7 Verified Reviews
@@ -91,14 +103,30 @@ test('FOUNDER_PROFILES, location, and contact routing strictly match SkyLine Dig
   assert.equal(serializedFounders.includes('CGPA'), false);
   assert.equal(serializedFounders.includes('Intern'), false);
 
-  // Verify 16 tech marquee items
-  assert.equal(TECH_STACK_MARQUEE_ROW_1.length + TECH_STACK_MARQUEE_ROW_2.length, 16);
+  // Verify 12-item Lean MVP 2026 tech marquee items
+  assert.equal(TECH_STACK_MARQUEE_ROW_1.length + TECH_STACK_MARQUEE_ROW_2.length, 12);
+  const allTech = [...TECH_STACK_MARQUEE_ROW_1, ...TECH_STACK_MARQUEE_ROW_2];
+  assert.ok(allTech.includes('Next.js 15 & React 19'));
+  assert.ok(allTech.includes('Supabase (PostgreSQL + RLS)'));
+  assert.ok(allTech.includes('Razorpay & Dodo 1-Tap UPI'));
+  assert.ok(allTech.includes('Capacitor (iOS & Android)'));
 
   // Verify zero #8B5CF6 or #10B981 in HERO_ORBS
   for (const orb of HERO_ORBS) {
     assert.notEqual(orb.psychColor.toUpperCase(), '#8B5CF6');
     assert.notEqual(orb.psychColor.toUpperCase(), '#10B981');
   }
+
+  // Verify 85ms and 4.4x technical jargon are completely purged from agencyData
+  const serializedAllData = JSON.stringify({
+    HERO_ORBS,
+    SHOWCASE_PROJECTS,
+    FOUNDER_PROFILES,
+    EXECUTION_ROADMAP,
+    VERIFIED_REVIEWS,
+  });
+  assert.equal(serializedAllData.includes('85ms'), false);
+  assert.equal(serializedAllData.includes('4.4x'), false);
 });
 
 test('generateSystemBlueprint produces unique valid 3-layer blueprints across all 16 combinations', () => {

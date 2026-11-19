@@ -26,6 +26,7 @@ import {
   InteractiveArtifactId,
   SKYLINE_SACHIN_WHATSAPP_NUMBER,
   SKYLINE_INSTAGRAM_URL,
+  SKYLINE_GITHUB_URL,
 } from '../data/agencyData';
 import { buildReferralWhatsAppUrl } from '../utils/architectEngine';
 import { WhatsAppBrandBadge, InstagramBrandIcon } from './BrandIcons';
@@ -321,10 +322,10 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14">
               <div>
                 <div className="inline-flex items-center gap-2.5 mb-3">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-xs dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 flex items-center justify-center shrink-0">
-                    <TrendingUp className="w-4 h-4 text-[var(--text-primary)]" />
+                  <div className="w-8 h-8 rounded-xl heading-icon-emerald flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
+                  <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[#10B981] dark:text-[#34D399]">
                     PROVEN CLIENT IMPACT
                   </span>
                 </div>
@@ -476,8 +477,10 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
                       </div>
 
                       {rev.leadArchitect && (
-                        <div className="font-mono-tech text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-                          Engineered by {rev.leadArchitect}
+                        <div className="font-mono-tech text-[10px] font-bold tracking-wider text-[var(--text-secondary)]">
+                          {rev.leadArchitect.startsWith('Engineered by')
+                            ? rev.leadArchitect
+                            : `Engineered by ${rev.leadArchitect}`}
                         </div>
                       )}
 
@@ -491,7 +494,7 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
+                        <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                           {rev.liveSiteUrl && (
                             <a
                               href={rev.liveSiteUrl}
@@ -503,6 +506,14 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
                               <ArrowUpRight className="w-3 h-3" />
                             </a>
                           )}
+                          <a
+                            href={SKYLINE_GITHUB_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg surface-elevated border border-[var(--border-hairline)] font-mono-tech text-[10px] font-bold text-[var(--text-primary)]"
+                          >
+                            <span>GitHub ↗</span>
+                          </a>
                           {rev.artifactId && (
                             <button
                               type="button"
@@ -532,10 +543,10 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div>
                 <div className="inline-flex items-center gap-2.5 mb-3">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-xs dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 flex items-center justify-center shrink-0">
-                    <Sparkles className="w-4 h-4 text-[var(--text-primary)]" />
+                  <div className="w-8 h-8 rounded-xl heading-icon-amber flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
+                  <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[#D97706] dark:text-[#FBBF24]">
                     PARTNER COMMISSIONS & ENGINEERING MENTORSHIP LAB
                   </span>
                 </div>
@@ -586,10 +597,10 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
                   {/* Left Explanation + Rich Architectural Cards (6 Cols) */}
                   <div className="lg:col-span-6 space-y-6">
                     <div className="inline-flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-xs dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 flex items-center justify-center shrink-0">
-                        <Gift className="w-4 h-4 text-[var(--text-primary)]" />
+                      <div className="w-9 h-9 rounded-xl heading-icon-blue flex items-center justify-center shrink-0">
+                        <Gift className="w-4 h-4 text-white" />
                       </div>
-                      <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
+                      <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[#0B63F6] dark:text-[#60A5FA]">
                         SKYLINE PARTNER PROGRAM • 15% DIRECT PAYOUT
                       </span>
                     </div>
@@ -612,8 +623,8 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
                           <span className="font-mono-tech text-[9px] uppercase tracking-widest text-[var(--text-muted)] font-semibold">
                             INTRODUCE
                           </span>
-                          <div className="w-11 h-11 rounded-2xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-sm dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 dark:shadow-inner flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                            <Share2 className="w-5 h-5 text-[var(--text-primary)]" />
+                          <div className="w-11 h-11 rounded-2xl heading-icon-blue flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <Share2 className="w-5 h-5 text-white" />
                           </div>
                         </div>
 
@@ -647,8 +658,8 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
                           <span className="font-mono-tech text-[9px] uppercase tracking-widest text-[var(--text-muted)] font-semibold">
                             BLUEPRINT
                           </span>
-                          <div className="w-11 h-11 rounded-2xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-sm dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 dark:shadow-inner flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                            <Handshake className="w-5 h-5 text-[var(--text-primary)]" />
+                          <div className="w-11 h-11 rounded-2xl heading-icon-amber flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <Handshake className="w-5 h-5 text-white" />
                           </div>
                         </div>
 
@@ -686,8 +697,8 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
                           <span className="font-mono-tech text-[9px] uppercase tracking-widest text-[var(--text-muted)] font-semibold">
                             REWARD
                           </span>
-                          <div className="w-11 h-11 rounded-2xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-sm dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 dark:shadow-inner flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                            <Wallet className="w-5 h-5 text-[var(--text-primary)]" />
+                          <div className="w-11 h-11 rounded-2xl heading-icon-emerald flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <Wallet className="w-5 h-5 text-white" />
                           </div>
                         </div>
 
@@ -882,10 +893,10 @@ export const ClientProofAndReferral: React.FC<ClientProofAndReferralProps> = ({
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                   <div className="lg:col-span-5 space-y-5">
                     <div className="inline-flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-b from-white to-zinc-100 border border-zinc-300/80 shadow-xs dark:from-zinc-800/90 dark:to-zinc-950 dark:border-white/15 flex items-center justify-center shrink-0">
-                        <GraduationCap className="w-4 h-4 text-[var(--text-primary)]" />
+                      <div className="w-9 h-9 rounded-xl heading-icon-crimson flex items-center justify-center shrink-0">
+                        <GraduationCap className="w-4 h-4 text-white" />
                       </div>
-                      <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
+                      <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[#DC2626] dark:text-[#F87171]">
                         FOR B.TECH • BCA • MCA & STUDENT FOUNDERS
                       </span>
                     </div>

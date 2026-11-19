@@ -1,2206 +1,3235 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  Lock,
+  Monitor,
+  Smartphone,
+  Compass,
+  ShoppingBag,
+  Stethoscope,
+  LayoutDashboard,
+  Calendar,
+  Download,
+  CheckCircle2,
+  Star,
+  MapPin,
+  ShieldCheck,
+  Search,
+  Plus,
+  Trash2,
+  Printer,
+  Cpu,
+  Database,
+  Users,
+  GraduationCap,
+  Terminal,
+  Zap,
+  Globe,
+  TrendingUp,
+  FileCheck2,
+  MessageSquare,
+} from 'lucide-react';
 import { InteractiveArtifactId } from '../data/agencyData';
-import { SKYLINE_WHATSAPP_NUMBER } from '../utils/architectEngine';
-import { WhatsAppLogoIcon } from './BrandIcons';
+import { WhatsAppBrandBadge } from './BrandIcons';
 
 interface InteractiveArtifactModalProps {
   artifactId: InteractiveArtifactId | null;
   onClose: () => void;
+  onRequestSimilarSystem?: () => void;
 }
 
-const ARTIFACT_TABS: { id: InteractiveArtifactId; label: string; badge: string }[] = [
-  { id: '360-views', label: '360 Views (Spatial)', badge: 'SACHIN SAHU • LIVE' },
-  { id: 'shadowbase-cdc', label: 'ShadowBase CDC', badge: 'SACHIN SAHU • KAFKA' },
-  { id: 'gridweaver-iot', label: 'GridWeaver IoT', badge: 'SACHIN SAHU • LOOM' },
-  { id: 'fileguard-security', label: 'FileGuard AI', badge: 'AASHIF KHAN • SHA-256' },
-  { id: 'ai-career-mentor', label: 'AI Career Mentor', badge: 'AASHIF KHAN • AI' },
-  { id: 'socialite-network', label: 'Socialite Studio', badge: 'AASHIF KHAN • FEED' },
-  { id: 'aa-chocolates-d2c', label: 'A&A Chocolates D2C', badge: 'AASHIF KHAN • D2C' },
-  { id: 'finvantage-saas', label: 'FinVantage GST SaaS', badge: 'FINTECH ENGINE' },
-  { id: 'auracare-local', label: 'AuraCare Map Pack', badge: 'CLINIC ENGINE' },
-  { id: 'nexaprop-crm', label: 'NexaProp CRM', badge: 'PROPTECH CRM' },
-  { id: 'searchpulse-seo', label: 'SearchPulse SEO', badge: 'GEO / AI SEO' },
+interface PrototypeSiteMeta {
+  id: InteractiveArtifactId;
+  name: string;
+  category: string;
+  url: string;
+  liveExternalUrl?: string;
+  architect: string;
+}
+
+const PROTOTYPE_SITES: PrototypeSiteMeta[] = [
+  {
+    id: '360-views',
+    name: '360 Views · Spatial PropTech',
+    category: 'Real Estate & 360° Virtual Tours',
+    url: 'https://360views.services',
+    liveExternalUrl: 'https://360views.services',
+    architect: 'Sachin Sahu (Founder & CEO)',
+  },
+  {
+    id: 'aa-chocolates-d2c',
+    name: 'A&A Artisan Chocolates',
+    category: 'D2C Storefront & 1-Tap UPI',
+    url: 'https://aachocolates.in',
+    architect: 'Sachin Sahu & Aashif Khan',
+  },
+  {
+    id: 'auracare-local',
+    name: 'AuraCare Multispecialty & Dental Studio',
+    category: 'Healthcare Clinic & WhatsApp Booking',
+    url: 'https://auracareclinic.in',
+    architect: 'Sachin Sahu & Aashif Khan',
+  },
+  {
+    id: 'finvantage-saas',
+    name: 'FinVantage Cloud GST SaaS',
+    category: 'Multi-Tenant GST Billing & Analytics',
+    url: 'https://finvantage.in',
+    architect: 'Sachin Sahu & Aashif Khan',
+  },
+  {
+    id: 'nexaprop-crm',
+    name: 'NexaProp WhatsApp AI & CRM',
+    category: '24/7 Real Estate WhatsApp Cloud Bot',
+    url: 'https://nexaprop.in',
+    architect: 'Sachin Sahu (Founder & CEO)',
+  },
+  {
+    id: 'fileguard-security',
+    name: 'FileGuard AI · Zero-Trust Verifier',
+    category: 'SHA-256 & Cryptographic Document Security',
+    url: 'https://fileguard.ai',
+    architect: 'Aashif Khan (Co-Founder & System Architect)',
+  },
+  {
+    id: 'gridweaver-iot',
+    name: 'GridWeaver · Smart Microgrid Platform',
+    category: 'CleanTech GIS & Java 21 Telemetry',
+    url: 'https://gridweaver.io',
+    architect: 'Sachin Sahu (Founder & CEO)',
+  },
+  {
+    id: 'shadowbase-cdc',
+    name: 'ShadowBase · Zero-Downtime SQL Platform',
+    category: 'Debezium CDC & Schema Migration Studio',
+    url: 'https://shadowbase.dev',
+    architect: 'Sachin Sahu (Founder & CEO)',
+  },
+  {
+    id: 'ai-career-mentor',
+    name: 'AI Career Guide & Engineering Viva Lab',
+    category: 'RAG Roadmap & Mock Viva Mentorship',
+    url: 'https://aicareerguide.in',
+    architect: 'Aashif Khan (Co-Founder & System Architect)',
+  },
+  {
+    id: 'socialite-network',
+    name: 'Socialite · Creator Community Platform',
+    category: 'Real-Time Creator Network & Cohorts',
+    url: 'https://socialite.club',
+    architect: 'Aashif Khan (Co-Founder & System Architect)',
+  },
+  {
+    id: 'searchpulse-seo',
+    name: 'SearchPulse · Local Map Pack Growth',
+    category: 'Google Business Profile SEO & Review Engine',
+    url: 'https://searchpulse.in',
+    architect: 'Sachin Sahu & Aashif Khan',
+  },
 ];
-
-type RoomKey = 'Living Room' | 'Master Suite' | 'Commercial Lobby' | 'Sky Deck';
-
-interface SpatialRoomSpec {
-  id: RoomKey;
-  subtitle: string;
-  elevation: string;
-  lightingLux: string;
-  defaultYaw: number;
-  floorAreaSqFt: number;
-  ambientTemp: string;
-  hotspots: {
-    id: string;
-    label: string;
-    coord: string;
-    materialSpec: string;
-    acoustics: string;
-  }[];
-}
-
-const SPATIAL_ROOMS: Record<RoomKey, SpatialRoomSpec> = {
-  'Living Room': {
-    id: 'Living Room',
-    subtitle: 'Double-Height Italian Marble Atrium • East-Facing Floor-to-Ceiling Glazing',
-    elevation: '+142.5m Above Sea Level (18th Floor)',
-    lightingLux: '680 Lux Natural Daylight • DALI Smart Dimming',
-    defaultYaw: 128,
-    floorAreaSqFt: 1180,
-    ambientTemp: '22.5°CVRV Zoned',
-    hotspots: [
-      {
-        id: 'hs-marble',
-        label: 'Statuario Bookmatched Flooring',
-        coord: 'Yaw 115° • Pitch -18°',
-        materialSpec: '18mm Imported Italian Statuario Marble with diamond-sealed anti-stain coat',
-        acoustics: 'STC 58 Impact Isolation Underlayment',
-      },
-      {
-        id: 'hs-glazing',
-        label: 'Low-E Double Glazed Curtain Wall',
-        coord: 'Yaw 142° • Pitch +4°',
-        materialSpec: 'Saint-Gobain Solar Control Double Glazed Unit (28mm Argon-filled)',
-        acoustics: '42 dB External Traffic Noise Attenuation',
-      },
-      {
-        id: 'hs-automation',
-        label: 'KNX Touch Scene Controller',
-        coord: 'Yaw 88° • Pitch 0°',
-        materialSpec: 'Brushed Anodized Platinum 6-Gang Scene Switch + WhatsApp Concierge Link',
-        acoustics: 'Zero-latency local KNX bus',
-      },
-    ],
-  },
-  'Master Suite': {
-    id: 'Master Suite',
-    subtitle: 'Corner Sanctuary with Walk-In Glass Wardrobe & Private Plunge Deck',
-    elevation: '+146.0m Above Sea Level (19th Floor Duplex)',
-    lightingLux: '320 Lux Warm Circadian 2700K Profile',
-    defaultYaw: 214,
-    floorAreaSqFt: 840,
-    ambientTemp: '21.0°C Whisper Mode',
-    hotspots: [
-      {
-        id: 'hs-oak',
-        label: 'Engineered Smoked Chevron Timber',
-        coord: 'Yaw 205° • Pitch -22°',
-        materialSpec: '15mm European White Oak with matte brushed UV lacquer',
-        acoustics: 'Warm acoustic absorption αw = 0.25',
-      },
-      {
-        id: 'hs-wardrobe',
-        label: 'Fluted Smoke-Glass Walk-In',
-        coord: 'Yaw 248° • Pitch +2°',
-        materialSpec: 'CNC-milled charcoal aluminum frame with integrated 4000K motion LED strips',
-        acoustics: 'Soft-close pneumatic magnetic dampers',
-      },
-      {
-        id: 'hs-bath',
-        label: 'Thermostatic Rain Spa Suite',
-        coord: 'Yaw 176° • Pitch -5°',
-        materialSpec: 'Hansgrohe Axor Brushed Platinum PVD fixtures + heated anti-fog mirror',
-        acoustics: 'Insulated silent drainage stack',
-      },
-    ],
-  },
-  'Commercial Lobby': {
-    id: 'Commercial Lobby',
-    subtitle: 'Grade-A Enterprise Arrival Concourse • Biometric Turnstiles & Concierge',
-    elevation: '+0.0m Ground Plaza Level',
-    lightingLux: '850 Lux Architectural Linear Louvre Grid',
-    defaultYaw: 45,
-    floorAreaSqFt: 4600,
-    ambientTemp: '23.0°C High-CFM Fresh Air',
-    hotspots: [
-      {
-        id: 'hs-turnstile',
-        label: 'NFC + QR Fast-Lane Turnstiles',
-        coord: 'Yaw 42° • Pitch -8°',
-        materialSpec: 'Sub-200ms visitor pass verification synced with WhatsApp pre-registration',
-        acoustics: 'Brushless servo motor barrier wings',
-      },
-      {
-        id: 'hs-elevator',
-        label: 'Destination Dispatch 6m/s Lifts',
-        coord: 'Yaw 76° • Pitch +6°',
-        materialSpec: '8-Car AI-grouped high-speed elevator bank with regenerative drives',
-        acoustics: 'Average wait time < 19 seconds at peak load',
-      },
-      {
-        id: 'hs-wall',
-        label: 'Brushed Titanium Acoustic Baffles',
-        coord: 'Yaw 12° • Pitch +24°',
-        materialSpec: 'Perforated anodized metal panels with Rockwool backing',
-        acoustics: 'RT60 reverberation controlled to 0.55s',
-      },
-    ],
-  },
-  'Sky Deck': {
-    id: 'Sky Deck',
-    subtitle: '360° Rooftop Infinity Lounge & Executive Helipad Observation Terrace',
-    elevation: '+198.0m Crown Level (42nd Floor)',
-    lightingLux: '140 Lux Starlight Perimeter Grazing',
-    defaultYaw: 310,
-    floorAreaSqFt: 3200,
-    ambientTemp: '19.5°C Open Breeze',
-    hotspots: [
-      {
-        id: 'hs-infinity',
-        label: 'Temperature-Controlled Infinity Edge',
-        coord: 'Yaw 318° • Pitch -12°',
-        materialSpec: '25m cantilevered lap pool with laminated 36mm structural acrylic viewing wall',
-        acoustics: 'Submerged laminar overflow weir',
-      },
-      {
-        id: 'hs-cabana',
-        label: 'Private Founder Cabana Pod',
-        coord: 'Yaw 280° • Pitch 0°',
-        materialSpec: 'Weatherproof marine-grade slate louvers with integrated 10Gbps Wi-Fi 7 node',
-        acoustics: 'Directional outdoor acoustic array',
-      },
-      {
-        id: 'hs-horizon',
-        label: 'Indore Super Corridor Skyline Vector',
-        coord: 'Yaw 345° • Pitch +5°',
-        materialSpec: 'Unobstructed 18km panoramic sightline toward IT Park & Airport corridor',
-        acoustics: 'Wind-baffled glass parapet',
-      },
-    ],
-  },
-};
-
-const MIGRATION_SCRIPTS = [
-  {
-    id: 'mig-orders-col',
-    label: 'ALTER TABLE orders ADD settlement_hash',
-    sql: `ALTER TABLE production.orders \n  ADD COLUMN settlement_hash VARCHAR(64) DEFAULT NULL,\n  ADD COLUMN reconciliation_state VARCHAR(24) NOT NULL DEFAULT 'PENDING';`,
-    rowsAffected: '4,820,400 rows',
-    legacyLockMs: '18,400 ms (Table Lock)',
-    shadowLockMs: '0 ms (Debezium Shadow Replay)',
-    parityRate: '100.000%',
-    logs: [
-      '[00:00.012] Testcontainers: Spawning ephemeral PostgreSQL 16.3 shadow container (id: sb-pg16-94a)...',
-      '[00:00.184] SchemaEngine: Applied DDL migration on shadow clone in 14ms (0 active client locks on primary).',
-      '[00:00.410] DebeziumCDC: Subscribed to WAL slot `skyline_orders_cdc_slot` @ LSN 0/1A8F9B0.',
-      '[00:00.890] KafkaRouter: Replaying 14,850 live INSERT/UPDATE events/sec to topic `shadow.orders.v2`...',
-      '[00:01.320] ParityVerifier: Audited 4,820,400 row SHA-256 checksums -> 0 drift, 0 dropped mutations.',
-      '[00:01.450] CutoverGate: READY FOR ATOMIC SUB-MILLISECOND POINTER SWAP ✓',
-    ],
-  },
-  {
-    id: 'mig-ledger-idx',
-    label: 'CREATE INDEX CONCURRENTLY idx_ledger_tenant',
-    sql: `CREATE INDEX CONCURRENTLY idx_ledger_tenant_created \n  ON production.ledger_entries (tenant_id, created_at DESC) \n  INCLUDE (amount_paise, status);`,
-    rowsAffected: '12,450,000 rows',
-    legacyLockMs: '42,900 ms (Write Stall)',
-    shadowLockMs: '0 ms (Shadow Index Build)',
-    parityRate: '99.999%',
-    logs: [
-      '[00:00.008] Testcontainers: Provisioned isolated NVMe storage volume for 12.4M ledger rows...',
-      '[00:00.220] IndexBuilder: Building B-Tree composite covering index on shadow instance...',
-      '[00:00.640] DebeziumCDC: Streaming live payment ledger deltas via Kafka partition group `ledger-sync-01`.',
-      '[00:01.110] QueryPlanner: Verified Index-Only Scan latency dropped from 148.2ms -> 1.4ms (99.05% faster).',
-      '[00:01.290] ParityVerifier: Checksum tree root `0x9f84...e21b` matches primary & shadow 100%.',
-      '[00:01.340] CutoverGate: ZERO LOCK CONTENTION VERIFIED ✓',
-    ],
-  },
-  {
-    id: 'mig-payments-part',
-    label: 'PARTITION TABLE payments BY RANGE (fiscal_quarter)',
-    sql: `ALTER TABLE production.payments_monolith \n  ATTACH PARTITION payments_fy26_q1 \n  FOR VALUES FROM ('2026-01-01') TO ('2026-04-01');`,
-    rowsAffected: '28,900,000 rows',
-    legacyLockMs: '64,200 ms (AccessExclusiveLock)',
-    shadowLockMs: '0 ms (Dual-Stream Partition Cutover)',
-    parityRate: '100.000%',
-    logs: [
-      '[00:00.015] Testcontainers: Initialized partitioned target topology across 8 range shards...',
-      '[00:00.305] DebeziumCDC: Routing high-throughput UPI webhook writes to dual Kafka topics...',
-      '[00:00.780] BackfillWorker: Completed parallel keyset batch copy (50,000 rows/batch, 0% CPU spike on primary).',
-      '[00:01.190] ParityVerifier: Reconciled 28.9M records across all fiscal partitions with zero orphan keys.',
-      '[00:01.380] CutoverGate: PARTITION ROUTING PROMOTED WITH 0ms DOWNTIME ✓',
-    ],
-  },
-] as const;
-
-const SAMPLE_DOCUMENTS = {
-  NDA: {
-    label: 'Mutual Enterprise NDA',
-    anchorTx: '0x8f4e92c1b7a04d3e91a5c62f8b01d4e79c3a21f0 (Polygon Mainnet Block #61940211)',
-    timestamp: '2026-02-18 14:22:09 UTC • OriginStamp Verified',
-    content:
-      'SKYLINE-NDA-2026-INDORE: Mutual Non-Disclosure Agreement between SkyLine Digital Agency (Sachin Sahu & Aashif Khan) and Enterprise Client. All proprietary source code, Kafka schemas, and zero-downtime migration blueprints remain strictly confidential.',
-  },
-  'Property Deed': {
-    label: 'Commercial Title Deed #402',
-    anchorTx: '0x3c91a04b7e21d8f56019c4a2e8b7d103f5a9c812 (Ethereum L1 Block #21849104)',
-    timestamp: '2026-03-04 09:45:51 UTC • OriginStamp Verified',
-    content:
-      'DEED-SUPER-CORRIDOR-402: Commercial Plot #14, Vijay Nagar IT Corridor, Indore MP. Registered Carpet Area: 4,600 Sq.Ft. Clear Title Verified. Encumbrance Status: ZERO LIENS.',
-  },
-  Invoice: {
-    label: 'Enterprise Milestone Invoice #INV-908',
-    anchorTx: '0x7a12f90e4c83b6d21508e9f3a4c7b120d9e4a518 (Bitcoin OP_RETURN #884120)',
-    timestamp: '2026-03-19 17:10:33 UTC • OriginStamp Verified',
-    content:
-      'INVOICE #SKY-2026-908 | Client: Apex Logistics Ltd | Deliverable: Custom Next.js 15 + Spring Boot Kafka Architecture | Net Settlement: INR 2,40,000 (Inclusive of 18% GST) | Status: PAID IN FULL.',
-  },
-} as const;
-
-type CareerLevel = 'Beginner' | 'B.Tech CSE' | 'Working Dev';
-type CareerRole = 'Full-Stack Architect' | 'AI Engineer' | 'Backend Java/Kafka' | 'Cybersecurity';
-
-interface CareerRoadmapData {
-  weeks: { week: string; title: string; deliverable: string }[];
-  skills: { name: string; current: number; target: number }[];
-  interviewQuestion: string;
-  modelAnswer: string;
-}
-
-const CAREER_MATRIX: Record<CareerRole, CareerRoadmapData> = {
-  'Full-Stack Architect': {
-    weeks: [
-      {
-        week: 'Weeks 1–3',
-        title: 'Next.js 15 App Router, TypeScript Strict Mode & Edge Caching',
-        deliverable: 'Ship a sub-100ms SSR storefront with zero layout shift (CLS 0.00).',
-      },
-      {
-        week: 'Weeks 4–6',
-        title: 'PostgreSQL Indexing, Prisma/Drizzle ORM & Redis Rate-Limiting',
-        deliverable: 'Build an idempotent multi-tenant booking API handling 2,500 req/sec.',
-      },
-      {
-        week: 'Weeks 7–10',
-        title: 'Docker CI/CD, Playwright E2E Verification & AWS/Cloudflare Deployment',
-        deliverable: 'Deploy production SaaS with automated zero-downtime rollback gates.',
-      },
-    ],
-    skills: [
-      { name: 'React 19 / Next.js 15 SSR', current: 45, target: 96 },
-      { name: 'PostgreSQL Query Tuning', current: 35, target: 92 },
-      { name: 'System Design & Caching', current: 30, target: 90 },
-      { name: 'Automated E2E Testing', current: 40, target: 94 },
-    ],
-    interviewQuestion:
-      'How do you prevent double-charging a customer when a mobile user double-taps the Pay button on an unstable 4G connection?',
-    modelAnswer:
-      'Generate a deterministic client-side Idempotency-Key (UUIDv5 or SHA-256 of user + cart + timestamp window) and enforce an atomic UNIQUE constraint + Redis lock on the backend before calling Razorpay/Stripe.',
-  },
-  'AI Engineer': {
-    weeks: [
-      {
-        week: 'Weeks 1–3',
-        title: 'Deterministic Prompt Engineering, Structured JSON Outputs & Token Budgeting',
-        deliverable: 'Build a schema-validated AI extraction pipeline with 99.4% parse reliability.',
-      },
-      {
-        week: 'Weeks 4–6',
-        title: 'Hybrid RAG (pgvector + BM25 Lexical Search) & Reranking Pipelines',
-        deliverable: 'Index 50,000 enterprise PDFs with sub-400ms grounded citation retrieval.',
-      },
-      {
-        week: 'Weeks 7–10',
-        title: 'Agentic Tool Calling, Guardrails & WhatsApp Cloud Webhook Orchestration',
-        deliverable: 'Launch an autonomous AI triage agent with human-in-the-loop escalation.',
-      },
-    ],
-    skills: [
-      { name: 'Hybrid Vector + BM25 RAG', current: 30, target: 95 },
-      { name: 'Structured Tool Calling', current: 40, target: 94 },
-      { name: 'Eval Benchmarks & Guardrails', current: 25, target: 90 },
-      { name: 'Low-Latency Streaming APIs', current: 45, target: 92 },
-    ],
-    interviewQuestion:
-      'Why does pure vector cosine similarity fail on exact SKU codes or legal clause numbers, and how do you fix it?',
-    modelAnswer:
-      'Dense embeddings compress exact alphanumeric tokens. Combine dense pgvector similarity with sparse BM25 keyword search using Reciprocal Rank Fusion (RRF) and a cross-encoder reranker.',
-  },
-  'Backend Java/Kafka': {
-    weeks: [
-      {
-        week: 'Weeks 1–3',
-        title: 'Java 21 Virtual Threads (Project Loom) & Spring Boot 3.3 High-Concurrency',
-        deliverable: 'Benchmark 50,000 concurrent non-blocking socket connections on a single JVM.',
-      },
-      {
-        week: 'Weeks 4–6',
-        title: 'Apache Kafka Partitioning, Consumer Groups & Transactional Outbox Pattern',
-        deliverable: 'Implement zero-data-loss event streaming between order and inventory services.',
-      },
-      {
-        week: 'Weeks 7–10',
-        title: 'Debezium CDC, Docker Testcontainers & Shadow Schema Cutovers',
-        deliverable: 'Execute a live 5M-row PostgreSQL schema migration with 0ms table lock.',
-      },
-    ],
-    skills: [
-      { name: 'Java 21 Loom Virtual Threads', current: 35, target: 96 },
-      { name: 'Kafka + Debezium CDC', current: 25, target: 94 },
-      { name: 'Spring Boot Microservices', current: 45, target: 95 },
-      { name: 'Testcontainers Integration', current: 30, target: 92 },
-    ],
-    interviewQuestion:
-      'How do you guarantee that a PostgreSQL row update and a Kafka event publish both succeed or both fail without distributed 2-Phase Commit?',
-    modelAnswer:
-      'Use the Transactional Outbox Pattern with Debezium CDC: write the business mutation and the outbox event in the same local ACID database transaction, then tail the PostgreSQL WAL into Kafka.',
-  },
-  Cybersecurity: {
-    weeks: [
-      {
-        week: 'Weeks 1–3',
-        title: 'Cryptographic Hashing (SHA-256, HMAC), JWT Rotation & Zero-Trust RBAC',
-        deliverable: 'Build a tamper-evident document verification API with Merkle-tree receipts.',
-      },
-      {
-        week: 'Weeks 4–6',
-        title: 'OWASP Top 10 Hardening, SQLi/XSS Sanitization & Rate-Limit Defense',
-        deliverable: 'Audit and patch a vulnerable financial web app with automated regression tests.',
-      },
-      {
-        week: 'Weeks 7–10',
-        title: 'Blockchain Timestamp Anchoring (OriginStamp) & Immutable Audit Logs',
-        deliverable: 'Ship an enterprise compliance vault with real-time 1-character tamper detection.',
-      },
-    ],
-    skills: [
-      { name: 'SHA-256 & Merkle Proofs', current: 40, target: 97 },
-      { name: 'Zero-Trust Auth & RBAC', current: 35, target: 94 },
-      { name: 'OWASP API Hardening', current: 45, target: 95 },
-      { name: 'Automated Security Audits', current: 30, target: 91 },
-    ],
-    interviewQuestion:
-      'Why is storing document hashes only inside the same PostgreSQL database insufficient for legal non-repudiation?',
-    modelAnswer:
-      'A compromised database admin credential could rewrite both the document and its stored hash. Anchoring the Merkle root to an external immutable ledger (via OriginStamp) proves the hash existed at a specific timestamp.',
-  },
-};
 
 export const InteractiveArtifactModal: React.FC<InteractiveArtifactModalProps> = ({
   artifactId,
   onClose,
+  onRequestSimilarSystem,
 }) => {
-  const [selectedTab, setSelectedTab] = useState<InteractiveArtifactId | null>(null);
-  useEffect(() => {
-    setSelectedTab(null);
-  }, [artifactId]);
-  const activeId: InteractiveArtifactId | null = selectedTab ?? artifactId;
-
-  // 1. 360 Views Spatial Real Estate Platform state (Sachin Sahu)
-  const [selectedRoom, setSelectedRoom] = useState<RoomKey>('Living Room');
-  const [compassYaw, setCompassYaw] = useState<number>(128);
-  const [fovLens, setFovLens] = useState<number>(90);
-  const [selectedHotspotId, setSelectedHotspotId] = useState<string>('hs-marble');
-  const [spatialLeadName, setSpatialLeadName] = useState<string>('Rajesh Singhania');
-  const [spatialLeadPhone, setSpatialLeadPhone] = useState<string>('+91 98260 44112');
-  const [spatialLeadSent, setSpatialLeadSent] = useState<boolean>(false);
-
-  const currentRoomSpec = SPATIAL_ROOMS[selectedRoom];
-  const activeHotspot =
-    currentRoomSpec.hotspots.find((h) => h.id === selectedHotspotId) ||
-    currentRoomSpec.hotspots[0];
-
-  const handleSelectRoom = (room: RoomKey) => {
-    setSelectedRoom(room);
-    setCompassYaw(SPATIAL_ROOMS[room].defaultYaw);
-    setSelectedHotspotId(SPATIAL_ROOMS[room].hotspots[0].id);
-  };
-
-  // 2. ShadowBase Zero-Downtime SQL Migration Sandbox state (Sachin Sahu)
-  const [selectedMigrationIdx, setSelectedMigrationIdx] = useState<number>(0);
-  const [cdcReplayCount, setCdcReplayCount] = useState<number>(1);
-  const [cdcRunning, setCdcRunning] = useState<boolean>(false);
-  const activeMigration = MIGRATION_SCRIPTS[selectedMigrationIdx];
-
-  const triggerCdcReplay = () => {
-    setCdcRunning(true);
-    setCdcReplayCount((c) => c + 1);
-    window.setTimeout(() => {
-      setCdcRunning(false);
-    }, 350);
-  };
-
-  // 3. GridWeaver Java 21 Loom IoT Microgrid Engine state (Sachin Sahu)
-  const [iotNodes, setIotNodes] = useState<
-    { id: string; zone: string; state: 'CHARGING' | 'DISCHARGING' | 'IDLE' | 'FAULT'; loadKw: number }[]
-  >([
-    { id: 'NODE-IND-01', zone: 'Pithampur Solar Array A', state: 'CHARGING', loadKw: 480 },
-    { id: 'NODE-IND-02', zone: 'Vijay Nagar Substation B', state: 'DISCHARGING', loadKw: 620 },
-    { id: 'NODE-IND-03', zone: 'Super Corridor EV Hub', state: 'IDLE', loadKw: 195 },
-    { id: 'NODE-IND-04', zone: 'Sanwer Industrial Feeder', state: 'CHARGING', loadKw: 540 },
-  ]);
-  const [loomSpikeActive, setLoomSpikeActive] = useState<boolean>(false);
-  const [virtualThreadCount, setVirtualThreadCount] = useState<number>(12400);
-
-  const setNodeStateExplicit = (
-    idx: number,
-    nextState: 'CHARGING' | 'DISCHARGING' | 'IDLE' | 'FAULT'
-  ) => {
-    setIotNodes((prev) =>
-      prev.map((node, i) => {
-        if (i !== idx) return node;
-        const loadMap = {
-          CHARGING: 510 + idx * 45,
-          DISCHARGING: 680 + idx * 55,
-          IDLE: 110 + idx * 15,
-          FAULT: 0,
-        };
-        return {
-          ...node,
-          state: nextState,
-          loadKw: loadMap[nextState],
-        };
-      })
-    );
-  };
-
-  const triggerLoomSpike = () => {
-    setLoomSpikeActive((prev) => {
-      const next = !prev;
-      setVirtualThreadCount(next ? 50000 : 12400);
-      return next;
-    });
-  };
-
-  const totalMicrogridKw = useMemo(
-    () => iotNodes.reduce((acc, n) => acc + n.loadKw, 0),
-    [iotNodes]
+  const [currentId, setCurrentId] = useState<InteractiveArtifactId>(
+    artifactId || '360-views'
   );
+  const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
 
-  // 4. FileGuard AI SHA-256 & Blockchain Verifier state (Aashif Khan)
-  const [selectedSampleDoc, setSelectedSampleDoc] = useState<keyof typeof SAMPLE_DOCUMENTS>('NDA');
-  const [docPayload, setDocPayload] = useState<string>(SAMPLE_DOCUMENTS.NDA.content);
-  const [tamperCheckInput, setTamperCheckInput] = useState<string>(SAMPLE_DOCUMENTS.NDA.content);
+  // 1. 360 Views State
+  const [active360Room, setActive360Room] = useState<number>(0);
+  const [fovZoom, setFovZoom] = useState<number>(105);
+  const [propFilterLocation, setPropFilterLocation] = useState<string>('Indore');
+  const [propFilterType, setPropFilterType] = useState<string>('All');
+  const [propFilterBudget, setPropFilterBudget] = useState<string>('₹65L – ₹3.5Cr');
+  const [visitDate, setVisitDate] = useState<string>('This Saturday, 11:30 AM');
+  const [visitPhone, setVisitPhone] = useState<string>('');
+  const [visitBooked, setVisitBooked] = useState<boolean>(false);
+  const [loanAmountLakhs, setLoanAmountLakhs] = useState<number>(85);
 
-  const handleSelectSampleDoc = (docKey: keyof typeof SAMPLE_DOCUMENTS) => {
-    setSelectedSampleDoc(docKey);
-    setDocPayload(SAMPLE_DOCUMENTS[docKey].content);
-    setTamperCheckInput(SAMPLE_DOCUMENTS[docKey].content);
-  };
+  // 2. A&A Chocolates State
+  const [boxSize, setBoxSize] = useState<'6-Piece' | '12-Piece' | '24-Piece'>('12-Piece');
+  const [cartItems, setCartItems] = useState<
+    { name: string; price: number; qty: number }[]
+  >([
+    { name: 'Belgian Dark 70%', price: 699, qty: 1 },
+    { name: 'Roasted Hazelnut Praline', price: 899, qty: 1 },
+  ]);
+  const [selectedUpiApp, setSelectedUpiApp] = useState<'GPay' | 'PhonePe' | 'Paytm'>('GPay');
+  const [checkoutSuccess, setCheckoutSuccess] = useState<boolean>(false);
 
-  const computeDeterministicHash = (text: string): string => {
-    let h1 = 0xdeadbeef ^ text.length;
-    let h2 = 0x41c6ce57 ^ text.length;
-    let h3 = 0x9e3779b9 ^ text.length;
-    let h4 = 0x85ebca6b ^ text.length;
-    for (let i = 0; i < text.length; i++) {
-      const ch = text.charCodeAt(i);
-      h1 = Math.imul(h1 ^ ch, 2654435761);
-      h2 = Math.imul(h2 ^ ch, 1597334677);
-      h3 = Math.imul(h3 ^ (ch << 3), 2246822507);
-      h4 = Math.imul(h4 ^ (ch << 5), 3266489909);
-    }
-    const p1 = (h1 >>> 0).toString(16).padStart(8, '0');
-    const p2 = (h2 >>> 0).toString(16).padStart(8, '0');
-    const p3 = (h3 >>> 0).toString(16).padStart(8, '0');
-    const p4 = (h4 >>> 0).toString(16).padStart(8, '0');
-    return `e3b0c442${p1}${p2}${p3}${p4}98fc1c149afbf4c8996fb924`;
-  };
+  // 3. AuraCare Clinic State
+  const [selectedTreatment, setSelectedTreatment] = useState<string>(
+    'Root Canal / Dental Implant'
+  );
+  const [selectedDoctor, setSelectedDoctor] = useState<string>(
+    'Dr. Ananya Verma (MDS Endodontics)'
+  );
+  const [selectedClinicSlot, setSelectedClinicSlot] = useState<string>('Today 5:30 PM');
+  const [patientName, setPatientName] = useState<string>('Aarav Sharma');
+  const [patientPhone, setPatientPhone] = useState<string>('+91 98260 12345');
+  const [clinicBooked, setClinicBooked] = useState<boolean>(false);
 
-  const shaHashOriginal = useMemo(() => computeDeterministicHash(docPayload), [docPayload]);
-  const shaHashVerify = useMemo(() => computeDeterministicHash(tamperCheckInput), [tamperCheckInput]);
-  const isSignatureMatch = shaHashOriginal === shaHashVerify;
+  // 4. FinVantage SaaS State
+  const [finBillingCycle, setFinBillingCycle] = useState<'monthly' | 'annual'>('annual');
+  const [invoiceClient, setInvoiceClient] = useState<string>('Apex MediCare Pvt Ltd');
+  const [invoiceBaseAmount, setInvoiceBaseAmount] = useState<number>(45000);
+  const [invoicesList, setInvoicesList] = useState<
+    { id: string; client: string; base: number; gst: number; total: number; status: string }[]
+  >([
+    {
+      id: 'INV-2026-108',
+      client: 'AuraCare Dental Studio',
+      base: 28000,
+      gst: 5040,
+      total: 33040,
+      status: 'PAID VIA UPI',
+    },
+    {
+      id: 'INV-2026-107',
+      client: '360 Views PropTech LLP',
+      base: 65000,
+      gst: 11700,
+      total: 76700,
+      status: 'PAID VIA NEFT',
+    },
+    {
+      id: 'INV-2026-106',
+      client: 'A&A Artisanal Foods',
+      base: 18000,
+      gst: 3240,
+      total: 21240,
+      status: 'DUE IN 3 DAYS',
+    },
+  ]);
 
-  // 5. AI Career Guide & Mentor state (Aashif Khan)
-  const [careerLevel, setCareerLevel] = useState<CareerLevel>('B.Tech CSE');
-  const [targetRole, setTargetRole] = useState<CareerRole>('Full-Stack Architect');
-  const [showInterviewAnswer, setShowInterviewAnswer] = useState<boolean>(false);
-  const [completedMilestones, setCompletedMilestones] = useState<Record<string, boolean>>({
-    'Weeks 1–3': true,
-  });
+  // 5. NexaProp WhatsApp AI State
+  const [nexaChatMessages, setNexaChatMessages] = useState<
+    { sender: 'user' | 'bot'; text: string; time: string }[]
+  >([
+    {
+      sender: 'user',
+      text: 'Hi! Please share the floor plan and price for SkyLine One 3BHK Residences.',
+      time: '10:41 AM',
+    },
+    {
+      sender: 'bot',
+      text: 'Namaste! Here is the verified RERA brochure for SkyLine One (3BHK starts at ₹85 Lakh). Would you like to book a site visit this weekend?',
+      time: '10:41 AM',
+    },
+  ]);
+  const [nexaHandoverActive, setNexaHandoverActive] = useState<boolean>(false);
 
-  const activeCareerData = CAREER_MATRIX[targetRole];
-  const levelBonus =
-    careerLevel === 'Working Dev' ? 22 : careerLevel === 'B.Tech CSE' ? 10 : 0;
+  // 6. FileGuard Security State
+  const [docContent, setDocContent] = useState<string>(
+    'Commercial Lease Agreement #IND-2026-884 · Monthly Rent: ₹65,000 · Signed by Both Parties'
+  );
+  const [tamperedMode, setTamperedMode] = useState<boolean>(false);
 
-  // 6. Socialite Real-Time Creator & Community Platform state (Aashif Khan)
-  const [socialChannel, setSocialChannel] = useState<
-    'All Channels' | 'Full-Stack Devs' | 'AI Builders' | 'Design Systems'
-  >('All Channels');
-  const [newPostDraft, setNewPostDraft] = useState<string>('');
-  const [socialPosts, setSocialPosts] = useState<
+  // 7. GridWeaver IoT State
+  const [gridNodes, setGridNodes] = useState<
     {
       id: string;
-      author: string;
-      handle: string;
-      channel: 'Full-Stack Devs' | 'AI Builders' | 'Design Systems';
-      content: string;
-      likes: number;
-      comments: number;
-      liked: boolean;
-      timestamp: string;
+      name: string;
+      zone: string;
+      kw: number;
+      soc: number;
+      state: 'CHARGING' | 'DISCHARGING' | 'IDLE' | 'FAULT';
     }[]
   >([
     {
-      id: 'post-1',
+      id: 'NODE-IND-01',
+      name: 'Super Corridor Solar Array A',
+      zone: 'Indore North Grid',
+      kw: 420,
+      soc: 88,
+      state: 'DISCHARGING',
+    },
+    {
+      id: 'NODE-IND-02',
+      name: 'Pithampur Industrial Storage B',
+      zone: 'MP Industrial Feeder',
+      kw: 680,
+      soc: 94,
+      state: 'CHARGING',
+    },
+    {
+      id: 'NODE-BPL-03',
+      name: 'Bhopal Smart Substation C',
+      zone: 'Central Telemetry Hub',
+      kw: 310,
+      soc: 76,
+      state: 'IDLE',
+    },
+    {
+      id: 'NODE-UJJ-04',
+      name: 'Ujjain Microgrid Reserve D',
+      zone: 'West Feeder Line',
+      kw: 515,
+      soc: 82,
+      state: 'DISCHARGING',
+    },
+  ]);
+  const [virtualThreadLoad, setVirtualThreadLoad] = useState<number>(12400);
+
+  // 8. ShadowBase CDC State
+  const [selectedMigrationIdx, setSelectedMigrationIdx] = useState<number>(0);
+  const [migrationVerified, setMigrationVerified] = useState<boolean>(true);
+  const [shadowRowsSynced, setShadowRowsSynced] = useState<number>(142850);
+
+  // 9. AI Career Mentor State
+  const [selectedCareerTrack, setSelectedCareerTrack] = useState<
+    'Full-Stack Next.js' | 'Java 21 & Kafka' | 'AI & Cybersecurity'
+  >('Full-Stack Next.js');
+  const [completedWeeks, setCompletedWeeks] = useState<number[]>([1]);
+  const [vivaAnswerSubmitted, setVivaAnswerSubmitted] = useState<boolean>(false);
+
+  // 10. Socialite Creator Network State
+  const [socialChannel, setSocialChannel] = useState<
+    'All Creators' | 'Web Builders' | 'UI/UX Design'
+  >('All Creators');
+  const [newPostText, setNewPostText] = useState<string>('');
+  const [socialPosts, setSocialPosts] = useState<
+    { id: number; author: string; role: string; channel: string; content: string; likes: number }[]
+  >([
+    {
+      id: 1,
       author: 'Aashif Khan',
-      handle: '@aashif_architect',
-      channel: 'Full-Stack Devs',
+      role: 'Principal Systems Architect',
+      channel: 'Web Builders',
       content:
-        'Just shipped our sub-100ms Next.js 15 + WhatsApp Cloud CRM architecture from Indore! Optimistic UI updates cut perceived feed latency to <18ms.',
-      likes: 148,
-      comments: 34,
-      liked: true,
-      timestamp: '2m ago',
+        'Shipped zero-trust SHA-256 document verification with instant WebSocket room sync for 2,400 active creators.',
+      likes: 48,
     },
     {
-      id: 'post-2',
+      id: 2,
       author: 'Sachin Sahu',
-      handle: '@sachin_systems',
-      channel: 'AI Builders',
+      role: 'Founder & Full-Stack Architect',
+      channel: 'UI/UX Design',
       content:
-        'Java 21 Virtual Threads + Kafka CDC pipeline benchmarked at 50,000 concurrent telemetry sockets with zero thread-pool exhaustion.',
-      likes: 212,
-      comments: 49,
-      liked: false,
-      timestamp: '14m ago',
-    },
-    {
-      id: 'post-3',
-      author: 'Riya Deshmukh',
-      handle: '@riya_uiux',
-      channel: 'Design Systems',
-      content:
-        'Monochromatic brushed-platinum tokens + zero-CLS typography scales conversion velocity by 3.4x on mobile viewports.',
-      likes: 96,
-      comments: 19,
-      liked: false,
-      timestamp: '41m ago',
+        'Launched 360views.services spatial virtual tour engine for luxury real estate developers across Indore and Bhopal.',
+      likes: 64,
     },
   ]);
 
-  const handlePublishPost = () => {
-    const trimmed = newPostDraft.trim();
-    if (!trimmed) return;
-    const targetChan =
-      socialChannel === 'All Channels' ? 'Full-Stack Devs' : socialChannel;
-    setSocialPosts((prev) => [
-      {
-        id: `post-${Date.now()}`,
-        author: 'You (Live Sandbox Creator)',
-        handle: '@creator_indore',
-        channel: targetChan,
-        content: trimmed,
-        likes: 1,
-        comments: 0,
-        liked: true,
-        timestamp: 'Just now',
-      },
-      ...prev,
-    ]);
-    setNewPostDraft('');
-  };
+  // 11. SearchPulse Local SEO State
+  const [seoBusinessCategory, setSeoBusinessCategory] = useState<
+    'Dental & Multispecialty Clinic' | 'Real Estate Developer' | 'Jewellery & Retail Showroom'
+  >('Dental & Multispecialty Clinic');
+  const [seoCity, setSeoCity] = useState<string>('Indore (Vijay Nagar)');
+  const [seoCurrentReviews, setSeoCurrentReviews] = useState<number>(38);
+  const [seoReviewDispatched, setSeoReviewDispatched] = useState<boolean>(false);
 
-  const togglePostLike = (postId: string) => {
-    setSocialPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId
-          ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 }
-          : p
-      )
-    );
-  };
+  useEffect(() => {
+    if (artifactId) {
+      setCurrentId(artifactId === 'career-socialite' ? 'ai-career-mentor' : artifactId);
+    }
+  }, [artifactId]);
 
-  const incrementPostComment = (postId: string) => {
-    setSocialPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, comments: p.comments + 1 } : p))
-    );
-  };
-
-  const filteredPosts = useMemo(
-    () =>
-      socialChannel === 'All Channels'
-        ? socialPosts
-        : socialPosts.filter((p) => p.channel === socialChannel),
-    [socialChannel, socialPosts]
-  );
-
-  // 7. A&A Chocolates D2C Customizer & Meta CAPI Funnel state (Aashif Khan)
-  const [boxSize, setBoxSize] = useState<6 | 12 | 24>(12);
-  const [flavorCounts, setFlavorCounts] = useState<{
-    'Belgian Dark Truffle': number;
-    'Roasted Hazelnut': number;
-    'Almond Praline': number;
-    'Cranberry Crunch': number;
-  }>({
-    'Belgian Dark Truffle': 4,
-    'Roasted Hazelnut': 3,
-    'Almond Praline': 3,
-    'Cranberry Crunch': 2,
-  });
-  const [giftNote, setGiftNote] = useState('Happy Diwali & Warm Wishes — From Indore!');
-  const [upiMethod, setUpiMethod] = useState<'GPay' | 'PhonePe'>('GPay');
-  const [checkoutDone, setCheckoutDone] = useState<boolean>(false);
-
-  const adjustFlavorCount = (
-    flavor: keyof typeof flavorCounts,
-    delta: number
-  ) => {
-    setFlavorCounts((prev) => ({
-      ...prev,
-      [flavor]: Math.max(0, prev[flavor] + delta),
-    }));
-    setCheckoutDone(false);
-  };
-
-  const totalSelectedPieces = useMemo(
-    () =>
-      Object.values(flavorCounts).reduce((acc, count) => acc + count, 0),
-    [flavorCounts]
-  );
-
-  const d2cPricing = useMemo(() => {
-    const baseBoxPrice = boxSize === 6 ? 690 : boxSize === 12 ? 1290 : 2390;
-    const extraPieces = Math.max(0, totalSelectedPieces - boxSize);
-    const addonCost = extraPieces * 95;
-    const subtotal = baseBoxPrice + addonCost;
-    const gst = Math.round(subtotal * 0.18);
-    const total = subtotal + gst;
-    return { baseBoxPrice, extraPieces, addonCost, subtotal, gst, total };
-  }, [boxSize, totalSelectedPieces]);
-
-  // 8. FinVantage SaaS GST state
-  const [invoiceBaseAmount, setInvoiceBaseAmount] = useState<number>(85000);
-  const [gstRate, setGstRate] = useState<number>(18);
-  const [isInterState, setIsInterState] = useState<boolean>(false);
-  const [clientName, setClientName] = useState<string>('Malwa Precision Gears Pvt. Ltd.');
-
-  const gstCalculation = useMemo(() => {
-    const taxTotal = Math.round((invoiceBaseAmount * gstRate) / 100);
-    const cgst = isInterState ? 0 : Math.round(taxTotal / 2);
-    const sgst = isInterState ? 0 : taxTotal - cgst;
-    const igst = isInterState ? taxTotal : 0;
-    const grandTotal = invoiceBaseAmount + taxTotal;
-    return { taxTotal, cgst, sgst, igst, grandTotal };
-  }, [invoiceBaseAmount, gstRate, isInterState]);
-
-  // 9. AuraCare Clinic state
-  const [selectedBranch, setSelectedBranch] = useState<string>('Vijay Nagar Flagship Clinic');
-  const [selectedDoctor, setSelectedDoctor] = useState<string>('Dr. Ananya Verma (Dermatology)');
-  const [selectedSlot, setSelectedSlot] = useState<string>('05:30 PM Today');
-  const [patientPhone, setPatientPhone] = useState<string>('+91 98260 11223');
-  const [bookingConfirmed, setBookingConfirmed] = useState<boolean>(false);
-
-  // 10. NexaProp CRM state
-  const [propertyBudgetLakhs, setPropertyBudgetLakhs] = useState<number>(125);
-  const [downPaymentPercent, setDownPaymentPercent] = useState<number>(20);
-  const [selectedUnit, setSelectedUnit] = useState<string>('Tower B • Unit 1402 (3BHK Sky Deck)');
-  const [visitStage, setVisitStage] = useState<'New Inquiry' | 'Site Visit Scheduled' | 'Token Paid'>(
-    'Site Visit Scheduled'
-  );
-
-  const emiSummary = useMemo(() => {
-    const principalLakhs = propertyBudgetLakhs * (1 - downPaymentPercent / 100);
-    const monthlyRate = 8.5 / 12 / 100;
-    const months = 240; // 20 years
-    const emiLakhs =
-      (principalLakhs * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-      (Math.pow(1 + monthlyRate, months) - 1);
-    const monthlyEmiInr = Math.round(emiLakhs * 100000);
-    return {
-      loanAmountLakhs: principalLakhs.toFixed(1),
-      monthlyEmiInr: monthlyEmiInr.toLocaleString('en-IN'),
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && artifactId) {
+        onClose();
+      }
     };
-  }, [propertyBudgetLakhs, downPaymentPercent]);
-
-  // 11. SearchPulse SEO / GEO state
-  const [monthlyTraffic, setMonthlyTraffic] = useState<number>(28000);
-  const [conversionRate, setConversionRate] = useState<number>(3.4);
-  const [avgDealInr, setAvgDealInr] = useState<number>(18500);
-
-  const seoProjection = useMemo(() => {
-    const monthlyLeads = Math.round((monthlyTraffic * conversionRate) / 100);
-    const qualifiedDeals = Math.max(1, Math.round(monthlyLeads * 0.18));
-    const projectedRevenue = qualifiedDeals * avgDealInr;
-    return {
-      monthlyLeads,
-      qualifiedDeals,
-      projectedRevenue: projectedRevenue.toLocaleString('en-IN'),
-    };
-  }, [monthlyTraffic, conversionRate, avgDealInr]);
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [artifactId, onClose]);
 
   if (!artifactId) return null;
 
-  return (
+  const activeSite =
+    PROTOTYPE_SITES.find((s) => s.id === currentId) || PROTOTYPE_SITES[0];
+
+  const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+  const addToChocolateCart = (name: string, price: number) => {
+    setCheckoutSuccess(false);
+    setCartItems((prev) => {
+      const existing = prev.find((i) => i.name === name);
+      if (existing) {
+        return prev.map((i) => (i.name === name ? { ...i, qty: i.qty + 1 } : i));
+      }
+      return [...prev, { name, price, qty: 1 }];
+    });
+  };
+
+  const removeFromChocolateCart = (name: string) => {
+    setCartItems((prev) => prev.filter((i) => i.name !== name));
+  };
+
+  const handleAddInvoice = () => {
+    const cleanClient = invoiceClient.trim() || 'New Enterprise Client';
+    const base = Math.max(1000, invoiceBaseAmount);
+    const gst = Math.round(base * 0.18);
+    const total = base + gst;
+    setInvoicesList((prev) => [
+      {
+        id: `INV-2026-${109 + prev.length}`,
+        client: cleanClient,
+        base,
+        gst,
+        total,
+        status: 'GENERATED · 18% GST',
+      },
+      ...prev,
+    ]);
+  };
+
+  const triggerNexaAction = (action: 'brochure' | 'visit' | 'price') => {
+    if (action === 'brochure') {
+      setNexaChatMessages((prev) => [
+        ...prev,
+        {
+          sender: 'user',
+          text: 'Please send the Floor Plan PDF brochure on WhatsApp.',
+          time: 'Just now',
+        },
+        {
+          sender: 'bot',
+          text: 'Sent! SkyLine_One_FloorPlans_2026.pdf (4.2 MB) has been delivered to your WhatsApp with RERA pricing.',
+          time: 'Just now',
+        },
+      ]);
+    } else if (action === 'visit') {
+      setNexaChatMessages((prev) => [
+        ...prev,
+        {
+          sender: 'user',
+          text: 'I want to schedule a site visit for Saturday 11:30 AM.',
+          time: 'Just now',
+        },
+        {
+          sender: 'bot',
+          text: 'Confirmed! Your private site visit is locked for Saturday at 11:30 AM. Google Maps pin shared.',
+          time: 'Just now',
+        },
+      ]);
+    } else {
+      setNexaChatMessages((prev) => [
+        ...prev,
+        {
+          sender: 'user',
+          text: 'What is the all-inclusive price for the 3BHK Garden Residence?',
+          time: 'Just now',
+        },
+        {
+          sender: 'bot',
+          text: 'The 3BHK Garden Residence (1,850 sq.ft) starts at ₹85 Lakh all-inclusive with flexible milestone payment plans.',
+          time: 'Just now',
+        },
+      ]);
+    }
+  };
+
+  const rooms360 = [
+    {
+      name: 'Living Room',
+      fullTitle: 'Sky Deck Living Room & Panorama',
+      tag: '360° SPATIAL TOUR · 2,450 SQ.FT',
+      price: '₹1.25 Cr',
+      image:
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=85',
+      hotspotNote: 'Italian Statuario Marble · 12ft Double-Glazed Glass · Automated Lutron Lighting',
+      hotspots: [
+        { x: '28%', y: '54%', label: 'Italian Marble Deck' },
+        { x: '68%', y: '42%', label: '12ft Acoustic Glass' },
+      ],
+    },
+    {
+      name: 'Master Suite',
+      fullTitle: 'Master Suite & Walk-In Wardrobe',
+      tag: '360° MASTER BEDROOM · PRIVATE BALCONY',
+      price: '₹1.25 Cr',
+      image:
+        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=85',
+      hotspotNote: 'Engineered Teak Wood Flooring · Walk-In Closet · Private Sit-Out Terrace',
+      hotspots: [
+        { x: '35%', y: '58%', label: 'Teak Wood Suite' },
+        { x: '74%', y: '48%', label: 'Private Sit-Out' },
+      ],
+    },
+    {
+      name: 'Sky Deck',
+      fullTitle: 'Rooftop Infinity Sky Deck & Lounge',
+      tag: '360° PENTHOUSE TERRACE · 3,100 SQ.FT',
+      price: '₹1.65 Cr',
+      image:
+        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1400&q=85',
+      hotspotNote: 'Outdoor Jacuzzi Deck · 270° City Horizon View · Private Elevator Lobby',
+      hotspots: [
+        { x: '42%', y: '50%', label: 'Horizon Lounge' },
+        { x: '72%', y: '62%', label: 'Private Deck Bar' },
+      ],
+    },
+    {
+      name: 'Commercial Lobby',
+      fullTitle: 'Sapphire Commercial Atrium & Retail',
+      tag: '360° GRADE-A COMMERCIAL · VIJAY NAGAR',
+      price: '₹85 Lakh',
+      image:
+        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1400&q=85',
+      hotspotNote: 'Double-Height Glass Frontage · High-Speed Elevators · 100% DG Power Backup',
+      hotspots: [
+        { x: '30%', y: '52%', label: 'Main Road Frontage' },
+        { x: '66%', y: '46%', label: 'Concierge Atrium' },
+      ],
+    },
+  ];
+
+  const monthlyEmi = Math.round(
+    (loanAmountLakhs * 100000 * 0.0072 * Math.pow(1.0072, 240)) /
+      (Math.pow(1.0072, 240) - 1)
+  );
+
+  const modalTree = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in"
+      data-testid="fullscreen-prototype-modal"
+      className="fixed inset-0 z-[200] w-screen h-screen bg-[#09090B] text-zinc-900 flex flex-col overflow-hidden"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="artifact-modal-title"
+      aria-label={`Full-Screen Live Production Website — ${activeSite.name}`}
     >
-      <div className="surface-glass-heavy w-full max-w-6xl rounded-3xl border border-[var(--border-metallic)] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-        {/* Modal Header + Multi-Artifact Switcher */}
-        <div className="px-5 py-4 border-b border-[var(--border-hairline)] flex flex-col gap-3 bg-[var(--bg-elevated)]">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse" />
-              <h2
-                id="artifact-modal-title"
-                className="font-mono-tech text-xs sm:text-sm uppercase tracking-wider font-bold text-[var(--text-primary)]"
-              >
-                SKYLINE LIVE INTERACTIVE SANDBOX • REAL WORKING WEB APPLICATION PROTOTYPE
-              </h2>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3.5 py-1.5 rounded-full surface-card text-xs font-mono-tech font-bold text-[var(--text-primary)] hover:opacity-80 cursor-pointer"
-            >
-              ✕ ESC / CLOSE
-            </button>
+      {/* =====================================================================
+          COMPACT TOP BROWSER BAR (h-12) — NO PROJECT SWITCHER PILLS OR DROPDOWNS
+         ===================================================================== */}
+      <div className="h-12 px-3 sm:px-5 bg-[#09090B] text-white border-b border-white/15 flex items-center justify-between gap-2 shrink-0 z-30">
+        {/* Left: <- Back to SkyLine + Active Brand Name */}
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            type="button"
+            data-testid="back-to-skyline-btn"
+            onClick={onClose}
+            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors shrink-0"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>← Back to SkyLine</span>
+          </button>
+
+          <span className="hidden md:inline-block text-xs font-semibold text-zinc-300 truncate">
+            {activeSite.name} <span className="text-zinc-500">·</span>{' '}
+            <span className="text-zinc-400 font-normal">{activeSite.category}</span>
+          </span>
+        </div>
+
+        {/* Center: Locked Domain Address Bar + Desktop / Mobile Viewport Toggle */}
+        <div className="hidden lg:flex items-center gap-2.5">
+          <div className="px-3.5 py-1 rounded-lg bg-zinc-900 border border-white/10 text-xs font-mono text-zinc-300 flex items-center gap-2 min-w-[240px]">
+            <Lock className="w-3 h-3 text-[#10B981] shrink-0" />
+            <span className="truncate">{activeSite.url}</span>
           </div>
 
-          {/* Interactive Switcher Bar */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-            {ARTIFACT_TABS.map((tab) => {
-              const isCurrent = activeId === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setSelectedTab(tab.id)}
-                  className={`px-3 py-1.5 rounded-xl font-mono-tech text-[11px] whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-                    isCurrent
-                      ? 'btn-platinum-primary font-bold shadow-sm'
-                      : 'surface-card text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  <span>{tab.label}</span>
-                  <span className="opacity-70 text-[9px]">[{tab.badge}]</span>
-                </button>
-              );
-            })}
+          <div className="inline-flex items-center p-0.5 rounded-lg bg-zinc-900 border border-white/10 text-[11px] font-semibold">
+            <button
+              type="button"
+              onClick={() => setViewportMode('desktop')}
+              className={`px-2.5 py-1 rounded-md inline-flex items-center gap-1 cursor-pointer transition-colors ${
+                viewportMode === 'desktop'
+                  ? 'bg-[#0B63F6] text-white'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Monitor className="w-3 h-3" />
+              <span>Desktop</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewportMode('mobile')}
+              className={`px-2.5 py-1 rounded-md inline-flex items-center gap-1 cursor-pointer transition-colors ${
+                viewportMode === 'mobile'
+                  ? 'bg-[#0B63F6] text-white'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Smartphone className="w-3 h-3" />
+              <span>Mobile</span>
+            </button>
           </div>
         </div>
 
-        {/* Scrollable Sandbox Body */}
-        <div className="p-5 sm:p-7 overflow-y-auto space-y-6 text-[var(--text-primary)]">
-          {/* 1. 360 VIEWS (SACHIN SAHU — REAL ESTATE SPATIAL PLATFORM) */}
-          {activeId === '360-views' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                    SACHIN SAHU • FOUNDER &amp; CEO • SPATIAL WEBGL PROPTECH ENGINE
+        {/* Right: External Domain Link (if live) + Request Similar System CTA */}
+        <div className="flex items-center gap-2 shrink-0">
+          {activeSite.liveExternalUrl && (
+            <a
+              href={activeSite.liveExternalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold"
+            >
+              <span>Open Live Domain</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+          )}
+
+          <button
+            type="button"
+            data-testid="build-website-like-this-cta"
+            onClick={() => {
+              if (onRequestSimilarSystem) {
+                onRequestSimilarSystem();
+              } else {
+                onClose();
+              }
+            }}
+            className="px-3.5 py-1.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-zinc-950 font-bold text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+          >
+            <span>Request Similar System (Starts at ₹10k) →</span>
+          </button>
+        </div>
+      </div>
+
+      {/* =====================================================================
+          FULL-SCREEN SCROLLABLE STANDALONE DEMO LANDING PAGE CANVAS
+         ===================================================================== */}
+      <div className="flex-1 w-full overflow-y-auto bg-zinc-950 flex justify-center">
+        <div
+          className={`w-full min-h-full transition-all duration-300 bg-white text-zinc-900 ${
+            viewportMode === 'mobile'
+              ? 'max-w-[430px] my-4 rounded-3xl overflow-hidden shadow-2xl border-4 border-zinc-800'
+              : 'max-w-full'
+          }`}
+        >
+          {/* =================================================================
+              1. 360 VIEWS (https://360views.services — Luxury Real Estate Website)
+             ================================================================= */}
+          {currentId === '360-views' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: Dedicated Client Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#0B63F6] text-white font-display font-black text-sm flex items-center justify-center shadow-sm">
+                    360°
                   </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base tracking-tight text-zinc-900">
+                      360° VIEWS · SPATIAL PROPTECH
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      Interactive Virtual Property Platform · Indore · Bhopal · Mumbai
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#residences-360" className="hover:text-[#0B63F6]">
+                    Residences
+                  </a>
+                  <a href="#tour-360" className="hover:text-[#0B63F6]">
+                    360° Virtual Tour
+                  </a>
+                  <a href="#floor-plans-360" className="hover:text-[#0B63F6]">
+                    Floor Plans
+                  </a>
+                  <a href="#emi-360" className="hover:text-[#0B63F6]">
+                    Pricing &amp; EMI
+                  </a>
+                </nav>
+
+                <div className="flex items-center gap-2.5">
                   <a
                     href="https://360views.services"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3.5 py-1.5 rounded-xl btn-platinum-primary font-mono-tech text-[11px] font-bold inline-flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl bg-[#0B63F6] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm hover:bg-[#1D4ED8]"
                   >
-                    <span>OPEN LIVE PRODUCTION SITE: 360views.services</span>
-                    <span>↗</span>
+                    <span>Visit 360views.services</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
+              </header>
 
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  360 Views — Interactive Spatial Room Explorer &amp; Hotspot Engine
-                </h3>
-
-                {/* Room Switcher Tabs */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {(Object.keys(SPATIAL_ROOMS) as RoomKey[]).map((room) => (
-                    <button
-                      key={room}
-                      type="button"
-                      onClick={() => handleSelectRoom(room)}
-                      className={`px-3 py-2.5 rounded-xl font-mono-tech text-xs font-bold cursor-pointer transition-all ${
-                        selectedRoom === room ? 'btn-platinum-primary' : 'surface-elevated'
-                      }`}
-                    >
-                      {room}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Simulated 360 Spatial Viewport Frame */}
-                <div className="p-5 rounded-2xl surface-elevated border border-[var(--border-metallic)] space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border-hairline)] pb-3">
-                    <div>
-                      <div className="font-mono-tech text-[10px] uppercase text-[#25D366] font-bold">
-                        LIVE SPATIAL STREAM • {selectedRoom.toUpperCase()} ({currentRoomSpec.floorAreaSqFt} SQ.FT.)
+              {/* Section 2: Full-Bleed Luxury Property Hero + Search Filter Bar + Interactive 360° Room Viewer */}
+              <div id="tour-360" className="bg-zinc-950 text-white py-10 px-6 sm:px-12">
+                <div className="max-w-7xl mx-auto space-y-6">
+                  <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+                    <div className="space-y-2 max-w-2xl">
+                      <div className="text-xs font-mono uppercase tracking-widest text-[#34D399] font-bold">
+                        01 · INTERACTIVE SPATIAL PROPERTY TOURS
                       </div>
-                      <div className="text-xs text-[var(--text-secondary)] mt-0.5">
-                        {currentRoomSpec.subtitle}
-                      </div>
+                      <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+                        Experience Luxury Properties in True 360° Before You Visit.
+                      </h1>
                     </div>
-                    <div className="px-3 py-1 rounded-lg surface-card font-mono-tech text-[11px] font-bold">
-                      COMPASS YAW: {compassYaw}° • FOV: {fovLens}°
+                    <p className="text-xs sm:text-sm text-zinc-300 max-w-md">
+                      Walk through penthouses, villas, and commercial showrooms from your phone or desktop. Shortlist verified RERA properties in minutes.
+                    </p>
+                  </div>
+
+                  {/* Interactive Property Search Filter Bar */}
+                  <div className="p-4 rounded-2xl bg-zinc-900/90 border border-white/15 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-wider text-zinc-400 mb-1">
+                        Location
+                      </label>
+                      <select
+                        value={propFilterLocation}
+                        onChange={(e) => setPropFilterLocation(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-white/15 text-white font-semibold"
+                      >
+                        <option value="Indore">Indore (Super Corridor / Vijay Nagar)</option>
+                        <option value="Bhopal">Bhopal (Arera Colony)</option>
+                        <option value="Mumbai">Mumbai (Worli / BKC)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-wider text-zinc-400 mb-1">
+                        Property Type
+                      </label>
+                      <select
+                        value={propFilterType}
+                        onChange={(e) => setPropFilterType(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-white/15 text-white font-semibold"
+                      >
+                        <option value="All">All Luxury Units (3BHK / 4BHK / Commercial)</option>
+                        <option value="Villa">4BHK Sky Villa</option>
+                        <option value="Penthouse">Sky Deck Penthouse</option>
+                        <option value="Commercial">Grade-A Commercial Showroom</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-wider text-zinc-400 mb-1">
+                        Budget Range
+                      </label>
+                      <select
+                        value={propFilterBudget}
+                        onChange={(e) => setPropFilterBudget(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-white/15 text-white font-semibold"
+                      >
+                        <option>₹65L – ₹3.5Cr</option>
+                        <option>₹85L – ₹1.5Cr</option>
+                        <option>₹1.5Cr – ₹3.5Cr+</option>
+                      </select>
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => setActive360Room((prev) => (prev + 1) % rooms360.length)}
+                        className="w-full py-2.5 px-4 rounded-xl bg-[#0B63F6] hover:bg-[#1D4ED8] text-white font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Search className="w-3.5 h-3.5" />
+                        <span>Explore Next 360° Space</span>
+                      </button>
                     </div>
                   </div>
 
-                  {/* Compass Yaw & FOV Controls */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                        360° COMPASS PANORAMA YAW ({compassYaw}°)
-                      </label>
-                      <input
-                        type="range"
-                        min={0}
-                        max={360}
-                        step={1}
-                        value={compassYaw}
-                        onChange={(e) => setCompassYaw(Number(e.target.value))}
-                        className="w-full accent-zinc-500 cursor-pointer"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                        CAMERA FIELD OF VIEW LENS ({fovLens}° WIDE)
-                      </label>
-                      <div className="flex gap-1.5">
-                        {[75, 90, 105, 120].map((fov) => (
+                  {/* Interactive 360° Room Switcher & Spatial Hotspot Stage */}
+                  <div className="relative h-[360px] sm:h-[440px] rounded-3xl overflow-hidden border border-white/15">
+                    <img
+                      src={rooms360[active360Room].image}
+                      alt={rooms360[active360Room].fullTitle}
+                      style={{ transform: `scale(${fovZoom / 100})` }}
+                      className="w-full h-full object-cover transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/30" />
+
+                    {/* Top Room Switcher Tabs */}
+                    <div className="absolute top-4 left-4 right-4 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap gap-2">
+                        {rooms360.map((rm, idx) => (
                           <button
-                            key={fov}
+                            key={rm.name}
                             type="button"
-                            onClick={() => setFovLens(fov)}
-                            className={`flex-1 py-1.5 rounded-lg font-mono-tech text-xs font-bold cursor-pointer ${
-                              fovLens === fov ? 'btn-platinum-primary' : 'surface-card'
+                            onClick={() => setActive360Room(idx)}
+                            className={`px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                              active360Room === idx
+                                ? 'bg-[#0B63F6] text-white shadow-lg'
+                                : 'bg-black/70 text-white hover:bg-black'
                             }`}
                           >
-                            {fov}°
+                            {rm.name}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center gap-2 bg-black/75 px-3 py-1.5 rounded-xl text-xs">
+                        <Compass className="w-3.5 h-3.5 text-[#10B981]" />
+                        <span>FOV Zoom ({fovZoom}%):</span>
+                        <button
+                          type="button"
+                          onClick={() => setFovZoom((z) => Math.max(100, z - 10))}
+                          className="px-2 py-0.5 rounded bg-white/15 hover:bg-white/25 cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFovZoom((z) => Math.min(135, z + 10))}
+                          className="px-2 py-0.5 rounded bg-white/15 hover:bg-white/25 cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Interactive Spatial Hotspot Pins */}
+                    {rooms360[active360Room].hotspots.map((spot) => (
+                      <div
+                        key={spot.label}
+                        style={{ left: spot.x, top: spot.y }}
+                        className="absolute -translate-x-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-black/80 border border-emerald-400/60 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow-lg"
+                      >
+                        <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+                        <span>{spot.label}</span>
+                      </div>
+                    ))}
+
+                    {/* Bottom Room Info Bar */}
+                    <div className="absolute bottom-5 left-5 right-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="text-[11px] font-mono font-bold text-[#34D399]">
+                          {rooms360[active360Room].tag} · {propFilterLocation.toUpperCase()}
+                        </div>
+                        <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white">
+                          {rooms360[active360Room].fullTitle}
+                        </h2>
+                        <p className="text-xs sm:text-sm text-zinc-200">
+                          {rooms360[active360Room].hotspotNote}
+                        </p>
+                      </div>
+                      <div className="px-5 py-2.5 rounded-2xl bg-white text-zinc-950 font-display font-extrabold text-xl shrink-0">
+                        {rooms360[active360Room].price}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Featured Properties Grid & Floor Plans */}
+              <div id="residences-360" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-8">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                  <div>
+                    <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0B63F6]">
+                      02 · VERIFIED RERA DEVELOPMENTS IN {propFilterLocation.toUpperCase()}
+                    </div>
+                    <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-zinc-900 mt-1">
+                      Featured Residences &amp; Floor Plans ({propFilterBudget})
+                    </h2>
+                  </div>
+                  <span className="text-xs font-semibold text-zinc-500">
+                    Click any residence card to switch the 360° room tour above
+                  </span>
+                </div>
+
+                <div id="floor-plans-360" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      title: 'SkyLine Greens 4BHK Villa',
+                      loc: `${propFilterLocation} · Super Corridor`,
+                      price: '₹1.25 Cr',
+                      area: '2,450 sq.ft · ₹5,102/sq.ft',
+                      floorPlan: '4 Bed · 4 Bath · Private Deck · 2 Car Park',
+                      img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+                      idx: 0,
+                    },
+                    {
+                      title: 'Emerald Sky Penthouse',
+                      loc: `${propFilterLocation} · AB Road Central`,
+                      price: '₹1.65 Cr',
+                      area: '3,100 sq.ft · ₹5,322/sq.ft',
+                      floorPlan: '4 Bed + Study · Sky Terrace · Servant Room',
+                      img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+                      idx: 2,
+                    },
+                    {
+                      title: 'Sapphire Commercial Plaza',
+                      loc: `${propFilterLocation} · Vijay Nagar Square`,
+                      price: '₹85 Lakh',
+                      area: '1,400 sq.ft · ₹6,071/sq.ft',
+                      floorPlan: 'Main Road Retail Frontage · 14ft Ceiling',
+                      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+                      idx: 3,
+                    },
+                  ].map((prop) => (
+                    <div
+                      key={prop.title}
+                      onClick={() => setActive360Room(prop.idx)}
+                      className="rounded-3xl bg-white border border-zinc-200 hover:border-[#0B63F6] overflow-hidden shadow-sm transition-all cursor-pointer flex flex-col justify-between"
+                    >
+                      <div>
+                        <img
+                          src={prop.img}
+                          alt={prop.title}
+                          className="w-full h-48 object-cover"
+                        />
+                        <div className="p-5 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-mono font-bold text-[#0B63F6]">
+                              360° TOUR READY
+                            </span>
+                            <span className="font-display font-extrabold text-base text-zinc-900">
+                              {prop.price}
+                            </span>
+                          </div>
+                          <h3 className="font-display font-bold text-lg text-zinc-900">
+                            {prop.title}
+                          </h3>
+                          <p className="text-xs text-zinc-500">{prop.loc}</p>
+                          <div className="pt-2 border-t border-zinc-100 text-xs font-medium text-zinc-700">
+                            <div>{prop.area}</div>
+                            <div className="text-zinc-500 mt-0.5">{prop.floorPlan}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="px-5 pb-5">
+                        <span className="w-full py-2.5 rounded-xl bg-zinc-900 text-white text-xs font-bold flex items-center justify-center gap-1.5">
+                          <span>Inspect in 360° Viewer</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Section 4: Interactive EMI Calculator & Private Site Visit Booking Drawer */}
+                <div
+                  id="emi-360"
+                  className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4"
+                >
+                  <div className="lg:col-span-6 p-6 rounded-3xl bg-white border border-zinc-200 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0B63F6]">
+                      03 · HOME LOAN &amp; EMI CALCULATOR (8.65% P.A. · 20 YEARS)
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-zinc-700">
+                        Loan Principal Amount:
+                      </span>
+                      <span className="font-display text-xl font-extrabold text-zinc-900">
+                        ₹{loanAmountLakhs} Lakh
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={35}
+                      max={250}
+                      step={5}
+                      value={loanAmountLakhs}
+                      onChange={(e) => setLoanAmountLakhs(Number(e.target.value))}
+                      className="w-full accent-[#0B63F6] cursor-pointer"
+                    />
+                    <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-between">
+                      <div>
+                        <div className="text-xs text-zinc-500">Estimated Monthly EMI</div>
+                        <div className="font-display text-2xl font-extrabold text-[#0B63F6]">
+                          ₹{monthlyEmi.toLocaleString('en-IN')} / month
+                        </div>
+                      </div>
+                      <span className="text-xs font-bold text-emerald-700">
+                        SBI / HDFC Approved
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-6 p-6 rounded-3xl bg-zinc-900 text-white space-y-4 flex flex-col justify-between">
+                    <div className="space-y-1">
+                      <span className="text-xs font-mono font-bold text-[#34D399]">
+                        04 · PRIVATE SITE VISIT &amp; WHATSAPP BROCHURE
+                      </span>
+                      <h3 className="font-display text-xl font-bold">
+                        Schedule Private Visit for {rooms360[active360Room].fullTitle}
+                      </h3>
+                      <p className="text-xs text-zinc-300">
+                        Get instant floor plan PDF + Google Maps location pin on your WhatsApp.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <select
+                        value={visitDate}
+                        onChange={(e) => {
+                          setVisitDate(e.target.value);
+                          setVisitBooked(false);
+                        }}
+                        className="px-3.5 py-2.5 rounded-xl bg-zinc-800 border border-white/15 text-white"
+                      >
+                        <option>This Saturday, 11:30 AM</option>
+                        <option>This Sunday, 4:00 PM</option>
+                        <option>Tomorrow, 5:30 PM</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={visitPhone}
+                        onChange={(e) => {
+                          setVisitPhone(e.target.value);
+                          setVisitBooked(false);
+                        }}
+                        placeholder="Your WhatsApp Number (+91...)"
+                        className="px-3.5 py-2.5 rounded-xl bg-zinc-800 border border-white/15 text-white placeholder:text-zinc-400"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setVisitBooked(true)}
+                      className="w-full py-3 rounded-xl bg-[#25D366] text-zinc-950 font-bold text-xs cursor-pointer"
+                    >
+                      {visitBooked
+                        ? `✓ Private Visit Confirmed for ${visitDate} · Brochure Sent!`
+                        : 'Schedule Private Visit & Get Brochure on WhatsApp'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 5: Client Footer */}
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800">
+                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+                  <div>
+                    <strong className="text-white">360° Views Spatial PropTech</strong> · Engineered by Sachin Sahu (SkyLine Digital Agency)
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <a
+                      href="https://360views.services"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#60A5FA] hover:underline font-semibold"
+                    >
+                      https://360views.services
+                    </a>
+                    <span>RERA Compliant Virtual Tours</span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          )}
+
+          {/* =================================================================
+              2. A&A CHOCOLATES (https://aachocolates.in — Artisanal D2C Storefront)
+             ================================================================= */}
+          {currentId === 'aa-chocolates-d2c' && (
+            <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-zinc-900">
+              {/* Promo Bar */}
+              <div className="px-4 py-2 bg-[#1C1412] text-amber-200 text-center text-xs font-medium">
+                Handcrafted Belgian Couverture Truffles · Express Cold-Chain Pan-India Delivery · 1-Tap UPI Checkout
+              </div>
+
+              {/* Section 1: Client Store Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-amber-900/10 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#F59E0B] text-zinc-950 font-display font-black text-sm flex items-center justify-center">
+                    A&amp;A
+                  </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      A&amp;A ARTISAN CHOCOLATES
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      Small-Batch Belgian Truffles &amp; Luxury Gift Hampers
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#aa-boxes" className="hover:text-amber-700">
+                    Collections
+                  </a>
+                  <a href="#aa-customizer" className="hover:text-amber-700">
+                    Custom Hamper Studio
+                  </a>
+                  <a href="#aa-reviews" className="hover:text-amber-700">
+                    Corporate Gifting
+                  </a>
+                </nav>
+
+                <a
+                  href="#aa-cart-panel"
+                  className="px-4 py-2 rounded-xl bg-[#1C1412] text-white text-xs font-bold flex items-center gap-2"
+                >
+                  <ShoppingBag className="w-3.5 h-3.5 text-[#F59E0B]" />
+                  <span>
+                    Cart ({cartItems.reduce((s, i) => s + i.qty, 0)}) · ₹
+                    {cartTotal.toLocaleString('en-IN')}
+                  </span>
+                </a>
+              </header>
+
+              {/* Section 2: Storefront Hero */}
+              <div className="relative bg-[#1C1412] text-white py-14 px-6 sm:px-12 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&w=1400&q=85"
+                  alt="A&A Artisan Chocolates"
+                  className="absolute inset-0 w-full h-full object-cover opacity-35"
+                />
+                <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#F59E0B]">
+                      01 · SMALL-BATCH COUVERTURE · ZERO PRESERVATIVES
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Handcrafted Belgian Truffles &amp; Custom Gift Hampers Delivered Chilled Across India.
+                    </h1>
+                    <p className="text-sm text-zinc-200 max-w-xl">
+                      Customize your 6, 12, or 24-piece luxury gift box with personalized satin ribbons and complete checkout in 10 seconds via 1-Tap UPI.
+                    </p>
+                    <div className="flex flex-wrap gap-3 pt-1">
+                      <a
+                        href="#aa-customizer"
+                        className="px-5 py-3 rounded-xl bg-[#F59E0B] text-zinc-950 font-bold text-xs sm:text-sm"
+                      >
+                        Build Custom Box ({boxSize})
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => addToChocolateCart('Royal Assorted Hamper', 1299)}
+                        className="px-5 py-3 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm cursor-pointer"
+                      >
+                        + Quick Add Royal Hamper (₹1,299)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Interactive Box Customizer, Product Grid & Slide-Out Cart / 1-Tap UPI Checkout */}
+              <div
+                id="aa-customizer"
+                className="max-w-7xl mx-auto py-12 px-6 sm:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8"
+              >
+                <div className="lg:col-span-8 space-y-6">
+                  {/* Box Size Selector */}
+                  <div className="p-5 rounded-3xl bg-white border border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-amber-700">
+                        02 · SELECT YOUR GIFT BOX SIZE
+                      </div>
+                      <div className="font-display font-bold text-base text-zinc-900">
+                        Custom Assorted Box Size: {boxSize}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {(['6-Piece', '12-Piece', '24-Piece'] as const).map((sz) => (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => setBoxSize(sz)}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                            boxSize === sz
+                              ? 'bg-[#1C1412] text-white'
+                              : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Product Grid */}
+                  <div id="aa-boxes" className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    {[
+                      {
+                        name: 'Belgian Dark 70%',
+                        price: 699,
+                        tag: 'SINGLE-ORIGIN DARK GANACHE',
+                        img: 'https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=600&q=80',
+                      },
+                      {
+                        name: 'Roasted Hazelnut Praline',
+                        price: 899,
+                        tag: 'PIEDMONT HAZELNUT & MILK',
+                        img: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&w=600&q=80',
+                      },
+                      {
+                        name: 'Royal Assorted Hamper',
+                        price: 1299,
+                        tag: '24-PIECE FESTIVE BOX + RIBBON',
+                        img: 'https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&w=600&q=80',
+                      },
+                    ].map((prod) => (
+                      <div
+                        key={prod.name}
+                        className="rounded-3xl bg-white border border-zinc-200 overflow-hidden flex flex-col justify-between shadow-xs"
+                      >
+                        <div>
+                          <img
+                            src={prod.img}
+                            alt={prod.name}
+                            className="w-full h-40 object-cover"
+                          />
+                          <div className="p-4 space-y-1">
+                            <div className="text-[10px] font-mono font-bold uppercase text-amber-700">
+                              {prod.tag}
+                            </div>
+                            <h3 className="font-display font-bold text-base text-zinc-900">
+                              {prod.name}
+                            </h3>
+                            <div className="font-display font-extrabold text-lg text-zinc-900">
+                              ₹{prod.price}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-4 pt-0">
+                          <button
+                            type="button"
+                            onClick={() => addToChocolateCart(prod.name, prod.price)}
+                            className="w-full py-2.5 rounded-xl bg-[#1C1412] hover:bg-zinc-800 text-white text-xs font-bold cursor-pointer flex items-center justify-center gap-1"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add to Box (₹{prod.price})</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Section 4: Corporate Gifting & Cold-Chain Assurance */}
+                  <div
+                    id="aa-reviews"
+                    className="p-6 rounded-3xl bg-white border border-zinc-200 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs"
+                  >
+                    <div>
+                      <div className="font-bold text-amber-700">★★★★★ 4.9/5 Corporate Gifting</div>
+                      <p className="text-zinc-600 mt-1">
+                        "Ordered 45 corporate Diwali hampers — delivered chilled with custom gold-foil sleeves!"
+                      </p>
+                    </div>
+                    <div>
+                      <div className="font-bold text-emerald-700">1-Tap UPI Checkout</div>
+                      <p className="text-zinc-600 mt-1">
+                        Zero account password friction. Customers complete payment via GPay, PhonePe, or Paytm in 8 seconds.
+                      </p>
+                    </div>
+                    <div>
+                      <div className="font-bold text-[#0B63F6]">WhatsApp Cart Recovery</div>
+                      <p className="text-zinc-600 mt-1">
+                        Automated WhatsApp reminders recover abandoned gift boxes with a direct 1-tap checkout link.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Interactive Shopping Cart & 1-Tap UPI Checkout */}
+                <div
+                  id="aa-cart-panel"
+                  className="lg:col-span-4 rounded-3xl bg-white border border-zinc-200 p-6 flex flex-col justify-between space-y-5 shadow-md"
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+                      <div>
+                        <h3 className="font-display font-bold text-base text-zinc-900">
+                          Your Custom Gift Cart ({boxSize})
+                        </h3>
+                        <p className="text-[11px] text-zinc-500">
+                          Includes complimentary ice-gel insulated packaging
+                        </p>
+                      </div>
+                      <span className="text-[11px] font-bold text-emerald-700">
+                        Free Shipping
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5 max-h-56 overflow-y-auto">
+                      {cartItems.map((item) => (
+                        <div
+                          key={item.name}
+                          className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-between gap-2 text-xs"
+                        >
+                          <div>
+                            <div className="font-bold text-zinc-900">{item.name}</div>
+                            <div className="text-zinc-500">
+                              Qty: {item.qty} × ₹{item.price}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-zinc-900">
+                              ₹{(item.qty * item.price).toLocaleString('en-IN')}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeFromChocolateCart(item.name)}
+                              className="p-1 text-zinc-400 hover:text-rose-600 cursor-pointer"
+                              aria-label={`Remove ${item.name}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="pt-3 border-t border-zinc-200 space-y-2">
+                      <div className="text-xs font-bold text-zinc-700">
+                        Select 1-Tap UPI Payment App:
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['GPay', 'PhonePe', 'Paytm'] as const).map((app) => (
+                          <button
+                            key={app}
+                            type="button"
+                            onClick={() => {
+                              setSelectedUpiApp(app);
+                              setCheckoutSuccess(false);
+                            }}
+                            className={`py-2 rounded-xl text-xs font-bold border cursor-pointer ${
+                              selectedUpiApp === app
+                                ? 'bg-[#0B63F6] text-white border-[#0B63F6]'
+                                : 'bg-zinc-50 text-zinc-700 border-zinc-200'
+                            }`}
+                          >
+                            {app}
                           </button>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  {/* Spatial Hotspots Selector */}
-                  <div className="space-y-2">
-                    <div className="font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                      CLICK SPATIAL HOTSPOT PIN TO INSPECT ARCHITECTURAL SPEC:
+                  <div className="space-y-3 pt-4 border-t border-zinc-200">
+                    <div className="flex items-center justify-between font-display font-extrabold text-lg text-zinc-900">
+                      <span>Total Payable</span>
+                      <span>₹{cartTotal.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      {currentRoomSpec.hotspots.map((hs) => (
-                        <button
-                          key={hs.id}
-                          type="button"
-                          onClick={() => setSelectedHotspotId(hs.id)}
-                          className={`p-3 rounded-xl text-left transition-all cursor-pointer border ${
-                            activeHotspot.id === hs.id
-                              ? 'btn-platinum-primary border-transparent'
-                              : 'surface-card border-[var(--border-hairline)]'
-                          }`}
-                        >
-                          <div className="font-mono-tech text-[10px] opacity-75">◉ {hs.coord}</div>
-                          <div className="font-display text-xs font-bold mt-1">{hs.label}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
 
-                  {/* Active Hotspot Telemetry Card */}
-                  <div className="p-3.5 rounded-xl surface-card border border-[var(--border-hairline)] font-mono-tech text-xs space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-[var(--text-primary)]">
-                        SELECTED HOTSPOT: {activeHotspot.label}
-                      </span>
-                      <span className="text-[10px] text-[#25D366] font-bold">
-                        {currentRoomSpec.elevation}
-                      </span>
-                    </div>
-                    <p className="text-[var(--text-secondary)]">
-                      <strong>Material Spec:</strong> {activeHotspot.materialSpec}
-                    </p>
-                    <p className="text-[var(--text-secondary)]">
-                      <strong>Acoustic / Environmental Rating:</strong> {activeHotspot.acoustics} •{' '}
-                      {currentRoomSpec.lightingLux}
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setCheckoutSuccess(true)}
+                      className="w-full py-3.5 rounded-2xl bg-[#10B981] hover:bg-[#059669] text-zinc-950 font-bold text-xs sm:text-sm cursor-pointer shadow-sm"
+                    >
+                      {checkoutSuccess
+                        ? `✓ Paid ₹${cartTotal.toLocaleString('en-IN')} via ${selectedUpiApp} · Tracking Sent on WhatsApp!`
+                        : `Pay ₹${cartTotal.toLocaleString('en-IN')} via 1-Tap ${selectedUpiApp} UPI`}
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Live WhatsApp Lead Capture Simulation & Production Link */}
-              <div className="lg:col-span-5">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-4">
-                  <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-3">
-                    <div>
-                      <div className="font-mono-tech text-[10px] text-[var(--text-muted)] uppercase">
-                        EMBEDDED SPATIAL LEAD CAPTURE ENGINE
-                      </div>
-                      <div className="font-display text-base font-bold">
-                        Lock Virtual Tour &amp; VIP Site Visit
-                      </div>
+              {/* Section 5: Client Footer */}
+              <footer className="mt-auto bg-[#1C1412] text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800">
+                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+                  <div>
+                    <strong className="text-white">A&amp;A Artisan Chocolates</strong> · D2C Storefront &amp; 1-Tap UPI Engineered by SkyLine Digital Agency
+                  </div>
+                  <div>FSSAI Certified · Express Cold-Chain Delivery Across India</div>
+                </div>
+              </footer>
+            </div>
+          )}
+
+          {/* =================================================================
+              3. AURACARE CLINIC (https://auracareclinic.in — Healthcare & Dental Studio)
+             ================================================================= */}
+          {currentId === 'auracare-local' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: Clinic Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#10B981] text-white flex items-center justify-center">
+                    <Stethoscope className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      AuraCare Multispecialty &amp; Dental Studio
                     </div>
-                    <span className="px-2.5 py-1 rounded-full bg-[#25D366]/15 text-[#25D366] font-mono-tech text-[10px] font-bold">
-                      +210% SITE VISITS
+                    <div className="text-[11px] text-zinc-500">
+                      Vijay Nagar, Indore · 4.9★ on Google Maps (420+ Verified Patient Reviews)
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#aura-treatments" className="hover:text-[#10B981]">
+                    Treatments
+                  </a>
+                  <a href="#aura-treatments" className="hover:text-[#10B981]">
+                    Our Specialists
+                  </a>
+                  <a href="#aura-reviews" className="hover:text-[#10B981]">
+                    Patient Reviews (4.9★)
+                  </a>
+                </nav>
+
+                <a
+                  href="#aura-booker"
+                  className="px-4 py-2 rounded-xl bg-[#10B981] text-zinc-950 text-xs font-bold"
+                >
+                  Book Appointment
+                </a>
+              </header>
+
+              {/* Section 2: Clinic Hero & Google Maps Trust Bar */}
+              <div className="bg-gradient-to-r from-[#09090B] via-[#111827] to-[#064E3B] text-white py-12 px-6 sm:px-12">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-emerald-300">
+                      01 · 4.9★ GOOGLE MAPS RATING · ZERO WAITING TIME
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Painless Dental &amp; Skin Care with Instant WhatsApp Slot Booking.
+                    </h1>
+                    <p className="text-sm text-zinc-200 max-w-xl">
+                      Choose your treatment, pick a live consultation time slot, and receive instant appointment confirmation + Google Maps directions on your WhatsApp.
+                    </p>
+                  </div>
+
+                  <div className="lg:col-span-5 grid grid-cols-2 gap-3 text-xs">
+                    <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
+                      <div className="font-display text-2xl font-extrabold text-emerald-300">
+                        420+
+                      </div>
+                      <div className="text-zinc-200 mt-1">5-Star Google Maps Patient Reviews</div>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
+                      <div className="font-display text-2xl font-extrabold text-white">
+                        Under 30s
+                      </div>
+                      <div className="text-zinc-200 mt-1">Automated WhatsApp Slot Confirmation</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Interactive Appointment Booker & Treatments */}
+              <div
+                id="aura-booker"
+                className="max-w-7xl mx-auto py-12 px-6 sm:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8"
+              >
+                <div id="aura-treatments" className="lg:col-span-7 space-y-6">
+                  <div>
+                    <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#10B981]">
+                      02 · TRANSPARENT CLINICAL CARE · SELECT A TREATMENT
+                    </div>
+                    <h2 className="font-display text-2xl font-extrabold text-zinc-900 mt-1">
+                      Specialized Treatments &amp; Lead Doctors
+                    </h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {[
+                      {
+                        name: 'Root Canal / Dental Implant',
+                        fee: '₹1,200 Consult',
+                        doc: 'Dr. Ananya Verma (MDS)',
+                        desc: 'Single-sitting painless microscopic root canal & digital 3D implant scan.',
+                      },
+                      {
+                        name: 'Laser Skin Consultation',
+                        fee: '₹800 Consult',
+                        doc: 'Dr. Neha Bansal (MD Derm)',
+                        desc: 'US-FDA approved hydra-facial, acne scar laser & pigmentation care.',
+                      },
+                      {
+                        name: 'General Checkup',
+                        fee: '₹500 Consult',
+                        doc: 'Dr. Rajesh Kulkarni (MD)',
+                        desc: 'Comprehensive family health screening, ECG & preventive diagnostics.',
+                      },
+                    ].map((tr) => {
+                      const active = selectedTreatment === tr.name;
+                      return (
+                        <div
+                          key={tr.name}
+                          onClick={() => {
+                            setSelectedTreatment(tr.name);
+                            setSelectedDoctor(tr.doc);
+                            setClinicBooked(false);
+                          }}
+                          className={`p-4 rounded-2xl border cursor-pointer transition-all space-y-2 ${
+                            active
+                              ? 'bg-emerald-50/70 border-[#10B981] shadow-sm'
+                              : 'bg-white border-zinc-200 hover:border-zinc-400'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-mono font-bold text-emerald-800">
+                              {tr.fee}
+                            </span>
+                            {active && (
+                              <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+                            )}
+                          </div>
+                          <h3 className="font-display font-bold text-sm text-zinc-900">
+                            {tr.name}
+                          </h3>
+                          <div className="text-xs font-semibold text-zinc-700">{tr.doc}</div>
+                          <p className="text-[11px] text-zinc-500 leading-relaxed">{tr.desc}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Section 4: Digital Google Maps Review Automation Strip */}
+                  <div
+                    id="aura-reviews"
+                    className="p-5 rounded-3xl bg-white border border-zinc-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-xs font-bold text-zinc-900">
+                        <MapPin className="w-4 h-4 text-[#0B63F6]" />
+                        <span>Automated Post-Visit WhatsApp Google Review Link</span>
+                      </div>
+                      <p className="text-xs text-zinc-500">
+                        2 hours after consultation, patients receive a polite WhatsApp message with a direct 1-tap link to rate AuraCare on Google Maps.
+                      </p>
+                    </div>
+                    <span className="px-3.5 py-2 rounded-xl bg-amber-50 text-amber-800 font-bold text-xs shrink-0">
+                      ★ 4.9 Rating (420+ Reviews)
                     </span>
+                  </div>
+                </div>
+
+                {/* Right: Live Appointment Slot Booker */}
+                <div className="lg:col-span-5 rounded-3xl bg-white border border-zinc-200 p-6 space-y-4 shadow-md">
+                  <div className="border-b border-zinc-200 pb-3">
+                    <span className="text-[11px] font-mono font-bold text-[#10B981]">
+                      03 · INSTANT WHATSAPP SLOT CONFIRMATION
+                    </span>
+                    <h3 className="font-display font-bold text-lg text-zinc-900">
+                      Book Your Clinic Slot
+                    </h3>
                   </div>
 
                   <div className="space-y-3 text-xs">
                     <div>
-                      <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                        BUYER / INVESTOR NAME
+                      <label className="block font-bold text-zinc-700 mb-1">
+                        Selected Treatment
                       </label>
                       <input
                         type="text"
-                        value={spatialLeadName}
-                        onChange={(e) => {
-                          setSpatialLeadName(e.target.value);
-                          setSpatialLeadSent(false);
-                        }}
-                        className="w-full px-3 py-2 rounded-xl surface-elevated font-mono-tech text-xs text-[var(--text-primary)]"
+                        readOnly
+                        value={`${selectedTreatment} — ${selectedDoctor}`}
+                        className="w-full p-2.5 rounded-xl bg-zinc-100 border border-zinc-200 font-semibold text-zinc-900"
                       />
                     </div>
+
                     <div>
-                      <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                        WHATSAPP MOBILE NUMBER
+                      <label className="block font-bold text-zinc-700 mb-1.5">
+                        Pick a Live Consultation Slot
                       </label>
-                      <input
-                        type="text"
-                        value={spatialLeadPhone}
-                        onChange={(e) => {
-                          setSpatialLeadPhone(e.target.value);
-                          setSpatialLeadSent(false);
-                        }}
-                        className="w-full px-3 py-2 rounded-xl surface-elevated font-mono-tech text-xs text-[var(--text-primary)]"
-                      />
-                    </div>
-                    <div className="p-3 rounded-xl surface-elevated font-mono-tech space-y-1">
-                      <div className="flex justify-between">
-                        <span className="text-[var(--text-secondary)]">Pinned Room View:</span>
-                        <span className="font-bold">
-                          {selectedRoom} ({compassYaw}° / {fovLens}° FOV)
-                        </span>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          'Today 5:30 PM',
+                          'Today 7:00 PM',
+                          'Tomorrow 11:00 AM',
+                          'Tomorrow 4:30 PM',
+                        ].map((slot) => (
+                          <button
+                            key={slot}
+                            type="button"
+                            onClick={() => {
+                              setSelectedClinicSlot(slot);
+                              setClinicBooked(false);
+                            }}
+                            className={`py-2.5 px-3 rounded-xl font-bold border cursor-pointer transition-all ${
+                              selectedClinicSlot === slot
+                                ? 'bg-[#0B63F6] text-white border-[#0B63F6]'
+                                : 'bg-zinc-50 text-zinc-800 border-zinc-200'
+                            }`}
+                          >
+                            {slot}
+                          </button>
+                        ))}
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[var(--text-secondary)]">Inspected Spec:</span>
-                        <span className="font-bold">{activeHotspot.label}</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block font-bold text-zinc-700 mb-1">
+                          Patient Name
+                        </label>
+                        <input
+                          type="text"
+                          value={patientName}
+                          onChange={(e) => setPatientName(e.target.value)}
+                          className="w-full p-2.5 rounded-xl bg-zinc-50 border border-zinc-300 text-zinc-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-bold text-zinc-700 mb-1">
+                          WhatsApp Number
+                        </label>
+                        <input
+                          type="text"
+                          value={patientPhone}
+                          onChange={(e) => setPatientPhone(e.target.value)}
+                          className="w-full p-2.5 rounded-xl bg-zinc-50 border border-zinc-300 text-zinc-900"
+                        />
                       </div>
                     </div>
-                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setSpatialLeadSent(true)}
-                    className="w-full py-2.5 px-4 rounded-xl btn-platinum-primary font-mono-tech text-xs font-bold cursor-pointer"
-                  >
-                    {spatialLeadSent
-                      ? '✓ VIP TOUR DISPATCHED TO DEVELOPER CRM'
-                      : 'SIMULATE INSTANT WHATSAPP LEAD CAPTURE'}
-                  </button>
-
-                  {spatialLeadSent && (
-                    <div className="p-3 rounded-xl bg-[#25D366]/10 border border-[#25D366]/30 font-mono-tech text-[11px] text-[var(--text-primary)]">
-                      ✓ Lead <strong>{spatialLeadName}</strong> ({spatialLeadPhone}) routed with
-                      pinned 360° camera state <strong>{selectedRoom} @ {compassYaw}°</strong>!
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                    <a
-                      href="https://360views.services"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-2.5 px-3 rounded-xl btn-platinum-secondary font-mono-tech text-[11px] font-bold text-center"
+                    <button
+                      type="button"
+                      onClick={() => setClinicBooked(true)}
+                      className="w-full py-3.5 rounded-2xl bg-[#25D366] text-zinc-950 font-bold text-xs sm:text-sm cursor-pointer"
                     >
-                      Launch 360views.services ↗
-                    </a>
-                    <a
-                      href={`https://wa.me/${SKYLINE_WHATSAPP_NUMBER}?text=${encodeURIComponent(
-                        `Hi Sachin, I explored the 360 Views (${selectedRoom} @ ${compassYaw}°) sandbox. Let's discuss a spatial web platform.`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-2.5 px-3 rounded-xl btn-whatsapp-official font-mono-tech text-[11px] font-bold inline-flex items-center justify-center gap-1.5"
-                    >
-                      <WhatsAppLogoIcon className="w-4 h-4 shrink-0" />
-                      <span>WhatsApp Sachin</span>
-                    </a>
+                      {clinicBooked
+                        ? `✓ Slot Confirmed (${selectedClinicSlot}) · WhatsApp Pass Sent!`
+                        : `Confirm ${selectedClinicSlot} Appointment on WhatsApp`}
+                    </button>
                   </div>
                 </div>
               </div>
+
+              {/* Section 5: Clinic Footer */}
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800">
+                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+                  <div>
+                    <strong className="text-white">AuraCare Multispecialty &amp; Dental Studio</strong> · Local SEO &amp; WhatsApp Booking System by SkyLine Digital Agency
+                  </div>
+                  <div>Scheme No. 54, Vijay Nagar, Indore · Emergency: +91 86430 02478</div>
+                </div>
+              </footer>
             </div>
           )}
 
-          {/* 2. SHADOWBASE (SACHIN SAHU — ZERO-DOWNTIME SQL MIGRATION SANDBOX) */}
-          {activeId === 'shadowbase-cdc' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                    SACHIN SAHU • FOUNDER &amp; CEO • SPRING BOOT + DEBEZIUM CDC + KAFKA
+          {/* =================================================================
+              4. FINVANTAGE SAAS (https://finvantage.in — B2B Cloud GST Billing & Cashflow SaaS Landing Page)
+             ================================================================= */}
+          {currentId === 'finvantage-saas' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: SaaS Product Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#0B63F6] text-white font-display font-black text-sm flex items-center justify-center">
+                    FV
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-[#10B981]/20 text-[#10B981] font-mono-tech text-xs font-bold">
-                    PARITY: {activeMigration.parityRate} • 0ms TABLE LOCK
-                  </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      FinVantage Cloud · GST &amp; Cashflow SaaS
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      Multi-Tenant GST Billing, Razorpay Webhooks &amp; Automated WhatsApp Reminders
+                    </div>
+                  </div>
                 </div>
 
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  ShadowBase — Zero-Downtime SQL Schema Migration IDE
-                </h3>
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#fv-studio" className="hover:text-[#0B63F6]">
+                    Live GST Invoice Studio
+                  </a>
+                  <a href="#fv-ledger" className="hover:text-[#0B63F6]">
+                    Multi-Tenant Ledger
+                  </a>
+                  <a href="#fv-pricing" className="hover:text-[#0B63F6]">
+                    Transparent Pricing
+                  </a>
+                </nav>
 
-                {/* Migration Script Selector */}
-                <div className="space-y-1.5">
-                  <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    1. SELECT PRODUCTION SQL DDL MIGRATION SCRIPT:
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    {MIGRATION_SCRIPTS.map((script, idx) => (
-                      <button
-                        key={script.id}
-                        type="button"
-                        onClick={() => setSelectedMigrationIdx(idx)}
-                        className={`p-3 rounded-xl font-mono-tech text-[11px] font-bold text-left cursor-pointer transition-all ${
-                          selectedMigrationIdx === idx ? 'btn-platinum-primary' : 'surface-elevated'
-                        }`}
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-4 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Export Sample GSTR-1 PDF</span>
+                </button>
+              </header>
+
+              {/* Section 2: B2B Fintech SaaS Hero */}
+              <div className="bg-[#09090B] text-white py-14 px-6 sm:px-12 border-b border-white/10">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#60A5FA]">
+                      01 · MULTI-TENANT B2B FINTECH · POSTGRESQL RLS ISOLATION
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Automate 18% GST Invoicing, 1-Tap UPI Recon &amp; Payment Reminders.
+                    </h1>
+                    <p className="text-sm text-zinc-300 max-w-xl">
+                      Built for Indian distributors, agencies, and growing SMBs. Generate compliant CGST/SGST tax invoices in 10 seconds and reconcile incoming UPI payments automatically via server-verified webhooks.
+                    </p>
+                    <div className="flex flex-wrap gap-3 pt-1">
+                      <a
+                        href="#fv-studio"
+                        className="px-5 py-3 rounded-xl bg-[#0B63F6] text-white font-bold text-xs sm:text-sm"
                       >
-                        {script.label}
-                      </button>
-                    ))}
+                        Try Live 18% GST Calculator &amp; Ledger
+                      </a>
+                      <a
+                        href="#fv-pricing"
+                        className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm"
+                      >
+                        Compare SMB Plans
+                      </a>
+                    </div>
                   </div>
-                </div>
 
-                {/* SQL IDE Code Box */}
-                <div className="p-4 rounded-2xl surface-elevated border border-[var(--border-metallic)] font-mono-tech text-xs space-y-3">
-                  <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
-                    <span>SQL MIGRATION BUFFER • TARGET: {activeMigration.rowsAffected}</span>
-                    <span>REPLAY RUN #{cdcReplayCount}</span>
-                  </div>
-                  <pre className="p-3 rounded-xl surface-card text-[11px] text-[var(--text-primary)] overflow-x-auto leading-relaxed">
-                    {activeMigration.sql}
-                  </pre>
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <button
-                      type="button"
-                      onClick={triggerCdcReplay}
-                      className="px-4 py-2.5 rounded-xl btn-platinum-primary font-mono-tech text-xs font-bold cursor-pointer"
-                    >
-                      {cdcRunning
-                        ? '⟳ REPLAYING KAFKA + DEBEZIUM WAL STREAM...'
-                        : '▶ RUN KAFKA + DEBEZIUM CDC REPLAY'}
-                    </button>
-                    <a
-                      href={`https://wa.me/${SKYLINE_WHATSAPP_NUMBER}?text=${encodeURIComponent(
-                        `Hi Sachin, I tested your ShadowBase CDC migration sandbox (${activeMigration.label}). Let's discuss zero-downtime backend engineering.`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2.5 rounded-xl btn-whatsapp-official font-mono-tech text-xs font-bold inline-flex items-center gap-1.5"
-                    >
-                      <WhatsAppLogoIcon className="w-4 h-4 shrink-0" />
-                      <span>Consult Sachin on Backend</span>
-                    </a>
-                  </div>
-                </div>
-
-                {/* Production vs Shadow Latency Comparison */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono-tech text-xs">
-                  <div className="p-4 rounded-2xl surface-elevated border border-red-500/30">
-                    <div className="text-[10px] text-red-400 font-bold uppercase">
-                      STANDARD DIRECT DDL (WITHOUT SHADOWBASE)
+                  <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="p-5 rounded-2xl bg-zinc-900 border border-white/10">
+                      <div className="text-zinc-400">Monthly Billed Volume</div>
+                      <div className="font-display text-2xl font-extrabold text-white mt-1">
+                        ₹4,82,500
+                      </div>
+                      <div className="text-[11px] text-[#34D399] font-semibold mt-1">
+                        18% CGST/SGST Auto-Split
+                      </div>
                     </div>
-                    <div className="font-display text-lg font-bold text-red-400 mt-1">
-                      {activeMigration.legacyLockMs}
-                    </div>
-                    <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                      Blocks live checkout &amp; UPI webhook inserts during table rewrite.
-                    </div>
-                  </div>
-                  <div className="p-4 rounded-2xl surface-elevated border border-[#10B981]/40">
-                    <div className="text-[10px] text-[#10B981] font-bold uppercase">
-                      SHADOWBASE KAFKA + DEBEZIUM CLONE
-                    </div>
-                    <div className="font-display text-lg font-bold text-[#10B981] mt-1">
-                      {activeMigration.shadowLockMs}
-                    </div>
-                    <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                      Dual-streams WAL mutations into Testcontainers shadow clone with 0ms lock.
+                    <div className="p-5 rounded-2xl bg-zinc-900 border border-white/10">
+                      <div className="text-zinc-400">Settled via UPI Webhooks</div>
+                      <div className="font-display text-2xl font-extrabold text-[#60A5FA] mt-1">
+                        ₹4,61,260
+                      </div>
+                      <div className="text-[11px] text-zinc-400 mt-1">
+                        Zero Manual Bank CSV Matching
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Live Docker Testcontainers & Debezium Logs */}
-              <div className="lg:col-span-5">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-3 font-mono-tech text-xs h-full flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-3">
-                      <span className="font-bold text-[11px] uppercase">
-                        DOCKER TESTCONTAINERS + DEBEZIUM LIVE LOGS
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-[#10B981]/20 text-[#10B981] text-[10px] font-bold">
-                        RUN #{cdcReplayCount} VERIFIED
-                      </span>
+              {/* Section 3: Interactive Live 18% GST Invoice Studio & Multi-Tenant Ledger */}
+              <div id="fv-studio" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-8">
+                <div className="p-6 sm:p-8 rounded-3xl bg-white border border-zinc-200 space-y-5 shadow-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0B63F6]">
+                        02 · INTERACTIVE GST TAX INVOICE GENERATOR
+                      </div>
+                      <h2 className="font-display font-extrabold text-xl text-zinc-900 mt-1">
+                        Create &amp; Dispatch a 18% GST Invoice
+                      </h2>
                     </div>
-                    <div className="space-y-2 p-3 rounded-xl surface-elevated text-[11px] leading-relaxed">
-                      {activeMigration.logs.map((line, i) => (
-                        <div key={i} className="text-[var(--text-secondary)]">
-                          <span className="text-[#10B981] font-bold mr-1">›</span>
-                          {line}
+                    <span className="text-xs font-mono font-semibold text-zinc-600">
+                      18% GST = ₹{Math.round(invoiceBaseAmount * 0.18).toLocaleString('en-IN')} · Total = ₹
+                      {Math.round(invoiceBaseAmount * 1.18).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <input
+                      type="text"
+                      value={invoiceClient}
+                      onChange={(e) => setInvoiceClient(e.target.value)}
+                      placeholder="Client / Enterprise Name"
+                      className="p-3 rounded-xl bg-zinc-50 border border-zinc-300 text-zinc-900 font-medium"
+                    />
+                    <input
+                      type="number"
+                      value={invoiceBaseAmount}
+                      onChange={(e) => setInvoiceBaseAmount(Number(e.target.value) || 0)}
+                      placeholder="Taxable Base Amount (₹)"
+                      className="p-3 rounded-xl bg-zinc-50 border border-zinc-300 text-zinc-900 font-medium"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddInvoice}
+                      className="py-3 px-4 rounded-xl bg-[#0B63F6] hover:bg-[#1D4ED8] text-white font-bold cursor-pointer"
+                    >
+                      + Generate &amp; Dispatch GST Invoice
+                    </button>
+                  </div>
+
+                  {/* Live Ledger Table */}
+                  <div id="fv-ledger" className="rounded-2xl border border-zinc-200 overflow-hidden">
+                    <div className="px-5 py-3.5 bg-zinc-50 border-b border-zinc-200 font-display font-bold text-xs text-zinc-900 flex items-center justify-between">
+                      <span>Live Multi-Tenant GST Invoice Ledger</span>
+                      <span className="font-mono text-[11px] text-zinc-500">GSTIN: 23AABCF4821M1Z5</span>
+                    </div>
+                    <div className="divide-y divide-zinc-200 text-xs">
+                      {invoicesList.map((inv) => (
+                        <div
+                          key={inv.id}
+                          className="px-5 py-3.5 flex flex-wrap items-center justify-between gap-3"
+                        >
+                          <div>
+                            <span className="font-mono font-bold text-zinc-900">{inv.id}</span>
+                            <span className="mx-2 text-zinc-400">·</span>
+                            <span className="font-bold text-zinc-800">{inv.client}</span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-4">
+                            <span className="text-zinc-500">
+                              Taxable: ₹{inv.base.toLocaleString('en-IN')} + 18% GST: ₹
+                              {inv.gst.toLocaleString('en-IN')}
+                            </span>
+                            <span className="font-display font-extrabold text-sm text-zinc-900">
+                              ₹{inv.total.toLocaleString('en-IN')}
+                            </span>
+                            <span className="font-mono font-bold text-[11px] text-emerald-700">
+                              {inv.status}
+                            </span>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
+                </div>
 
-                  <div className="p-3.5 rounded-xl surface-elevated border border-[var(--border-hairline)] space-y-1 text-[11px]">
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-muted)]">Primary P99 Read Latency:</span>
-                      <span className="font-bold text-[#10B981]">2.1 ms (Unchanged)</span>
+                {/* Section 4: Transparent Indian SMB SaaS Pricing Tiers */}
+                <div id="fv-pricing" className="space-y-6">
+                  <div className="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0B63F6]">
+                        03 · BUILT FOR INDIAN BUSINESSES
+                      </div>
+                      <h2 className="font-display text-2xl font-extrabold text-zinc-900 mt-1">
+                        Simple, Predictable GST Billing Plans
+                      </h2>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-muted)]">Shadow Clone P99 Latency:</span>
-                      <span className="font-bold text-[#10B981]">1.4 ms (Indexed)</span>
+                    <div className="inline-flex p-1 rounded-xl bg-zinc-200 text-xs font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setFinBillingCycle('monthly')}
+                        className={`px-3 py-1.5 rounded-lg cursor-pointer ${
+                          finBillingCycle === 'monthly' ? 'bg-white text-zinc-900' : 'text-zinc-600'
+                        }`}
+                      >
+                        Monthly
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFinBillingCycle('annual')}
+                        className={`px-3 py-1.5 rounded-lg cursor-pointer ${
+                          finBillingCycle === 'annual' ? 'bg-white text-zinc-900' : 'text-zinc-600'
+                        }`}
+                      >
+                        Annual (Save 20%)
+                      </button>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-muted)]">Row Checksum Drift:</span>
-                      <span className="font-bold text-[#10B981]">0 Rows (100% Parity)</span>
-                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                      {
+                        tier: 'Starter SMB',
+                        price: finBillingCycle === 'annual' ? '₹799/mo' : '₹999/mo',
+                        desc: 'For solo founders, consultants, and retail shops.',
+                        features: 'Unlimited 18% GST Invoices · 1-Tap UPI Links · GSTR-1 CSV Export',
+                      },
+                      {
+                        tier: 'Growth Business',
+                        price: finBillingCycle === 'annual' ? '₹1,999/mo' : '₹2,499/mo',
+                        desc: 'For growing agencies, clinics, and regional distributors.',
+                        features: 'Multi-User RBAC · Automated WhatsApp Payment Reminders · CA Audit Portal',
+                      },
+                      {
+                        tier: 'Enterprise Multi-Branch',
+                        price: 'Custom License',
+                        desc: 'Dedicated database isolation & custom ERP integrations.',
+                        features: 'Multi-GSTIN Branches · Webhook API Access · Dedicated SLA Support',
+                      },
+                    ].map((plan) => (
+                      <div
+                        key={plan.tier}
+                        className="p-6 rounded-3xl bg-white border border-zinc-200 space-y-3 flex flex-col justify-between"
+                      >
+                        <div className="space-y-2">
+                          <div className="font-display font-bold text-lg text-zinc-900">
+                            {plan.tier}
+                          </div>
+                          <div className="font-display font-extrabold text-2xl text-[#0B63F6]">
+                            {plan.price}
+                          </div>
+                          <p className="text-xs text-zinc-500">{plan.desc}</p>
+                        </div>
+                        <div className="pt-3 border-t border-zinc-100 text-xs text-zinc-700 font-medium">
+                          {plan.features}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
+
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">FinVantage Cloud SaaS</strong> · Engineered by Sachin Sahu &amp; Aashif Khan (SkyLine Digital Agency)
+                </div>
+                <div>PostgreSQL Row-Level Security · Automated GSTR-1 &amp; UPI Recon</div>
+              </footer>
             </div>
           )}
 
-          {/* 3. GRIDWEAVER (SACHIN SAHU — JAVA 21 LOOM IOT MICROGRID ENGINE) */}
-          {activeId === 'gridweaver-iot' && (
-            <div className="space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                    SACHIN SAHU • FOUNDER &amp; CEO • JAVA 21 VIRTUAL THREADS (LOOM) + KAFKA
+          {/* =================================================================
+              5. NEXAPROP WHATSAPP AI & CRM (https://nexaprop.in — Conversational PropTech Landing Page)
+             ================================================================= */}
+          {currentId === 'nexaprop-crm' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: NexaProp Brand Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#25D366] text-zinc-950 font-display font-black text-sm flex items-center justify-center">
+                    NP
                   </span>
-                  <h3 className="font-display text-xl sm:text-2xl font-bold mt-2">
-                    GridWeaver — GIS Microgrid Control Center &amp; Virtual Thread Telemetry
-                  </h3>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      NexaProp · WhatsApp Cloud AI for Builders
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      24/7 Brochure Dispatch, Site-Visit Scheduling &amp; Sales Advisor Routing
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={triggerLoomSpike}
-                    className={`px-4 py-2.5 rounded-xl font-mono-tech text-xs font-bold cursor-pointer transition-all ${
-                      loomSpikeActive ? 'bg-[#10B981] text-black' : 'btn-platinum-primary'
-                    }`}
-                  >
-                    {loomSpikeActive
-                      ? '⚡ 50,000 VIRTUAL THREAD SPIKE ACTIVE (CLICK TO NORMALIZE)'
-                      : '⚡ SIMULATE 50,000 VIRTUAL THREAD LOAD SPIKE'}
-                  </button>
-                </div>
-              </div>
 
-              {/* Live Telemetry Banner */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono-tech text-xs">
-                <div className="p-3.5 rounded-2xl surface-elevated border border-[var(--border-metallic)]">
-                  <div className="text-[10px] text-[var(--text-muted)] uppercase">ACTIVE LOOM THREADS</div>
-                  <div className="font-display text-lg font-bold text-[#10B981] mt-0.5">
-                    {virtualThreadCount.toLocaleString('en-IN')} Threads
-                  </div>
-                  <div className="text-[10px] text-[var(--text-secondary)]">OS Carrier Threads: 8</div>
-                </div>
-                <div className="p-3.5 rounded-2xl surface-elevated border border-[var(--border-metallic)]">
-                  <div className="text-[10px] text-[var(--text-muted)] uppercase">AGGREGATE GRID VECTOR</div>
-                  <div className="font-display text-lg font-bold text-[var(--text-primary)] mt-0.5">
-                    {totalMicrogridKw.toLocaleString('en-IN')} kW
-                  </div>
-                  <div className="text-[10px] text-[var(--text-secondary)]">Sub-second Kafka sync</div>
-                </div>
-                <div className="p-3.5 rounded-2xl surface-elevated border border-[var(--border-metallic)]">
-                  <div className="text-[10px] text-[var(--text-muted)] uppercase">P99 INGESTION LATENCY</div>
-                  <div className="font-display text-lg font-bold text-[#10B981] mt-0.5">
-                    {loomSpikeActive ? '6.8 ms' : '3.2 ms'}
-                  </div>
-                  <div className="text-[10px] text-[var(--text-secondary)]">0 Dropped Telemetry Pings</div>
-                </div>
-                <div className="p-3.5 rounded-2xl surface-elevated border border-[var(--border-metallic)]">
-                  <div className="text-[10px] text-[var(--text-muted)] uppercase">GRID FREQUENCY LOCK</div>
-                  <div className="font-display text-lg font-bold text-[var(--text-primary)] mt-0.5">
-                    50.02 Hz
-                  </div>
-                  <div className="text-[10px] text-[var(--text-secondary)]">PostGIS Spatial Sync</div>
-                </div>
-              </div>
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#nexa-live-bot" className="hover:text-[#059669]">
+                    Live WhatsApp Bot Demo
+                  </a>
+                  <a href="#nexa-pipeline" className="hover:text-[#059669]">
+                    Lead Routing Pipeline
+                  </a>
+                </nav>
 
-              {/* 4 Interactive Battery Nodes with explicit state buttons */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {iotNodes.map((node, idx) => (
-                  <div
-                    key={node.id}
-                    className="p-4 rounded-2xl surface-elevated border border-[var(--border-metallic)] space-y-3"
-                  >
-                    <div className="flex items-center justify-between font-mono-tech text-xs">
-                      <div>
-                        <span className="text-[10px] text-[var(--text-muted)] font-bold">
-                          {node.id}
-                        </span>
-                        <div className="font-display text-base font-bold text-[var(--text-primary)]">
-                          {node.zone}
-                        </div>
+                <a
+                  href="#nexa-live-bot"
+                  className="px-4 py-2 rounded-xl bg-[#09090B] text-white text-xs font-bold"
+                >
+                  Test Live Bot
+                </a>
+              </header>
+
+              {/* Section 2: Conversational PropTech Hero */}
+              <div className="bg-gradient-to-br from-[#071A12] via-[#09090B] to-[#0B1F17] text-white py-14 px-6 sm:px-12">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#34D399]">
+                      01 · OFFICIAL META WHATSAPP CLOUD API · REAL ESTATE CRM
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Turn Every Facebook &amp; Google Property Lead into a Confirmed Weekend Site Visit.
+                    </h1>
+                    <p className="text-sm text-zinc-300 max-w-xl">
+                      Buyers don't wait 6 hours for a callback. NexaProp replies on WhatsApp in 2 seconds with RERA floor plans, pricing sheets, and an interactive weekend site-visit calendar.
+                    </p>
+                  </div>
+                  <div className="lg:col-span-5 grid grid-cols-2 gap-3 text-xs">
+                    <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+                      <div className="font-display text-2xl font-extrabold text-[#34D399]">
+                        Under 3s
                       </div>
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                          node.state === 'FAULT'
-                            ? 'bg-red-500/20 text-red-400'
-                            : node.state === 'CHARGING'
-                              ? 'bg-[#10B981]/20 text-[#10B981]'
-                              : 'badge-neutral'
-                        }`}
-                      >
-                        {node.state} • {node.loadKw} kW
-                      </span>
+                      <div className="text-zinc-300 mt-1">Instant Brochure &amp; Price Sheet Reply</div>
+                    </div>
+                    <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+                      <div className="font-display text-2xl font-extrabold text-white">
+                        24/7
+                      </div>
+                      <div className="text-zinc-300 mt-1">Automated Lead Qualification &amp; Alerts</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Live Interactive WhatsApp Simulator & Property Trigger Studio */}
+              <div id="nexa-live-bot" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                  <div className="lg:col-span-7 rounded-3xl bg-white border border-zinc-200 p-6 flex flex-col justify-between space-y-5">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+                        <div>
+                          <div className="text-xs font-mono font-bold text-[#059669]">
+                            02 · INTERACTIVE BUYER TRIGGER STUDIO
+                          </div>
+                          <div className="font-display font-extrabold text-base text-zinc-900">
+                            SkyLine One Luxury 3BHK &amp; 4BHK Residences
+                          </div>
+                        </div>
+                        <span className="text-xs font-mono font-bold text-emerald-700">
+                          Meta Cloud API Connected
+                        </span>
+                      </div>
+                      <img
+                        src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=1000&q=80"
+                        alt="SkyLine One Residences"
+                        className="w-full h-52 object-cover rounded-2xl"
+                      />
+                      <p className="text-xs sm:text-sm text-zinc-600">
+                        Click any buyer action below to watch the live WhatsApp bot respond on the right:
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => triggerNexaAction('brochure')}
+                          className="py-3 px-3 rounded-xl bg-[#0B63F6] text-white font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Send PDF Brochure</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => triggerNexaAction('visit')}
+                          className="py-3 px-3 rounded-xl bg-zinc-900 text-white font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>Book Site Visit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => triggerNexaAction('price')}
+                          className="py-3 px-3 rounded-xl bg-zinc-100 text-zinc-900 font-bold text-xs cursor-pointer"
+                        >
+                          Check 3BHK Price
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-1.5">
-                      {(['CHARGING', 'DISCHARGING', 'IDLE', 'FAULT'] as const).map((st) => (
-                        <button
-                          key={st}
-                          type="button"
-                          onClick={() => setNodeStateExplicit(idx, st)}
-                          className={`py-1.5 px-2 rounded-lg font-mono-tech text-[10px] font-bold cursor-pointer transition-all ${
-                            node.state === st
-                              ? 'btn-platinum-primary'
-                              : 'surface-card text-[var(--text-secondary)]'
+                    <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs">
+                      <span className="font-medium text-zinc-700">
+                        Need instant human sales advisor takeover?
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setNexaHandoverActive((prev) => !prev)}
+                        className="px-3.5 py-1.5 rounded-xl bg-amber-100 text-amber-900 font-bold cursor-pointer"
+                      >
+                        {nexaHandoverActive
+                          ? '✓ Connected to Senior Sales Advisor'
+                          : 'Simulate Human Handover'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Live WhatsApp Phone Frame */}
+                  <div className="lg:col-span-5 rounded-3xl bg-[#0B141A] text-white border-4 border-zinc-800 overflow-hidden flex flex-col justify-between shadow-xl">
+                    <div className="px-4 py-3.5 bg-[#1F2C34] flex items-center gap-2.5">
+                      <WhatsAppBrandBadge size="sm" />
+                      <div>
+                        <div className="text-xs font-bold text-white">
+                          NexaProp Official Bot
+                        </div>
+                        <div className="text-[10px] text-[#34D399]">
+                          {nexaHandoverActive
+                            ? 'Human Sales Advisor Active'
+                            : '24/7 Automated Lead Qualification'}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-3 max-h-80 overflow-y-auto flex-1">
+                      {nexaChatMessages.map((msg, i) => (
+                        <div
+                          key={i}
+                          className={`flex ${
+                            msg.sender === 'user' ? 'justify-end' : 'justify-start'
                           }`}
                         >
-                          {st}
+                          <div
+                            className={`px-3.5 py-2.5 rounded-2xl text-xs max-w-[85%] ${
+                              msg.sender === 'user'
+                                ? 'bg-[#005C4B] text-white'
+                                : 'bg-[#1F2C34] text-zinc-100'
+                            }`}
+                          >
+                            <div>{msg.text}</div>
+                            <div className="text-[9px] text-zinc-400 text-right mt-1">
+                              {msg.time}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 4: 3-Step Lead Routing Architecture */}
+                <div id="nexa-pipeline" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      step: '01 · INSTANT CAPTURE',
+                      title: 'Meta Ad & Website Webhook Sync',
+                      desc: 'The moment a buyer clicks your Instagram/Facebook ad or website button, NexaProp initiates a verified WhatsApp conversation.',
+                    },
+                    {
+                      step: '02 · QUALIFICATION',
+                      title: 'Budget, BHK & Timeline Tagging',
+                      desc: 'Interactive WhatsApp buttons capture whether the buyer wants a 3BHK, 4BHK, or commercial unit without manual cold-calling.',
+                    },
+                    {
+                      step: '03 · SALES CLOSING',
+                      title: 'Instant Closer Alert & Calendar Lock',
+                      desc: 'High-intent site visits are assigned to your senior sales manager with one-tap CRM stage tracking.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.step}
+                      className="p-6 rounded-3xl bg-white border border-zinc-200 space-y-2"
+                    >
+                      <div className="text-xs font-mono font-bold text-[#059669]">{item.step}</div>
+                      <h3 className="font-display font-bold text-base text-zinc-900">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-zinc-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">NexaProp WhatsApp AI &amp; CRM</strong> · Engineered by Sachin Sahu (SkyLine Digital Agency)
+                </div>
+                <div>Official WhatsApp Cloud API · Real Estate Lead Automation</div>
+              </footer>
+            </div>
+          )}
+
+          {/* =================================================================
+              6. FILEGUARD AI (https://fileguard.ai — Zero-Trust Document Verification Landing Page)
+             ================================================================= */}
+          {currentId === 'fileguard-security' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: FileGuard Security Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#09090B] text-[#10B981] flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      FileGuard AI · Cryptographic Contract Verifier
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      SHA-256 Document Integrity, Tamper Detection &amp; Zero-Trust AST Scanning
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#fg-tamper-lab" className="hover:text-[#0B63F6]">
+                    Live SHA-256 Tamper Lab
+                  </a>
+                  <a href="#fg-architecture" className="hover:text-[#0B63F6]">
+                    Zero-Trust Pipeline
+                  </a>
+                </nav>
+
+                <span className="text-xs font-mono font-bold text-emerald-700">
+                  OriginStamp Ledger Active
+                </span>
+              </header>
+
+              {/* Section 2: Enterprise Cybersecurity Hero */}
+              <div className="bg-[#09090B] text-white py-14 px-6 sm:px-12 border-b border-white/10">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-8 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#34D399]">
+                      01 · CRYPTOGRAPHIC DOCUMENT INTEGRITY · OWASP &amp; AGENTSHIELD HARDENED
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Detect Unauthorized Contract Edits &amp; Forged PDFs in Real Time.
+                    </h1>
+                    <p className="text-sm text-zinc-300 max-w-2xl">
+                      Built for legal teams, real estate registries, and financial institutions. FileGuard anchors every signed agreement to a cryptographic SHA-256 digest so even a single character edit triggers an instant tamper alert.
+                    </p>
+                  </div>
+                  <div className="lg:col-span-4 p-5 rounded-2xl bg-zinc-900 border border-white/10 space-y-2 text-xs font-mono">
+                    <div className="text-[#34D399] font-bold">VERIFICATION ENGINE</div>
+                    <div className="text-zinc-300">Algorithm: SHA-256 + Merkle Proof</div>
+                    <div className="text-zinc-400">MIME Guard: Strict PDF/DOCX Allowlist</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Live Interactive SHA-256 Document Tamper Lab */}
+              <div id="fg-tamper-lab" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  <div className="lg:col-span-7 p-6 rounded-3xl bg-white border border-zinc-200 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <div className="text-xs font-mono font-bold text-[#0B63F6]">
+                          02 · INTERACTIVE SHA-256 TAMPER INSPECTOR
+                        </div>
+                        <h2 className="font-display font-bold text-lg text-zinc-900 mt-1">
+                          Edit Contract Payload Below to Test Tamper Detection
+                        </h2>
+                      </div>
+                      <span
+                        className={`px-3 py-1 rounded-xl text-xs font-mono font-bold ${
+                          tamperedMode
+                            ? 'bg-rose-100 text-rose-700'
+                            : 'bg-emerald-100 text-emerald-800'
+                        }`}
+                      >
+                        {tamperedMode
+                          ? 'ALERT · HASH MISMATCH DETECTED'
+                          : '✓ VERIFIED AUTHENTIC SIGNATURE'}
+                      </span>
+                    </div>
+                    <textarea
+                      rows={4}
+                      value={docContent}
+                      onChange={(e) => {
+                        setDocContent(e.target.value);
+                        setTamperedMode(true);
+                      }}
+                      className="w-full p-4 rounded-2xl bg-zinc-50 border border-zinc-300 text-xs font-mono text-zinc-900"
+                    />
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDocContent(
+                            'Commercial Lease Agreement #IND-2026-884 · Monthly Rent: ₹65,000 · Signed by Both Parties'
+                          );
+                          setTamperedMode(false);
+                        }}
+                        className="px-4 py-2.5 rounded-xl bg-[#0B63F6] text-white text-xs font-bold cursor-pointer"
+                      >
+                        Restore Original Signed Contract
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDocContent(
+                            'Commercial Lease Agreement #IND-2026-884 · Monthly Rent: ₹95,000 · Signed by Both Parties'
+                          );
+                          setTamperedMode(true);
+                        }}
+                        className="px-4 py-2.5 rounded-xl bg-zinc-900 text-white text-xs font-bold cursor-pointer"
+                      >
+                        Simulate Unauthorized Rent Alteration
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-5 p-6 rounded-3xl bg-white border border-zinc-200 space-y-4 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500">
+                        CRYPTOGRAPHIC AUDIT LEDGER
+                      </div>
+                      <div className="p-4 rounded-2xl bg-zinc-950 text-emerald-300 border border-zinc-800 font-mono text-xs break-all">
+                        {tamperedMode
+                          ? '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08 (TAMPERED DIGEST)'
+                          : 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (VERIFIED DIGEST)'}
+                      </div>
+                      <p className="text-xs text-zinc-600 leading-relaxed">
+                        Anchored to OriginStamp Ledger Block #19482104 · Strict MIME &amp; Macro Sanitization prevents malicious SVG/HTML payload execution.
+                      </p>
+                    </div>
+                    <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 text-xs font-medium text-zinc-700">
+                      Lead Security Architect: <strong>Aashif Khan</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 4: 3-Pillar Security Architecture */}
+                <div id="fg-architecture" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      code: '01 · ZERO-TRUST INGESTION',
+                      title: 'Strict MIME & Payload Sanitization',
+                      desc: 'Blocks disguised executable uploads, embedded PDF scripts, and XXE injection vectors before storage.',
+                    },
+                    {
+                      code: '02 · IMMUTABLE PROOF',
+                      title: 'SHA-256 & Merkle Tree Anchoring',
+                      desc: 'Generates deterministic cryptographic certificates so clients can verify document authenticity without exposing private contents.',
+                    },
+                    {
+                      code: '03 · RBAC AUDIT TRAIL',
+                      title: 'Per-Tenant Access & Download Logs',
+                      desc: 'Every view, signature verification, and download is logged with IP, timestamp, and role-based tenant isolation.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.code}
+                      className="p-6 rounded-3xl bg-white border border-zinc-200 space-y-2"
+                    >
+                      <div className="text-xs font-mono font-bold text-[#0B63F6]">{item.code}</div>
+                      <h3 className="font-display font-bold text-base text-zinc-900">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-zinc-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">FileGuard AI · Zero-Trust Verifier</strong> · Engineered by Aashif Khan (SkyLine Digital Agency)
+                </div>
+                <div>SHA-256 Cryptographic Verification · OWASP Top 10 Compliant</div>
+              </footer>
+            </div>
+          )}
+
+          {/* =================================================================
+              7. GRIDWEAVER IOT (https://gridweaver.io — Smart Microgrid & CleanTech Landing Page)
+             ================================================================= */}
+          {currentId === 'gridweaver-iot' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: GridWeaver CleanTech Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#0B63F6] text-white flex items-center justify-center">
+                    <Cpu className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      GridWeaver · Smart Microgrid &amp; Energy Telemetry
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      Java 21 Project Loom Virtual Threads · Apache Kafka · Industrial Solar GIS
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#gw-substation" className="hover:text-[#0B63F6]">
+                    Live Substation Control
+                  </a>
+                  <a href="#gw-architecture" className="hover:text-[#0B63F6]">
+                    Java 21 + Kafka Architecture
+                  </a>
+                </nav>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVirtualThreadLoad((prev) => (prev >= 50000 ? 12400 : 50000))
+                  }
+                  className="px-4 py-2 rounded-xl bg-[#0B63F6] text-white text-xs font-bold cursor-pointer"
+                >
+                  {virtualThreadLoad >= 50000
+                    ? 'Reset Thread Load (12.4k)'
+                    : 'Simulate 50k Telemetry Spike'}
+                </button>
+              </header>
+
+              {/* Section 2: CleanTech Industrial Hero */}
+              <div className="bg-gradient-to-r from-[#09090B] via-[#0F172A] to-[#1E3A8A] text-white py-14 px-6 sm:px-12">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#60A5FA]">
+                      01 · INDUSTRIAL IOT &amp; SOLAR MICROGRID GIS · JAVA 21 LOOM
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Real-Time Substation Telemetry &amp; Automated Grid Load Balancing.
+                    </h1>
+                    <p className="text-sm text-zinc-200 max-w-xl">
+                      Engineered for solar parks, industrial feeders, and EV charging networks. Ingest tens of thousands of concurrent inverter streams over Java 21 virtual threads and Apache Kafka.
+                    </p>
+                  </div>
+                  <div className="lg:col-span-5 grid grid-cols-2 gap-3 text-xs">
+                    <div className="p-5 rounded-2xl bg-white/10 border border-white/15">
+                      <div className="font-display text-2xl font-extrabold text-[#34D399]">
+                        {virtualThreadLoad.toLocaleString('en-IN')}
+                      </div>
+                      <div className="text-zinc-200 mt-1">Concurrent Java 21 Virtual Threads</div>
+                    </div>
+                    <div className="p-5 rounded-2xl bg-white/10 border border-white/15">
+                      <div className="font-display text-2xl font-extrabold text-white">
+                        1,925 kW
+                      </div>
+                      <div className="text-zinc-200 mt-1">Active Regional Feeder Output</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Interactive Regional Substation Control Matrix */}
+              <div id="gw-substation" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-10">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0B63F6]">
+                        02 · INTERACTIVE REGIONAL SUBSTATION CONTROL
+                      </div>
+                      <h2 className="font-display text-2xl font-extrabold text-zinc-900 mt-1">
+                        Switch Feeder Nodes Between Charging, Discharging &amp; Fault Isolation
+                      </h2>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    {gridNodes.map((node, idx) => (
+                      <div
+                        key={node.id}
+                        className="p-6 rounded-3xl bg-white border border-zinc-200 space-y-3 shadow-xs"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="font-display font-bold text-base text-zinc-900">
+                              {node.name}
+                            </h3>
+                            <p className="text-xs font-mono text-zinc-500">
+                              {node.id} · {node.zone}
+                            </p>
+                          </div>
+                          <span
+                            className={`px-3 py-1 rounded-xl text-xs font-mono font-bold ${
+                              node.state === 'FAULT'
+                                ? 'bg-rose-100 text-rose-700'
+                                : node.state === 'CHARGING'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-zinc-900 text-white'
+                            }`}
+                          >
+                            {node.state}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-zinc-700 pt-1">
+                          <span>
+                            Feeder Load: <strong>{node.kw} kW</strong>
+                          </span>
+                          <span>
+                            Battery Storage SoC: <strong>{node.soc}%</strong>
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 pt-2">
+                          {(['CHARGING', 'DISCHARGING', 'IDLE', 'FAULT'] as const).map(
+                            (st) => (
+                              <button
+                                key={st}
+                                type="button"
+                                onClick={() =>
+                                  setGridNodes((prev) =>
+                                    prev.map((n, i) =>
+                                      i === idx ? { ...n, state: st } : n
+                                    )
+                                  )
+                                }
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
+                                  node.state === st
+                                    ? 'bg-[#0B63F6] text-white'
+                                    : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                                }`}
+                              >
+                                {st}
+                              </button>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Section 4: Hardware-to-Cloud Architecture Grid */}
+                <div id="gw-architecture" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      code: '01 · EDGE INGESTION',
+                      title: 'Java 21 Virtual Thread Collectors',
+                      desc: 'Handles thousands of non-blocking inverter and smart-meter socket connections without OS thread exhaustion.',
+                    },
+                    {
+                      code: '02 · EVENT BACKBONE',
+                      title: 'Apache Kafka Telemetry Partitions',
+                      desc: 'Buffers regional substation events by feeder ID for real-time anomaly detection and replayable audit logs.',
+                    },
+                    {
+                      code: '03 · GIS DISPATCH',
+                      title: 'Automated Fault Isolation',
+                      desc: 'Instantly reroutes power loads across neighboring microgrid reserves when an industrial feeder reports a fault.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.code}
+                      className="p-6 rounded-3xl bg-white border border-zinc-200 space-y-2"
+                    >
+                      <div className="text-xs font-mono font-bold text-[#0B63F6]">{item.code}</div>
+                      <h3 className="font-display font-bold text-base text-zinc-900">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-zinc-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">GridWeaver Smart Microgrid Platform</strong> · Engineered by Sachin Sahu (SkyLine Digital Agency)
+                </div>
+                <div>Java 21 Project Loom · Apache Kafka · TimescaleDB</div>
+              </footer>
+            </div>
+          )}
+
+          {/* =================================================================
+              8. SHADOWBASE CDC (https://shadowbase.dev — Zero-Downtime SQL DevTools Landing Page)
+             ================================================================= */}
+          {currentId === 'shadowbase-cdc' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: ShadowBase DevTools Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#09090B] text-[#60A5FA] flex items-center justify-center">
+                    <Database className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      ShadowBase · Zero-Downtime SQL Migration Studio
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      Debezium WAL Change Data Capture · Testcontainers · 0ms Table Lock Cutover
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#sb-sandbox" className="hover:text-[#0B63F6]">
+                    Interactive Migration Sandbox
+                  </a>
+                  <a href="#sb-workflow" className="hover:text-[#0B63F6]">
+                    How Zero-Lock Cutover Works
+                  </a>
+                </nav>
+
+                <span className="px-3 py-1.5 rounded-xl bg-zinc-900 text-emerald-300 font-mono text-xs">
+                  $ npx shadowbase verify --pg16
+                </span>
+              </header>
+
+              {/* Section 2: Developer Infrastructure Hero */}
+              <div className="bg-[#09090B] text-white py-14 px-6 sm:px-12 border-b border-white/10">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#60A5FA]">
+                      01 · DATABASE RELIABILITY ENGINEERING · DEBEZIUM + TESTCONTAINERS
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Run High-Risk PostgreSQL Schema Migrations with Zero Production Table Locks.
+                    </h1>
+                    <p className="text-sm text-zinc-300 max-w-xl">
+                      Never bring down checkout during an `ALTER TABLE` again. ShadowBase provisions an isolated shadow container, streams live WAL changes via Debezium CDC, verifies row-hash parity, and executes atomic cutover.
+                    </p>
+                  </div>
+                  <div className="lg:col-span-5 p-5 rounded-2xl bg-zinc-900 border border-white/10 space-y-2 font-mono text-xs">
+                    <div className="text-zinc-400"># Live CDC Replication Status</div>
+                    <div className="text-emerald-300">
+                      ✓ {shadowRowsSynced.toLocaleString('en-IN')} WAL Events Replayed
+                    </div>
+                    <div className="text-zinc-300">Production Lock Duration: 0.00 ms</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Interactive SQL Migration & CDC Replay Sandbox */}
+              <div id="sb-sandbox" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <div className="lg:col-span-7 p-6 rounded-3xl bg-[#09090B] text-white space-y-4">
+                    <div className="text-xs font-mono font-bold text-[#60A5FA]">
+                      02 · SELECT SQL MIGRATION TO REPLAY ON ISOLATED SHADOW CONTAINER
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        'V14__add_gst_invoice_index.sql',
+                        'V15__partition_orders_by_month.sql',
+                      ].map((script, idx) => (
+                        <button
+                          key={script}
+                          type="button"
+                          onClick={() => {
+                            setSelectedMigrationIdx(idx);
+                            setMigrationVerified(true);
+                          }}
+                          className={`px-3.5 py-2 rounded-xl text-xs font-mono cursor-pointer ${
+                            selectedMigrationIdx === idx
+                              ? 'bg-[#0B63F6] text-white'
+                              : 'bg-white/10 text-zinc-300'
+                          }`}
+                        >
+                          {script}
+                        </button>
+                      ))}
+                    </div>
+                    <pre className="p-4 rounded-2xl bg-black/60 text-xs font-mono text-emerald-300 overflow-x-auto">
+                      {selectedMigrationIdx === 0
+                        ? 'CREATE INDEX CONCURRENTLY idx_invoices_gstin\nON invoices (customer_gstin, invoice_date)\nWHERE status = \'PAID\';'
+                        : "ALTER TABLE customer_orders\nATTACH PARTITION orders_2026_11\nFOR VALUES FROM ('2026-11-01') TO ('2026-12-01');"}
+                    </pre>
+                  </div>
+
+                  <div className="lg:col-span-5 p-6 rounded-3xl bg-white border border-zinc-200 flex flex-col justify-between space-y-4">
+                    <div className="space-y-2">
+                      <div className="text-xs font-mono font-bold text-[#0B63F6]">
+                        03 · PARITY VERIFICATION GATE
+                      </div>
+                      <h3 className="font-display font-bold text-base text-zinc-900">
+                        Debezium CDC + Testcontainers Verification
+                      </h3>
+                      <p className="text-xs text-zinc-600">
+                        Replays live production mutations against a disposable PostgreSQL 16 container with 0ms production table lock time.
+                      </p>
+                      {migrationVerified && (
+                        <div className="p-3.5 rounded-2xl bg-emerald-50 text-emerald-800 text-xs font-mono font-bold">
+                          ✓ 0ms Lock Time · {shadowRowsSynced.toLocaleString('en-IN')} Rows Checksum Verified
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMigrationVerified(true);
+                        setShadowRowsSynced((prev) => prev + 1250);
+                      }}
+                      className="w-full py-3 rounded-xl bg-[#0B63F6] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
+                    >
+                      Run Kafka + Debezium CDC ReplayBatch (+1,250 Rows)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Section 4: 3-Step Zero-Downtime Cutover Workflow */}
+                <div id="sb-workflow" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      step: '01 · SHADOW CLONE',
+                      title: 'Ephemeral Testcontainers Provisioning',
+                      desc: 'Spins up an isolated PostgreSQL 16 container mirroring your production schema before applying DDL changes.',
+                    },
+                    {
+                      step: '02 · WAL STREAMING',
+                      title: 'Debezium CDC Dual-Write Sync',
+                      desc: 'Streams live INSERT, UPDATE, and DELETE transactions from primary WAL so the shadow table never falls behind.',
+                    },
+                    {
+                      step: '03 · ATOMIC CUTOVER',
+                      title: 'Row-Hash Parity & Pointer Swap',
+                      desc: 'Verifies CRC32 row checksums across both tables before swapping connection pool routing with zero downtime.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.step}
+                      className="p-6 rounded-3xl bg-white border border-zinc-200 space-y-2"
+                    >
+                      <div className="text-xs font-mono font-bold text-[#0B63F6]">{item.step}</div>
+                      <h3 className="font-display font-bold text-base text-zinc-900">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-zinc-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">ShadowBase · Zero-Downtime SQL Studio</strong> · Engineered by Sachin Sahu (SkyLine Digital Agency)
+                </div>
+                <div>PostgreSQL 16 · Debezium CDC · Docker Testcontainers</div>
+              </footer>
+            </div>
+          )}
+
+          {/* =================================================================
+              9. AI CAREER MENTOR (https://aicareerguide.in — EdTech & Mock Viva Landing Page)
+             ================================================================= */}
+          {currentId === 'ai-career-mentor' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: EdTech Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#0B63F6] text-white flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      AI Career Guide &amp; Engineering Viva Lab
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      Personalized Skill Roadmaps, System Design Defense &amp; Mock Viva Engine
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#ac-roadmap" className="hover:text-[#0B63F6]">
+                    Interactive Track Roadmap
+                  </a>
+                  <a href="#ac-viva" className="hover:text-[#0B63F6]">
+                    Live Mock Viva Lab
+                  </a>
+                </nav>
+
+                <a
+                  href="#ac-roadmap"
+                  className="px-4 py-2 rounded-xl bg-[#09090B] text-white text-xs font-bold"
+                >
+                  Explore Tracks
+                </a>
+              </header>
+
+              {/* Section 2: EdTech Hero */}
+              <div className="bg-gradient-to-r from-[#09090B] via-[#1E1B4B] to-[#0F172A] text-white py-14 px-6 sm:px-12">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-8 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#60A5FA]">
+                      01 · OUTCOME-DRIVEN ENGINEERING MENTORSHIP · RAG VIVA ENGINE
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Master Production System Design &amp; Ace Technical Interviews with Live AI Viva.
+                    </h1>
+                    <p className="text-sm text-zinc-200 max-w-2xl">
+                      Stop watching passive tutorial playlists. Pick your engineering track, complete weekly architecture sprints, and defend your code decisions in an interactive technical viva.
+                    </p>
+                  </div>
+                  <div className="lg:col-span-4 p-5 rounded-2xl bg-white/10 border border-white/15 space-y-2 text-xs">
+                    <div className="font-mono font-bold text-[#34D399]">TRACK COMPLETION</div>
+                    <div className="font-display text-2xl font-extrabold text-white">
+                      {completedWeeks.length} / 3 Sprints Done
+                    </div>
+                    <div className="text-zinc-300">Active Track: {selectedCareerTrack}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Interactive Career Track Selector & Weekly Sprint Checklist */}
+              <div id="ac-roadmap" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-10">
+                <div className="space-y-5">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#0B63F6]">
+                        02 · SELECT YOUR ENGINEERING SPECIALIZATION
+                      </div>
+                      <h2 className="font-display text-2xl font-extrabold text-zinc-900 mt-1">
+                        Interactive 3-Sprint Production Curriculum
+                      </h2>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {(
+                        [
+                          'Full-Stack Next.js',
+                          'Java 21 & Kafka',
+                          'AI & Cybersecurity',
+                        ] as const
+                      ).map((tr) => (
+                        <button
+                          key={tr}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCareerTrack(tr);
+                            setVivaAnswerSubmitted(false);
+                          }}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
+                            selectedCareerTrack === tr
+                              ? 'bg-[#0B63F6] text-white'
+                              : 'bg-white border border-zinc-200 text-zinc-700'
+                          }`}
+                        >
+                          {tr}
                         </button>
                       ))}
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
 
-          {/* 4. FILEGUARD AI (AASHIF KHAN — SHA-256 & BLOCKCHAIN DOCUMENT VERIFIER) */}
-          {activeId === 'fileguard-security' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                    AASHIF KHAN • CO-FOUNDER &amp; SYSTEM ARCHITECT • SHA-256 + ORIGINSTAMP
-                  </span>
-                  <span
-                    className={`px-3 py-1 rounded-full font-mono-tech text-[11px] font-bold ${
-                      isSignatureMatch
-                        ? 'bg-[#10B981]/20 text-[#10B981]'
-                        : 'bg-red-500/20 text-red-400'
-                    }`}
-                  >
-                    {isSignatureMatch
-                      ? '✓ BLOCKCHAIN ANCHOR VERIFIED'
-                      : '✕ CRYPTOGRAPHIC TAMPER ALERT'}
-                  </span>
-                </div>
-
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  FileGuard AI — SHA-256 &amp; OriginStamp Blockchain Document Verifier
-                </h3>
-
-                {/* Sample Document Selector */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    LOAD SAMPLE CONTRACT:
-                  </span>
-                  {(Object.keys(SAMPLE_DOCUMENTS) as (keyof typeof SAMPLE_DOCUMENTS)[]).map(
-                    (docKey) => (
-                      <button
-                        key={docKey}
-                        type="button"
-                        onClick={() => handleSelectSampleDoc(docKey)}
-                        className={`px-3 py-1.5 rounded-xl font-mono-tech text-xs font-bold cursor-pointer ${
-                          selectedSampleDoc === docKey
-                            ? 'btn-platinum-primary'
-                            : 'surface-elevated'
-                        }`}
-                      >
-                        {docKey}
-                      </button>
-                    )
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setTamperCheckInput((prev) => prev + ' [TAMPERED]')}
-                    className="px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 font-mono-tech text-xs font-bold cursor-pointer"
-                  >
-                    ⚡ Simulate 1-Char Tamper
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                      1. ORIGINAL ANCHORED DOCUMENT PAYLOAD (IMMUTABLE LEDGER RECORD)
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={docPayload}
-                      onChange={(e) => setDocPayload(e.target.value)}
-                      className="w-full p-3 rounded-xl surface-elevated text-xs font-mono-tech text-[var(--text-primary)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                      2. LIVE VERIFICATION INPUT (CHANGE ANY CHARACTER TO TEST SHA-256 DRIFT)
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={tamperCheckInput}
-                      onChange={(e) => setTamperCheckInput(e.target.value)}
-                      className="w-full p-3 rounded-xl surface-elevated text-xs font-mono-tech text-[var(--text-primary)]"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:col-span-5">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-3 font-mono-tech text-xs">
-                  <div className="text-[10px] text-[var(--text-muted)] uppercase font-bold">
-                    ORIGINSTAMP MERKLE ROOT &amp; SHA-256 AUDIT
-                  </div>
-                  <div className="p-3 rounded-xl surface-elevated space-y-1">
-                    <div className="text-[10px] text-[var(--text-muted)]">BLOCKCHAIN ANCHOR TX</div>
-                    <div className="font-bold text-[11px] break-all text-[var(--text-primary)]">
-                      {SAMPLE_DOCUMENTS[selectedSampleDoc].anchorTx}
-                    </div>
-                    <div className="text-[10px] text-[#10B981]">
-                      {SAMPLE_DOCUMENTS[selectedSampleDoc].timestamp}
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-xl surface-elevated break-all">
-                    <div className="text-[10px] text-[var(--text-muted)]">ANCHORED SHA-256 DIGEST</div>
-                    <div className="mt-1 font-bold text-[11px]">{shaHashOriginal}</div>
-                  </div>
-                  <div className="p-3 rounded-xl surface-elevated break-all">
-                    <div className="text-[10px] text-[var(--text-muted)]">COMPUTED INCOMING DIGEST</div>
-                    <div
-                      className={`mt-1 font-bold text-[11px] ${
-                        isSignatureMatch ? 'text-[#10B981]' : 'text-red-400'
-                      }`}
-                    >
-                      {shaHashVerify}
-                    </div>
-                  </div>
-                  {!isSignatureMatch && (
-                    <button
-                      type="button"
-                      onClick={() => setTamperCheckInput(docPayload)}
-                      className="w-full py-2 rounded-xl btn-platinum-primary font-mono-tech text-xs font-bold cursor-pointer"
-                    >
-                      ↺ RESTORE ORIGINAL DOCUMENT INTEGRITY
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 5. AI CAREER GUIDE & MENTOR (AASHIF KHAN — PERSONALIZED AI ROADMAP ENGINE) */}
-          {(activeId === 'ai-career-mentor' || activeId === 'career-socialite') && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7 space-y-4">
-                <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                  AASHIF KHAN • CO-FOUNDER &amp; SYSTEM ARCHITECT • AI CAREER ARCHITECT
-                </span>
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  AI Career Guide &amp; Mentor — Personalized Roadmap &amp; Viva Simulator
-                </h3>
-
-                {/* Current Experience Level Selector */}
-                <div className="space-y-1.5">
-                  <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    1. SELECT CURRENT EXPERIENCE LEVEL:
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(['Beginner', 'B.Tech CSE', 'Working Dev'] as CareerLevel[]).map((lvl) => (
-                      <button
-                        key={lvl}
-                        type="button"
-                        onClick={() => setCareerLevel(lvl)}
-                        className={`py-2 px-3 rounded-xl font-mono-tech text-xs font-bold cursor-pointer ${
-                          careerLevel === lvl ? 'btn-platinum-primary' : 'surface-elevated'
-                        }`}
-                      >
-                        {lvl}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Target Engineering Role Selector */}
-                <div className="space-y-1.5">
-                  <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    2. SELECT TARGET ENGINEERING TRACK:
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {(
-                      [
-                        'Full-Stack Architect',
-                        'AI Engineer',
-                        'Backend Java/Kafka',
-                        'Cybersecurity',
-                      ] as CareerRole[]
-                    ).map((role) => (
-                      <button
-                        key={role}
-                        type="button"
-                        onClick={() => {
-                          setTargetRole(role);
-                          setShowInterviewAnswer(false);
-                        }}
-                        className={`py-2 px-2.5 rounded-xl font-mono-tech text-[11px] font-bold cursor-pointer ${
-                          targetRole === role ? 'btn-platinum-primary' : 'surface-elevated'
-                        }`}
-                      >
-                        {role}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Interactive Week-by-Week Project Roadmap */}
-                <div className="space-y-2">
-                  <div className="font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    WEEK-BY-WEEK CAPSTONE ROADMAP ({careerLevel.toUpperCase()} → {targetRole.toUpperCase()}):
-                  </div>
-                  {activeCareerData.weeks.map((w) => {
-                    const isDone = !!completedMilestones[w.week];
-                    return (
-                      <button
-                        key={w.week}
-                        type="button"
-                        onClick={() =>
-                          setCompletedMilestones((prev) => ({
-                            ...prev,
-                            [w.week]: !prev[w.week],
-                          }))
-                        }
-                        className="w-full p-3.5 rounded-2xl surface-elevated border border-[var(--border-hairline)] text-left flex items-start justify-between gap-3 cursor-pointer"
-                      >
-                        <div>
-                          <div className="font-mono-tech text-[10px] text-[#10B981] font-bold">
-                            {w.week} • {w.title}
-                          </div>
-                          <div className="text-xs text-[var(--text-secondary)] mt-1">
-                            {w.deliverable}
-                          </div>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-lg surface-card font-mono-tech text-[10px] font-bold shrink-0">
-                          {isDone ? '✓ DONE' : 'MARK DONE'}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Right Column: Skill-Gap Radar + Mock Interview Question Simulator */}
-              <div className="lg:col-span-5 space-y-4">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-3">
-                  <div className="font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    SKILL-GAP RADAR TELEMETRY ({careerLevel})
-                  </div>
-                  <div className="space-y-2.5 font-mono-tech text-xs">
-                    {activeCareerData.skills.map((sk) => {
-                      const baseline = Math.min(85, sk.current + levelBonus);
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    {[
+                      {
+                        week: 1,
+                        title: `Foundations of ${selectedCareerTrack}`,
+                        task: 'System Architecture, Strict Schema Validation & Clean Domain Modeling',
+                      },
+                      {
+                        week: 2,
+                        title: 'Authentication, RBAC & AppSec',
+                        task: 'JWT Sessions, Row-Level Security, Rate Limiting & OWASP Hardening',
+                      },
+                      {
+                        week: 3,
+                        title: 'Cloud Deployment & Live Mock Viva',
+                        task: 'Docker CI/CD Pipeline & Interactive System Architecture Defense',
+                      },
+                    ].map((mod) => {
+                      const done = completedWeeks.includes(mod.week);
                       return (
-                        <div key={sk.name} className="space-y-1">
-                          <div className="flex justify-between text-[11px]">
-                            <span>{sk.name}</span>
-                            <span className="text-[#10B981] font-bold">
-                              {baseline}% → {sk.target}%
+                        <div
+                          key={mod.week}
+                          onClick={() =>
+                            setCompletedWeeks((prev) =>
+                              prev.includes(mod.week)
+                                ? prev.filter((w) => w !== mod.week)
+                                : [...prev, mod.week]
+                            )
+                          }
+                          className="p-6 rounded-3xl bg-white border border-zinc-200 hover:border-[#0B63F6] cursor-pointer space-y-2 transition-all"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-mono font-bold text-[#0B63F6]">
+                              SPRINT 0{mod.week}
+                            </span>
+                            <span
+                              className={`text-[11px] font-mono font-bold ${
+                                done ? 'text-emerald-700' : 'text-zinc-500'
+                              }`}
+                            >
+                              {done ? '✓ COMPLETED' : 'CLICK TO COMPLETE'}
                             </span>
                           </div>
-                          <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
-                            <div
-                              className="h-full bg-[#10B981]"
-                              style={{ width: `${sk.target}%` }}
-                            />
-                          </div>
+                          <h3 className="font-display font-bold text-base text-zinc-900">
+                            {mod.title}
+                          </h3>
+                          <p className="text-xs text-zinc-600 leading-relaxed">{mod.task}</p>
                         </div>
                       );
                     })}
                   </div>
                 </div>
 
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-3">
-                  <div className="font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    MOCK TECHNICAL INTERVIEW SIMULATOR
-                  </div>
-                  <p className="text-xs font-semibold text-[var(--text-primary)]">
-                    Q: &ldquo;{activeCareerData.interviewQuestion}&rdquo;
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowInterviewAnswer((prev) => !prev)}
-                    className="w-full py-2 px-3 rounded-xl btn-platinum-primary font-mono-tech text-xs font-bold cursor-pointer"
-                  >
-                    {showInterviewAnswer
-                      ? 'HIDE PRINCIPAL ARCHITECT ANSWER'
-                      : 'REVEAL PRINCIPAL ARCHITECT ANSWER'}
-                  </button>
-                  {showInterviewAnswer && (
-                    <div className="p-3 rounded-xl surface-elevated text-xs text-[var(--text-secondary)] border border-[#10B981]/30">
-                      <strong className="text-[#10B981]">Model Answer:</strong>{' '}
-                      {activeCareerData.modelAnswer}
+                {/* Section 4: Interactive Mock Viva Simulator */}
+                <div
+                  id="ac-viva"
+                  className="p-6 sm:p-8 rounded-3xl bg-white border border-zinc-200 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+                >
+                  <div className="lg:col-span-8 space-y-2">
+                    <div className="text-xs font-mono font-bold text-[#0B63F6]">
+                      03 · LIVE TECHNICAL VIVA CHALLENGE ({selectedCareerTrack.toUpperCase()})
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 6. SOCIALITE (AASHIF KHAN — REAL-TIME CREATOR & COMMUNITY PLATFORM) */}
-          {activeId === 'socialite-network' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                    AASHIF KHAN • CO-FOUNDER &amp; SYSTEM ARCHITECT • REAL-TIME SOCIAL STUDIO
-                  </span>
-                  <span className="font-mono-tech text-xs text-[#10B981] font-bold">
-                    ● OPTIMISTIC UI FEED LATENCY: 14ms
-                  </span>
-                </div>
-
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  Socialite — Real-Time Creator Feed &amp; Community Studio
-                </h3>
-
-                {/* Channel Filter Bar */}
-                <div className="flex flex-wrap gap-2">
-                  {(
-                    [
-                      'All Channels',
-                      'Full-Stack Devs',
-                      'AI Builders',
-                      'Design Systems',
-                    ] as const
-                  ).map((chan) => (
-                    <button
-                      key={chan}
-                      type="button"
-                      onClick={() => setSocialChannel(chan)}
-                      className={`px-3 py-1.5 rounded-xl font-mono-tech text-xs font-bold cursor-pointer ${
-                        socialChannel === chan ? 'btn-platinum-primary' : 'surface-elevated'
-                      }`}
-                    >
-                      {chan}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Live Post Creator */}
-                <div className="p-4 rounded-2xl surface-elevated border border-[var(--border-metallic)] space-y-2.5">
-                  <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    PUBLISH LIVE POST TO {socialChannel.toUpperCase()}:
-                  </label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="text"
-                      placeholder="Share an engineering milestone, release note, or creator update..."
-                      value={newPostDraft}
-                      onChange={(e) => setNewPostDraft(e.target.value)}
-                      className="flex-1 px-3.5 py-2 rounded-xl surface-card text-xs text-[var(--text-primary)]"
-                    />
+                    <h3 className="font-display font-bold text-lg text-zinc-900">
+                      "How do you prevent race conditions and double-charging during a high-concurrency payment webhook callback?"
+                    </h3>
+                    <p className="text-xs text-zinc-600">
+                      {vivaAnswerSubmitted
+                        ? '✓ AI Rubric Evaluation (9.4/10): Strong explanation of idempotency keys, HMAC signature verification, and atomic database transactions.'
+                        : 'Test the instant AI Viva evaluation rubric with our reference architectural answer.'}
+                    </p>
+                  </div>
+                  <div className="lg:col-span-4 flex justify-end">
                     <button
                       type="button"
-                      onClick={handlePublishPost}
-                      className="px-4 py-2 rounded-xl btn-platinum-primary font-mono-tech text-xs font-bold cursor-pointer shrink-0"
+                      onClick={() => setVivaAnswerSubmitted((prev) => !prev)}
+                      className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#09090B] text-white text-xs font-bold cursor-pointer"
                     >
-                      + Publish Post
+                      {vivaAnswerSubmitted
+                        ? 'Reset Viva Challenge'
+                        : 'Evaluate Reference Viva Answer'}
                     </button>
                   </div>
                 </div>
-
-                {/* Feed Stream */}
-                <div className="space-y-3">
-                  {filteredPosts.map((post) => (
-                    <div
-                      key={post.id}
-                      className="p-4 rounded-2xl surface-elevated border border-[var(--border-hairline)] space-y-2.5"
-                    >
-                      <div className="flex items-center justify-between text-xs">
-                        <div>
-                          <span className="font-bold text-[var(--text-primary)]">{post.author}</span>{' '}
-                          <span className="font-mono-tech text-[11px] text-[var(--text-muted)]">
-                            {post.handle} • {post.timestamp}
-                          </span>
-                        </div>
-                        <span className="px-2.5 py-0.5 rounded-full surface-card font-mono-tech text-[10px] font-bold">
-                          {post.channel}
-                        </span>
-                      </div>
-                      <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-                        {post.content}
-                      </p>
-                      <div className="flex items-center gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => togglePostLike(post.id)}
-                          className={`px-3 py-1 rounded-lg font-mono-tech text-[11px] font-bold cursor-pointer ${
-                            post.liked ? 'btn-platinum-primary' : 'surface-card'
-                          }`}
-                        >
-                          {post.liked ? `★ Liked (${post.likes})` : `☆ Like (${post.likes})`}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => incrementPostComment(post.id)}
-                          className="px-3 py-1 rounded-lg surface-card font-mono-tech text-[11px] font-bold cursor-pointer"
-                        >
-                          💬 +1 Reply ({post.comments})
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              {/* Right Column: Creator Engagement Analytics */}
-              <div className="lg:col-span-5">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-4 font-mono-tech text-xs">
-                  <div className="text-[10px] text-[var(--text-muted)] uppercase font-bold">
-                    CREATOR STUDIO REAL-TIME TELEMETRY
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3.5 rounded-xl surface-elevated">
-                      <div className="text-[10px] text-[var(--text-muted)]">TOTAL LIKES</div>
-                      <div className="font-display text-xl font-bold text-[#10B981] mt-1">
-                        {socialPosts.reduce((a, b) => a + b.likes, 0)}
-                      </div>
-                    </div>
-                    <div className="p-3.5 rounded-xl surface-elevated">
-                      <div className="text-[10px] text-[var(--text-muted)]">ACTIVE THREADS</div>
-                      <div className="font-display text-xl font-bold text-[var(--text-primary)] mt-1">
-                        {socialPosts.reduce((a, b) => a + b.comments, 0)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3.5 rounded-xl surface-elevated space-y-1.5 text-[11px]">
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">Edge Feed Cache Hit Ratio:</span>
-                      <span className="font-bold text-[#10B981]">99.2%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">Creator Engagement Velocity:</span>
-                      <span className="font-bold text-[#10B981]">+318% vs Legacy</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">WebSocket Fanout P99:</span>
-                      <span className="font-bold">18.4 ms</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 7. A&A CHOCOLATES D2C STOREFRONT & AD FUNNEL (AASHIF KHAN) */}
-          {activeId === 'aa-chocolates-d2c' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7 space-y-4">
-                <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                  AASHIF KHAN • CO-FOUNDER &amp; SYSTEM ARCHITECT • D2C LUXURY COMMERCE
-                </span>
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  A&amp;A Chocolates — Handcrafted Box Customizer &amp; Meta CAPI Funnel
-                </h3>
-
-                {/* Box Size Selector */}
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1.5">
-                    1. SELECT HANDCRAFTED GIFT BOX CAPACITY:
-                  </label>
-                  <div className="grid grid-cols-3 gap-2.5">
-                    {([6, 12, 24] as const).map((size) => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => {
-                          setBoxSize(size);
-                          setCheckoutDone(false);
-                        }}
-                        className={`py-2.5 px-3 rounded-xl font-mono-tech text-xs font-bold cursor-pointer transition-all ${
-                          boxSize === size ? 'btn-platinum-primary' : 'surface-elevated'
-                        }`}
-                      >
-                        {size}-Piece Assorted Box
-                      </button>
-                    ))}
-                  </div>
+                  <strong className="text-white">AI Career Guide &amp; Viva Lab</strong> · Engineered by Aashif Khan (SkyLine Digital Agency)
                 </div>
-
-                {/* 4 Artisanal Flavors Counter */}
-                <div className="space-y-2">
-                  <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    2. CUSTOMIZE ARTISANAL FLAVOR SELECTION ({totalSelectedPieces} PIECES IN BOX):
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {(Object.keys(flavorCounts) as (keyof typeof flavorCounts)[]).map((flavor) => (
-                      <div
-                        key={flavor}
-                        className="p-3 rounded-xl surface-elevated border border-[var(--border-hairline)] flex items-center justify-between"
-                      >
-                        <div>
-                          <div className="font-display text-xs font-bold">{flavor}</div>
-                          <div className="font-mono-tech text-[10px] text-[var(--text-muted)]">
-                            Hand-tempered Couverture
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 font-mono-tech text-xs">
-                          <button
-                            type="button"
-                            onClick={() => adjustFlavorCount(flavor, -1)}
-                            className="w-7 h-7 rounded-lg surface-card font-bold cursor-pointer"
-                          >
-                            -
-                          </button>
-                          <span className="w-5 text-center font-bold">{flavorCounts[flavor]}</span>
-                          <button
-                            type="button"
-                            onClick={() => adjustFlavorCount(flavor, 1)}
-                            className="w-7 h-7 rounded-lg surface-card font-bold cursor-pointer"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Personalized Gift Card Input */}
-                <div>
-                  <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                    3. PERSONALIZED GOLD-FOIL RIBBON MESSAGE:
-                  </label>
-                  <input
-                    type="text"
-                    value={giftNote}
-                    onChange={(e) => setGiftNote(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl surface-elevated text-xs text-[var(--text-primary)]"
-                  />
-                </div>
-              </div>
-
-              {/* Right Column: Live INR Cart + 1-Tap UPI Checkout + Meta CAPI ROAS Funnel */}
-              <div className="lg:col-span-5">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-4 font-mono-tech text-xs">
-                  <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-3">
-                    <span className="font-bold">1-TAP UPI EXPRESS CHECKOUT</span>
-                    <span className="text-[#10B981] font-bold">3.8x META ROAS</span>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">Base {boxSize}-Piece Box:</span>
-                      <span>₹{d2cPricing.baseBoxPrice.toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">
-                        Extra Truffles ({d2cPricing.extraPieces} pcs):
-                      </span>
-                      <span>₹{d2cPricing.addonCost.toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">GST (18% Included):</span>
-                      <span>₹{d2cPricing.gst.toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="flex justify-between text-sm font-bold pt-2 border-t border-[var(--border-hairline)]">
-                      <span>Grand Total Payable:</span>
-                      <span className="text-[#10B981]">
-                        ₹{d2cPricing.total.toLocaleString('en-IN')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* UPI Selector */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {(['GPay', 'PhonePe'] as const).map((method) => (
-                      <button
-                        key={method}
-                        type="button"
-                        onClick={() => setUpiMethod(method)}
-                        className={`py-2 rounded-xl font-mono-tech text-xs font-bold cursor-pointer ${
-                          upiMethod === method ? 'btn-platinum-primary' : 'surface-elevated'
-                        }`}
-                      >
-                        1-Tap {method} UPI
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setCheckoutDone(true)}
-                    className="w-full py-2.5 rounded-xl btn-platinum-primary font-mono-tech text-xs font-bold cursor-pointer"
-                  >
-                    {checkoutDone
-                      ? `✓ PAID ₹${d2cPricing.total.toLocaleString('en-IN')} VIA ${upiMethod}`
-                      : `SIMULATE 1-TAP ${upiMethod.toUpperCase()} CHECKOUT`}
-                  </button>
-
-                  {/* Server-Side Meta Conversions API (CAPI) Attribution Funnel */}
-                  <div className="p-3 rounded-xl surface-elevated space-y-1 text-[11px]">
-                    <div className="text-[10px] text-[var(--text-muted)] font-bold uppercase">
-                      LIVE META CAPI ATTRIBUTION TELEMETRY
-                    </div>
-                    <div className="flex justify-between">
-                      <span>ViewContent → AddToCart:</span>
-                      <span className="text-[#10B981] font-bold">98.4% Event Match</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>InitiateCheckout → Purchase:</span>
-                      <span className="text-[#10B981] font-bold">
-                        {checkoutDone ? 'PURCHASE FIRED (ROAS 3.8x)' : 'READY TO DISPATCH'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <div>RAG Curriculum Engine · Technical Interview Simulator</div>
+              </footer>
             </div>
           )}
 
-          {/* 8. FINVANTAGE GST BILLING & TREASURY SAAS */}
-          {activeId === 'finvantage-saas' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-6 space-y-4">
-                <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                  FINTECH SAAS ENGINE • LIVE GST &amp; LEDGER SIMULATOR
-                </span>
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  FinVantage Automated GST Invoice &amp; Reconciliation Engine
-                </h3>
-
-                <div className="space-y-3">
+          {/* =================================================================
+              10. SOCIALITE CREATOR NETWORK (https://socialite.club — Creator Community Landing Page)
+             ================================================================= */}
+          {currentId === 'socialite-network' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: Socialite Brand Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#DC2626] text-white flex items-center justify-center">
+                    <Users className="w-5 h-5" />
+                  </span>
                   <div>
-                    <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                      ENTERPRISE COUNTERPARTY NAME
-                    </label>
-                    <input
-                      type="text"
-                      value={clientName}
-                      onChange={(e) => setClientName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl surface-elevated text-sm text-[var(--text-primary)]"
-                    />
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      Socialite · Creator &amp; Builder Community Graph
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      Real-Time WebSocket Channels, Cohort Drops &amp; Verified Builder Profiles
+                    </div>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                      TAXABLE INVOICE VALUE (INR): ₹{invoiceBaseAmount.toLocaleString('en-IN')}
-                    </label>
-                    <input
-                      type="range"
-                      min={10000}
-                      max={500000}
-                      step={5000}
-                      value={invoiceBaseAmount}
-                      onChange={(e) => setInvoiceBaseAmount(Number(e.target.value))}
-                      className="w-full accent-zinc-500 cursor-pointer"
-                    />
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#soc-feed" className="hover:text-[#DC2626]">
+                    Live Community Feed
+                  </a>
+                  <a href="#soc-cohorts" className="hover:text-[#DC2626]">
+                    Creator Perks
+                  </a>
+                </nav>
+
+                <a
+                  href="#soc-feed"
+                  className="px-4 py-2 rounded-xl bg-[#09090B] text-white text-xs font-bold"
+                >
+                  Publish Update
+                </a>
+              </header>
+
+              {/* Section 2: Creator Community Hero */}
+              <div className="bg-gradient-to-r from-[#09090B] via-[#1F1218] to-[#3B0A1E] text-white py-14 px-6 sm:px-12">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-8 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-rose-400">
+                      01 · REAL-TIME CREATOR GRAPH · WEBSOCKET CHANNELS
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Where India’s Top Product Builders, Designers &amp; Founders Ship in Public.
+                    </h1>
+                    <p className="text-sm text-zinc-200 max-w-2xl">
+                      Host private member channels, share live build milestones, and run cohort launches without noisy algorithmic feeds.
+                    </p>
                   </div>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    {[5, 12, 18].map((rate) => (
-                      <button
-                        key={rate}
-                        type="button"
-                        onClick={() => setGstRate(rate)}
-                        className={`py-2 rounded-xl font-mono-tech text-xs font-bold cursor-pointer ${
-                          gstRate === rate ? 'btn-platinum-primary' : 'surface-elevated'
-                        }`}
-                      >
-                        {rate}% GST Slab
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-3 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setIsInterState(false)}
-                      className={`flex-1 py-2 rounded-xl font-mono-tech text-xs font-bold cursor-pointer ${
-                        !isInterState ? 'btn-platinum-primary' : 'surface-elevated'
-                      }`}
-                    >
-                      Intra-State (MP: CGST + SGST)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsInterState(true)}
-                      className={`flex-1 py-2 rounded-xl font-mono-tech text-xs font-bold cursor-pointer ${
-                        isInterState ? 'btn-platinum-primary' : 'surface-elevated'
-                      }`}
-                    >
-                      Inter-State (IGST)
-                    </button>
+                  <div className="lg:col-span-4 p-5 rounded-2xl bg-white/10 border border-white/15 space-y-1 text-xs">
+                    <div className="font-mono font-bold text-rose-300">ACTIVE COMMUNITY</div>
+                    <div className="font-display text-2xl font-extrabold text-white">
+                      2,400+ Builders
+                    </div>
+                    <div className="text-zinc-300">3 Curated Engineering &amp; Design Channels</div>
                   </div>
                 </div>
               </div>
 
-              <div className="lg:col-span-6">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-4">
-                  <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-3">
+              {/* Section 3: Interactive Channel Switcher, Live Post Composer & Feed */}
+              <div id="soc-feed" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-10">
+                <div className="space-y-5">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
                     <div>
-                      <div className="font-mono-tech text-[10px] text-[var(--text-muted)]">
-                        IRN E-INVOICE PREVIEW • {clientName}
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#DC2626]">
+                        02 · LIVE COMMUNITY CHANNELS
                       </div>
-                      <div className="font-display text-lg font-bold text-[var(--text-primary)]">
-                        Total Payable: ₹{gstCalculation.grandTotal.toLocaleString('en-IN')}
-                      </div>
+                      <h2 className="font-display text-2xl font-extrabold text-zinc-900 mt-1">
+                        Filter by Channel or Publish a Build Update
+                      </h2>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full bg-[#10B981]/20 text-[#10B981] font-mono-tech text-[10px] font-bold">
-                      RAZORPAY WEBHOOK READY
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 font-mono-tech text-xs">
-                    <div className="p-3 rounded-xl surface-elevated">
-                      <div className="text-[var(--text-muted)] text-[10px]">CGST</div>
-                      <div className="font-bold text-sm mt-0.5">
-                        ₹{gstCalculation.cgst.toLocaleString('en-IN')}
-                      </div>
-                    </div>
-                    <div className="p-3 rounded-xl surface-elevated">
-                      <div className="text-[var(--text-muted)] text-[10px]">SGST</div>
-                      <div className="font-bold text-sm mt-0.5">
-                        ₹{gstCalculation.sgst.toLocaleString('en-IN')}
-                      </div>
-                    </div>
-                    <div className="p-3 rounded-xl surface-elevated">
-                      <div className="text-[var(--text-muted)] text-[10px]">IGST</div>
-                      <div className="font-bold text-sm mt-0.5">
-                        ₹{gstCalculation.igst.toLocaleString('en-IN')}
-                      </div>
-                    </div>
-                    <div className="p-3 rounded-xl surface-elevated">
-                      <div className="text-[var(--text-muted)] text-[10px]">TOTAL TAX</div>
-                      <div className="font-bold text-sm mt-0.5">
-                        ₹{gstCalculation.taxTotal.toLocaleString('en-IN')}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 9. AURACARE LOCAL CLINIC MAP PACK & BOOKING ENGINE */}
-          {activeId === 'auracare-local' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-6 space-y-4">
-                <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                  LOCAL HEALTHCARE ENGINE • ZERO-COMMISSION BOOKING
-                </span>
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  AuraCare Multi-Branch Appointment &amp; QR Review Simulator
-                </h3>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                      SELECT INDORE CLINIC BRANCH
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {[
-                        'Vijay Nagar Flagship Clinic',
-                        'Saket Square Aesthetic Center',
-                        'Palasia Dental & Skin Hub',
-                        'Bhanwarkuan Express Care',
-                      ].map((branch) => (
-                        <button
-                          key={branch}
-                          type="button"
-                          onClick={() => {
-                            setSelectedBranch(branch);
-                            setBookingConfirmed(false);
-                          }}
-                          className={`p-2.5 rounded-xl font-mono-tech text-xs text-left cursor-pointer ${
-                            selectedBranch === branch ? 'btn-platinum-primary' : 'surface-elevated'
-                          }`}
-                        >
-                          {branch}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                      SELECT SPECIALIST &amp; TIME SLOT
-                    </label>
                     <div className="flex flex-wrap gap-2">
-                      {['11:00 AM Today', '02:30 PM Today', '05:30 PM Today', '07:00 PM Today'].map(
-                        (slot) => (
+                      {(['All Creators', 'Web Builders', 'UI/UX Design'] as const).map(
+                        (ch) => (
                           <button
-                            key={slot}
+                            key={ch}
                             type="button"
-                            onClick={() => {
-                              setSelectedSlot(slot);
-                              setBookingConfirmed(false);
-                            }}
-                            className={`px-3 py-1.5 rounded-xl font-mono-tech text-xs cursor-pointer ${
-                              selectedSlot === slot ? 'btn-platinum-primary' : 'surface-elevated'
+                            onClick={() => setSocialChannel(ch)}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer ${
+                              socialChannel === ch
+                                ? 'bg-[#09090B] text-white'
+                                : 'bg-white border border-zinc-200 text-zinc-700'
                             }`}
                           >
-                            {slot}
+                            {ch}
                           </button>
                         )
                       )}
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setBookingConfirmed(true)}
-                    className="w-full py-3 rounded-xl btn-platinum-primary font-mono-tech text-xs font-bold cursor-pointer"
-                  >
-                    {bookingConfirmed
-                      ? '✓ CONFIRMED & WHATSAPP REMINDER QUEUED'
-                      : 'SIMULATE PATIENT SLOT BOOKING'}
-                  </button>
-                </div>
-              </div>
-
-              <div className="lg:col-span-6">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-4">
-                  <div className="font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold">
-                    LIVE RECEPTION STANDEE &amp; WHATSAPP TRIAGE PAYLOAD
-                  </div>
-                  <div className="p-4 rounded-xl surface-elevated font-mono-tech text-xs space-y-1.5">
-                    <div>
-                      <strong>Branch:</strong> {selectedBranch}
-                    </div>
-                    <div>
-                      <strong>Specialist:</strong> {selectedDoctor}
-                    </div>
-                    <div>
-                      <strong>Confirmed Slot:</strong> {selectedSlot}
-                    </div>
-                    <div>
-                      <strong>Patient WhatsApp:</strong> {patientPhone}
-                    </div>
-                    <div className="text-[#25D366] pt-1 font-bold">
-                      Status:{' '}
-                      {bookingConfirmed
-                        ? 'Automated T-2hr Reminder + Google Review Link Scheduled ✓'
-                        : 'Awaiting Slot Lock'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 10. NEXAPROP REAL ESTATE CRM */}
-          {activeId === 'nexaprop-crm' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-6 space-y-4">
-                <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                  PROPTECH INVENTORY &amp; MORTGAGE SIMULATOR
-                </span>
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  NexaProp Interactive Inventory &amp; EMI Estimator
-                </h3>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                      UNIT PRICE: ₹{propertyBudgetLakhs} LAKHS (₹
-                      {(propertyBudgetLakhs / 100).toFixed(2)} CR)
-                    </label>
+                  <div className="flex gap-2">
                     <input
-                      type="range"
-                      min={45}
-                      max={350}
-                      step={5}
-                      value={propertyBudgetLakhs}
-                      onChange={(e) => setPropertyBudgetLakhs(Number(e.target.value))}
-                      className="w-full accent-zinc-500 cursor-pointer"
+                      type="text"
+                      value={newPostText}
+                      onChange={(e) => setNewPostText(e.target.value)}
+                      placeholder="Publish a live milestone to the Socialite builder feed..."
+                      className="flex-1 p-3.5 rounded-2xl bg-white border border-zinc-300 text-xs text-zinc-900"
                     />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!newPostText.trim()) return;
+                        setSocialPosts((prev) => [
+                          {
+                            id: Date.now(),
+                            author: 'You (Visiting Founder)',
+                            role: 'SkyLine Partner',
+                            channel:
+                              socialChannel === 'All Creators' ? 'Web Builders' : socialChannel,
+                            content: newPostText.trim(),
+                            likes: 1,
+                          },
+                          ...prev,
+                        ]);
+                        setNewPostText('');
+                      }}
+                      className="px-5 py-3.5 rounded-2xl bg-[#DC2626] hover:bg-rose-700 text-white text-xs font-bold cursor-pointer"
+                    >
+                      Publish Live
+                    </button>
                   </div>
-                  <div>
-                    <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                      DOWN PAYMENT: {downPaymentPercent}%
-                    </label>
-                    <input
-                      type="range"
-                      min={10}
-                      max={50}
-                      step={5}
-                      value={downPaymentPercent}
-                      onChange={(e) => setDownPaymentPercent(Number(e.target.value))}
-                      className="w-full accent-zinc-500 cursor-pointer"
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {(['New Inquiry', 'Site Visit Scheduled', 'Token Paid'] as const).map(
-                      (stage) => (
-                        <button
-                          key={stage}
-                          type="button"
-                          onClick={() => setVisitStage(stage)}
-                          className={`px-3 py-1.5 rounded-xl font-mono-tech text-xs cursor-pointer ${
-                            visitStage === stage ? 'btn-platinum-primary' : 'surface-elevated'
-                          }`}
-                        >
-                          {stage}
-                        </button>
+
+                  <div className="space-y-3">
+                    {socialPosts
+                      .filter(
+                        (p) =>
+                          socialChannel === 'All Creators' || p.channel === socialChannel
                       )
-                    )}
+                      .map((post) => (
+                        <div
+                          key={post.id}
+                          className="p-5 rounded-3xl bg-white border border-zinc-200 flex items-center justify-between gap-4"
+                        >
+                          <div className="space-y-1">
+                            <div className="text-xs font-bold text-zinc-900">
+                              {post.author} <span className="text-zinc-400">·</span>{' '}
+                              <span className="text-zinc-500 font-normal">{post.role}</span>{' '}
+                              <span className="text-zinc-400">·</span>{' '}
+                              <span className="font-mono text-[11px] text-[#DC2626]">
+                                {post.channel}
+                              </span>
+                            </div>
+                            <p className="text-xs sm:text-sm text-zinc-700">{post.content}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSocialPosts((prev) =>
+                                prev.map((item) =>
+                                  item.id === post.id
+                                    ? { ...item, likes: item.likes + 1 }
+                                    : item
+                                )
+                              )
+                            }
+                            className="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold cursor-pointer shrink-0"
+                          >
+                            ♥ {post.likes}
+                          </button>
+                        </div>
+                      ))}
                   </div>
+                </div>
+
+                {/* Section 4: Community Perks */}
+                <div id="soc-cohorts" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      code: '01 · REAL-TIME ROOMS',
+                      title: 'Instant WebSocket Topic Feeds',
+                      desc: 'Zero page refreshes. Posts, reactions, and cohort announcements stream live across connected browsers.',
+                    },
+                    {
+                      code: '02 · VERIFIED PROFILES',
+                      title: 'Proof-of-Work Builder Portfolios',
+                      desc: 'Members link shipped repositories, live domains, and case studies directly to their creator profile.',
+                    },
+                    {
+                      code: '03 · COHORT MONETIZATION',
+                      title: 'Paid Micro-Communities & Drops',
+                      desc: 'Launch gated workshops and member-only channels with integrated UPI & card subscriptions.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.code}
+                      className="p-6 rounded-3xl bg-white border border-zinc-200 space-y-2"
+                    >
+                      <div className="text-xs font-mono font-bold text-[#DC2626]">{item.code}</div>
+                      <h3 className="font-display font-bold text-base text-zinc-900">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-zinc-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="lg:col-span-6">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-3 font-mono-tech text-xs">
-                  <div className="text-[10px] text-[var(--text-muted)]">
-                    SELECTED INVENTORY: {selectedUnit}
-                  </div>
-                  <div className="font-display text-xl font-bold">
-                    Estimated EMI: ₹{emiSummary.monthlyEmiInr} / month
-                  </div>
-                  <div>Loan Principal: ₹{emiSummary.loanAmountLakhs} Lakhs @ 8.5% p.a.</div>
-                  <div>Lead Pipeline Stage: {visitStage}</div>
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">Socialite Creator Network</strong> · Engineered by Aashif Khan (SkyLine Digital Agency)
                 </div>
-              </div>
+                <div>WebSocket Event Graph · Role-Based Community Channels</div>
+              </footer>
             </div>
           )}
 
-          {/* 11. SEARCHPULSE SEO & GEO PIPELINE CALCULATOR */}
-          {activeId === 'searchpulse-seo' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-6 space-y-4">
-                <span className="px-3 py-1 rounded-full badge-neutral font-mono-tech text-[10px] font-bold">
-                  SEARCH &amp; GENERATIVE AI SEO SIMULATOR
-                </span>
-                <h3 className="font-display text-xl sm:text-2xl font-bold">
-                  SearchPulse Organic Pipeline &amp; Schema Yield Model
-                </h3>
-                <div>
-                  <label className="block font-mono-tech text-[10px] uppercase text-[var(--text-muted)] font-bold mb-1">
-                    MONTHLY SEARCH IMPRESSIONS / CLICKS: {monthlyTraffic.toLocaleString('en-IN')}
-                  </label>
-                  <input
-                    type="range"
-                    min={5000}
-                    max={150000}
-                    step={2500}
-                    value={monthlyTraffic}
-                    onChange={(e) => setMonthlyTraffic(Number(e.target.value))}
-                    className="w-full accent-zinc-500 cursor-pointer"
-                  />
+          {/* =================================================================
+              11. SEARCHPULSE LOCAL SEO ENGINE (https://searchpulse.in — Google Map Pack Growth Landing Page)
+             ================================================================= */}
+          {currentId === 'searchpulse-seo' && (
+            <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+              {/* Section 1: SearchPulse Brand Navbar */}
+              <header className="sticky top-0 z-20 px-6 py-4 bg-white/95 backdrop-blur-md border-b border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#10B981] text-zinc-950 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <div className="font-display font-extrabold text-sm sm:text-base text-zinc-900">
+                      SearchPulse · Local Google Map Pack &amp; Review Engine
+                    </div>
+                    <div className="text-[11px] text-zinc-500">
+                      Top-3 Google Business Profile Ranking, Local Citations &amp; WhatsApp Review Links
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#sp-calculator" className="hover:text-[#059669]">
+                    Map Pack Call Estimator
+                  </a>
+                  <a href="#sp-review-flow" className="hover:text-[#059669]">
+                    WhatsApp Review Flow
+                  </a>
+                </nav>
+
+                <a
+                  href="#sp-calculator"
+                  className="px-4 py-2 rounded-xl bg-[#09090B] text-white text-xs font-bold"
+                >
+                  Run Local Audit
+                </a>
+              </header>
+
+              {/* Section 2: Local SEO Dominance Hero */}
+              <div className="bg-gradient-to-r from-[#09090B] via-[#064E3B] to-[#09090B] text-white py-14 px-6 sm:px-12">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-8 space-y-4">
+                    <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#34D399]">
+                      01 · LOCAL GOOGLE MAPS SEO · AUTOMATED 5-STAR REVIEW VELOCITY
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-tight">
+                      Rank in the Top-3 Google Map Pack When High-Intent Local Customers Search Near You.
+                    </h1>
+                    <p className="text-sm text-zinc-200 max-w-2xl">
+                      78% of local clinic visits, showroom walk-ins, and property inquiries go to the top 3 Google Maps results. SearchPulse optimizes your Google Business Profile and automates post-visit WhatsApp review links.
+                    </p>
+                  </div>
+                  <div className="lg:col-span-4 p-5 rounded-2xl bg-white/10 border border-white/15 space-y-1 text-xs">
+                    <div className="font-mono font-bold text-[#34D399]">TARGET MAP POSITION</div>
+                    <div className="font-display text-2xl font-extrabold text-white">
+                      Top #1 – #3 Pack
+                    </div>
+                    <div className="text-zinc-200">Direct Phone Calls &amp; Map Direction Taps</div>
+                  </div>
                 </div>
               </div>
 
-              <div className="lg:col-span-6">
-                <div className="surface-card rounded-2xl p-5 border border-[var(--border-metallic)] space-y-3 font-mono-tech text-xs">
-                  <div className="font-display text-xl font-bold">
-                    Projected Organic Pipeline: ₹{seoProjection.projectedRevenue} / mo
+              {/* Section 3: Interactive Local Map Pack Audit & Call Volume Calculator */}
+              <div id="sp-calculator" className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  <div className="lg:col-span-7 p-6 rounded-3xl bg-white border border-zinc-200 space-y-5">
+                    <div>
+                      <div className="text-xs font-mono font-bold text-[#059669]">
+                        02 · INTERACTIVE LOCAL MAP PACK CALL &amp; WALK-IN ESTIMATOR
+                      </div>
+                      <h2 className="font-display font-bold text-xl text-zinc-900 mt-1">
+                        Select Your Business Category &amp; Current Review Count
+                      </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <label className="block font-bold text-zinc-700 mb-1">
+                          Business Category
+                        </label>
+                        <select
+                          value={seoBusinessCategory}
+                          onChange={(e) =>
+                            setSeoBusinessCategory(
+                              e.target.value as typeof seoBusinessCategory
+                            )
+                          }
+                          className="w-full p-3 rounded-xl bg-zinc-50 border border-zinc-300 font-semibold text-zinc-900"
+                        >
+                          <option value="Dental & Multispecialty Clinic">
+                            Dental &amp; Multispecialty Clinic
+                          </option>
+                          <option value="Real Estate Developer">
+                            Real Estate Developer / Broker
+                          </option>
+                          <option value="Jewellery & Retail Showroom">
+                            Jewellery &amp; Retail Showroom
+                          </option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-bold text-zinc-700 mb-1">
+                          Target City / Micro-Market
+                        </label>
+                        <input
+                          type="text"
+                          value={seoCity}
+                          onChange={(e) => setSeoCity(e.target.value)}
+                          className="w-full p-3 rounded-xl bg-zinc-50 border border-zinc-300 font-semibold text-zinc-900"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-zinc-700">Current Google Maps Reviews:</span>
+                        <span className="text-[#0B63F6] font-mono">
+                          {seoCurrentReviews} Reviews → Target: {seoCurrentReviews + 180} Reviews
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={5}
+                        max={300}
+                        step={5}
+                        value={seoCurrentReviews}
+                        onChange={(e) => setSeoCurrentReviews(Number(e.target.value))}
+                        className="w-full accent-[#10B981] cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 pt-2">
+                      <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
+                        <div className="text-xs text-zinc-500">Projected Monthly Map Calls</div>
+                        <div className="font-display text-2xl font-extrabold text-zinc-900 mt-1">
+                          +{Math.round(seoCurrentReviews * 1.8 + 95)} Calls/mo
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                        <div className="text-xs text-emerald-800">Estimated Direction Taps</div>
+                        <div className="font-display text-2xl font-extrabold text-emerald-900 mt-1">
+                          +{Math.round(seoCurrentReviews * 2.4 + 140)} Visits/mo
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>Monthly Inbound Leads: {seoProjection.monthlyLeads}</div>
-                  <div>Closed Deals (18% Close Rate): {seoProjection.qualifiedDeals}</div>
+
+                  {/* Right: Automated WhatsApp Google Review Dispatch Simulator */}
+                  <div
+                    id="sp-review-flow"
+                    className="lg:col-span-5 p-6 rounded-3xl bg-white border border-zinc-200 flex flex-col justify-between space-y-4"
+                  >
+                    <div className="space-y-3">
+                      <div className="text-xs font-mono font-bold text-[#0B63F6]">
+                        03 · 1-TAP WHATSAPP GOOGLE REVIEW AUTOMATION
+                      </div>
+                      <h3 className="font-display font-bold text-lg text-zinc-900">
+                        Turn Happy Walk-In Customers into 5-Star Google Reviews
+                      </h3>
+                      <p className="text-xs text-zinc-600 leading-relaxed">
+                        Instead of asking customers to search your business name manually, SearchPulse sends an automated WhatsApp message after billing with a direct 1-tap Google Review modal link.
+                      </p>
+                      <div className="p-4 rounded-2xl bg-zinc-900 text-white text-xs space-y-1.5">
+                        <div className="font-mono text-[10px] text-[#34D399]">
+                          WHATSAPP PREVIEW · {seoCity.toUpperCase()}
+                        </div>
+                        <p className="text-zinc-200">
+                          "Thank you for visiting our {seoBusinessCategory}! Tap below to share your 30-second experience on Google Maps: ★★★★★"
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSeoReviewDispatched(true);
+                        setSeoCurrentReviews((prev) => prev + 1);
+                      }}
+                      className="w-full py-3.5 rounded-2xl bg-[#25D366] text-zinc-950 font-bold text-xs cursor-pointer"
+                    >
+                      {seoReviewDispatched
+                        ? `✓ 5-Star Review Added (${seoCurrentReviews} Total Reviews)`
+                        : 'Simulate 1-Tap Customer Review (+1 Review)'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Section 4: Local SEO Pillars */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      code: '01 · GBP SCHEMA & CATEGORIES',
+                      title: 'Primary Category & Keyword Alignment',
+                      desc: 'Optimizes primary and secondary Google Business Profile categories, service catalogs, and geo-tagged clinic/showroom photos.',
+                    },
+                    {
+                      code: '02 · NAP CITATION CONSISTENCY',
+                      title: '40+ Verified Indian Directory Citations',
+                      desc: 'Synchronizes your exact Name, Address, and Phone number across Justdial, Practo, IndiaMART, and local chamber listings.',
+                    },
+                    {
+                      code: '03 · REVIEW VELOCITY ENGINE',
+                      title: 'QR Standee + WhatsApp Review Link',
+                      desc: 'Combines reception desk QR standees with automated post-visit WhatsApp links for steady, authentic 5-star review growth.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.code}
+                      className="p-6 rounded-3xl bg-white border border-zinc-200 space-y-2"
+                    >
+                      <div className="text-xs font-mono font-bold text-[#059669]">{item.code}</div>
+                      <h3 className="font-display font-bold text-base text-zinc-900">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-zinc-600 leading-relaxed">{item.desc}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
+
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">SearchPulse Local SEO Engine</strong> · Engineered by Sachin Sahu &amp; Aashif Khan (SkyLine Digital Agency)
+                </div>
+                <div>Google Business Profile Optimization · Automated WhatsApp Review Flow</div>
+              </footer>
             </div>
           )}
         </div>
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalTree, document.body) : modalTree;
 };

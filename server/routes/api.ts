@@ -34,6 +34,171 @@ import {
 
 export const apiRouter = express.Router();
 
+// ============================================================================
+// 85-CHECK PRE-LAUNCH SECURITY & AGENTSHIELD PROTOCOL HARDENING
+// ============================================================================
+
+export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'X-Frame-Options': 'SAMEORIGIN',
+};
+
+// Check 10.1: Attach security headers on all /api/* responses
+apiRouter.use((_req, res, next) => {
+  for (const [header, value] of Object.entries(SECURITY_HEADERS)) {
+    res.setHeader(header, value);
+  }
+  next();
+});
+
+// Check 6.1: Per-IP Sliding Window Rate Limiter (Max 15 requests / 60 seconds)
+export const RATE_LIMIT_MAX_REQUESTS = 15;
+export const RATE_LIMIT_WINDOW_MS = 60_000;
+
+const ipRateBuckets = new Map<string, number[]>();
+
+export function resetRateLimitBuckets(): void {
+  ipRateBuckets.clear();
+}
+
+export function checkPerIpRateLimit(
+  ipKey: string,
+  nowMs: number = Date.now()
+): { allowed: boolean; remaining: number; retryAfterSec: number } {
+  const key = (ipKey || 'unknown-ip').trim();
+  const cutoff = nowMs - RATE_LIMIT_WINDOW_MS;
+  const existing = (ipRateBuckets.get(key) || []).filter((ts) => ts > cutoff);
+
+  if (existing.length >= RATE_LIMIT_MAX_REQUESTS) {
+    ipRateBuckets.set(key, existing);
+    const oldest = existing[0] ?? nowMs;
+    const retryAfterSec = Math.max(1, Math.ceil((oldest + RATE_LIMIT_WINDOW_MS - nowMs) / 1000));
+    return { allowed: false, remaining: 0, retryAfterSec };
+  }
+
+  existing.push(nowMs);
+  ipRateBuckets.set(key, existing);
+  return {
+    allowed: true,
+    remaining: Math.max(0, RATE_LIMIT_MAX_REQUESTS - existing.length),
+    retryAfterSec: 0,
+  };
+}
+
+function getClientIp(req: express.Request): string {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string' && forwarded.trim().length > 0) {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.ip || req.socket?.remoteAddress || '127.0.0.1';
+}
+
+function enforceRateLimitMiddleware(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+): void {
+  const ip = getClientIp(req);
+  const verdict = checkPerIpRateLimit(`${req.path}:${ip}`);
+  res.setHeader('X-RateLimit-Limit', String(RATE_LIMIT_MAX_REQUESTS));
+  res.setHeader('X-RateLimit-Remaining', String(verdict.remaining));
+  if (!verdict.allowed) {
+    res.setHeader('Retry-After', String(verdict.retryAfterSec));
+    res.status(429).json({
+      error: 'Too many requests. Please wait a minute before trying again.',
+    });
+    return;
+  }
+  next();
+}
+
+// Check 5.1 & 8.1: Input length cap & history turn cap
+export const MAX_CHAT_MESSAGE_LENGTH = 500;
+export const MAX_CHAT_HISTORY_TURNS = 6;
+export const MAX_CHAT_OUTPUT_TOKENS = 320;
+
+export function validateAiChatPayload(payload: {
+  message?: unknown;
+  messages?: unknown;
+  currentSection?: unknown;
+}): {
+  valid: boolean;
+  error?: string;
+  cleanMessage: string;
+  sanitizedHistory: { role: 'user' | 'model'; text: string }[];
+  cleanSection: string;
+} {
+  if (typeof payload.message !== 'string') {
+    return {
+      valid: false,
+      error: 'Message is required.',
+      cleanMessage: '',
+      sanitizedHistory: [],
+      cleanSection: 'Hero & 3D Overview',
+    };
+  }
+  const cleanMessage = payload.message.trim();
+  if (!cleanMessage) {
+    return {
+      valid: false,
+      error: 'Message is required.',
+      cleanMessage: '',
+      sanitizedHistory: [],
+      cleanSection: 'Hero & 3D Overview',
+    };
+  }
+  if (cleanMessage.length > MAX_CHAT_MESSAGE_LENGTH) {
+    return {
+      valid: false,
+      error: `Message exceeds the ${MAX_CHAT_MESSAGE_LENGTH}-character security limit.`,
+      cleanMessage: '',
+      sanitizedHistory: [],
+      cleanSection: 'Hero & 3D Overview',
+    };
+  }
+
+  const rawHistory = Array.isArray(payload.messages) ? payload.messages : [];
+  const sanitizedHistory = rawHistory
+    .filter(
+      (item): item is { role: 'user' | 'model'; text: string } =>
+        Boolean(item) &&
+        typeof item === 'object' &&
+        typeof (item as { text?: unknown }).text === 'string' &&
+        (item as { text: string }).text.trim().length > 0
+    )
+    .slice(-MAX_CHAT_HISTORY_TURNS)
+    .map((item) => ({
+      role: item.role === 'model' ? ('model' as const) : ('user' as const),
+      text: item.text.trim().slice(0, MAX_CHAT_MESSAGE_LENGTH),
+    }));
+
+  const cleanSection =
+    typeof payload.currentSection === 'string' && payload.currentSection.trim().length > 0
+      ? payload.currentSection.trim().slice(0, 80)
+      : 'Hero & 3D Overview';
+
+  return {
+    valid: true,
+    cleanMessage,
+    sanitizedHistory,
+    cleanSection,
+  };
+}
+
+// Check 5.5 & 8.2: AgentShield Prompt-Injection & System-Prompt Exfiltration Guard
+const PROMPT_INJECTION_PATTERNS: readonly RegExp[] = [
+  /ignore\s+(all\s+)?(previous|prior|above)\s+(instructions|prompts|rules)/i,
+  /disregard\s+(all\s+)?(previous|prior|system)\s+(instructions|prompts)/i,
+  /(print|reveal|show|dump|output|repeat)\s+(your\s+|the\s+)?(system\s+prompt|system\s+instruction|hidden\s+prompt|developer\s+prompt)/i,
+  /what\s+(is|are)\s+your\s+(system\s+instructions|system\s+prompt|secret\s+keys)/i,
+  /(gemini_api_key|process\.env|service_role|sk_live_)/i,
+];
+
+export function detectPromptInjection(input: string): boolean {
+  return PROMPT_INJECTION_PATTERNS.some((pattern) => pattern.test(input));
+}
+
 function sanitizeAccent(color?: string): SemanticAccentColor {
   if (color && VALID_ACCENT_COLORS.includes(color as SemanticAccentColor)) {
     return color as SemanticAccentColor;
@@ -75,8 +240,8 @@ apiRouter.get('/cms', (_req, res) => {
   });
 });
 
-// 2. Public Lead / Contact & Strategy Meeting Capture
-apiRouter.post('/leads', (req, res) => {
+// 2. Public Lead / Contact & Strategy Meeting Capture (Rate-Limited Check 6.1)
+apiRouter.post('/leads', enforceRateLimitMiddleware, (req, res) => {
   const body = req.body as Partial<CreateLeadPayload>;
   const check = validateCreateLeadPayload(body);
 
@@ -89,18 +254,18 @@ apiRouter.post('/leads', (req, res) => {
   const now = new Date().toISOString();
   const newLead: LeadRecord = {
     id: `LEAD-${Date.now().toString().slice(-6)}`,
-    nameOrCompany: (body.nameOrCompany ?? '').trim(),
-    contact: (body.contact ?? '').trim(),
+    nameOrCompany: (body.nameOrCompany ?? '').trim().slice(0, 120),
+    contact: (body.contact ?? '').trim().slice(0, 120),
     contactType: check.contactType,
     inquiryType: body.inquiryType === 'meeting' ? 'meeting' : 'inquiry',
     budget: (body.budget ?? 'Custom Scope').trim() || 'Custom Scope',
     meetingDate: body.meetingDate,
     meetingSlot: body.meetingSlot,
     selectedPillars: body.selectedPillars ?? [],
-    projectScope: (body.projectScope ?? '').trim(),
+    projectScope: (body.projectScope ?? '').trim().slice(0, 500),
     status: 'new',
     notes: '',
-    source: (body.source ?? 'Website Dispatch Form').trim(),
+    source: (body.source ?? 'Website Dispatch Form').trim().slice(0, 80),
     createdAt: now,
     updatedAt: now,
   };
@@ -115,8 +280,8 @@ apiRouter.post('/leads', (req, res) => {
   });
 });
 
-// 3. Public Partner Referral (15% Commission) Capture
-apiRouter.post('/referrals', (req, res) => {
+// 3. Public Partner Referral (15% Commission) Capture (Rate-Limited Check 6.1)
+apiRouter.post('/referrals', enforceRateLimitMiddleware, (req, res) => {
   const body = req.body as Partial<CreateReferralPayload>;
   const check = validateCreateReferralPayload(body);
 
@@ -305,7 +470,7 @@ apiRouter.post('/projects', requireAdminAuth, (req, res) => {
       Array.isArray(body.architectureNodes) && body.architectureNodes.length > 0
         ? body.architectureNodes
         : ['Next.js Edge UI', 'WhatsApp Cloud Bot', 'Server CAPI'],
-    accentMetric: (body.accentMetric ?? '99 CWV · <6s SLA').trim(),
+    accentMetric: (body.accentMetric ?? 'Instant Load · 24/7 Bot').trim(),
     imageUrl: (body.imageUrl ?? '').trim(),
     fallbackSvgUrl: body.fallbackSvgUrl || '/assets/hero-system-preview.svg',
     problemStatement:
@@ -313,7 +478,7 @@ apiRouter.post('/projects', requireAdminAuth, (req, res) => {
         'High acquisition leakage and slow manual sales follow-ups across digital channels.').trim(),
     architectureSummary:
       (body.architectureSummary ??
-        'Engineered a sub-100ms Next.js platform integrated with WhatsApp Cloud API and server-side Meta CAPI attribution.').trim(),
+        'Engineered a high-speed Next.js platform integrated with WhatsApp Cloud API and server-side Meta CAPI attribution.').trim(),
     impactMetrics:
       Array.isArray(body.impactMetrics) && body.impactMetrics.length > 0
         ? body.impactMetrics
@@ -322,19 +487,19 @@ apiRouter.post('/projects', requireAdminAuth, (req, res) => {
               label: 'Qualified Conversion Velocity',
               before: '1.4%',
               after: '3.8%',
-              delta: '+171% Lift',
+              delta: '3x More Inquiries',
             },
             {
-              label: 'First-Touch WhatsApp SLA',
+              label: 'First-Touch WhatsApp Reply',
               before: '8 Hours',
-              after: '< 6 Seconds',
+              after: 'Instant',
               delta: '24/7 AI Bot',
             },
             {
-              label: 'Mobile Core Web Vitals',
-              before: '58 / 100',
-              after: '99 / 100',
-              delta: '84ms TTFB',
+              label: 'Mobile Experience',
+              before: 'Slow Load',
+              after: 'Instant Load',
+              delta: 'Mobile First',
             },
           ],
     stackPills:
@@ -383,7 +548,7 @@ apiRouter.post('/services', requireAdminAuth, (req, res) => {
       (body.leadSentence ?? 'High-velocity engineering and automated growth pipeline.').trim(),
     subtitle:
       (body.subtitle ??
-        'Custom-engineered architecture designed for sub-second speed, automated WhatsApp qualification, and measurable ROI.').trim(),
+        'Custom-engineered architecture designed for instant mobile speed, automated WhatsApp qualification, and measurable growth.').trim(),
     outcomeMetric: (body.outcomeMetric ?? '+150% Pipeline Conversion Velocity').trim(),
     timeline: (body.timeline ?? '2–3 Weeks Delivery').trim(),
     deliverables:
@@ -393,14 +558,14 @@ apiRouter.post('/services', requireAdminAuth, (req, res) => {
             'Custom Architecture Blueprint',
             'Full-Stack Next.js / Node Deployment',
             'WhatsApp & CRM Webhook Sync',
-            '99+ Core Web Vitals Verification',
+            'Mobile Speed & Security Verification',
           ],
     architectureSpecs:
       Array.isArray(body.architectureSpecs) && body.architectureSpecs.length > 0
         ? body.architectureSpecs
         : [
             { key: 'Core Stack', val: 'Next.js 15 · TypeScript · PostgreSQL' },
-            { key: 'Performance Target', val: '99+ Lighthouse · <100ms TTFB' },
+            { key: 'Performance Target', val: 'Instant Mobile Load · High Conversion' },
             { key: 'Automation', val: 'Official WhatsApp Cloud API' },
           ],
     previewMode: body.previewMode || 'web-vitals',
@@ -516,21 +681,25 @@ apiRouter.post('/admin/reset', requireAdminAuth, (_req, res) => {
   });
 });
 
-// 12. SkyLine AI Assistant Server-Side Endpoints (Gemini 3.8 Flash / 3.1 Flash Lite / 3.5 Transcribe + Built-In Intent Engine)
-export const SKYLINE_SYSTEM_INSTRUCTION = `You are "Sky Bot", the official AI SDR Agent for SkyLine Digital Agency.
-Answer concisely (2 to 4 sentences max) and ONLY about SkyLine Digital Agency:
-- Services: Custom Web & SaaS Apps (Next.js 15, React 19, TypeScript, Java 21, Python, Node.js, PostgreSQL), 24/7 WhatsApp AI Bots (Official WhatsApp Cloud API), Local Business Growth (#Top Google Map Pack & Smart QR 5-Star Reviews), Meta/Google Performance Ads (Server-Side CAPI), Technical SEO/AEO, and D2C 1-Tap UPI Stores (like 360views.services and A&A Chocolates).
-- Pricing Tiers:
-  1) Local Business / Google Maps #Top Pack: ₹15,000 to ₹35,000
-  2) Custom Next.js Web App + WhatsApp AI Bot: ₹35,000 to ₹85,000
-  3) Multi-Tenant SaaS / ERP / Ad Engine: ₹90,000 to ₹2,50,000+
-- Student Mentorship & Project Lab (B.Tech/BCA/MCA): ₹599 to ₹3,999.
-- Timelines: Fast-Track Build: 14 to 21 Days | Standard Sprint: 3 to 5 Weeks.
-- Referral Program: 15% Direct UPI/Bank Commission on referred client deals.
-- Official Email: agencyskylinedigital@gmail.com
-- Location: Indore, Madhya Pradesh, India (Serving Globally).
-- Founding Architects: Aashif Khan (Co-Founder & Principal Systems Architect, Direct Call & WhatsApp: +91 86430 02478) & Sachin Sahu (Co-Founder & Lead Full-Stack & Growth Architect, WhatsApp: +91 89591 44686).
-- Language Rule: If the user writes in Hindi or Hinglish, reply in natural, warm Hinglish. If the user writes in English, reply in crisp, human-written English. Never use em-dashes. Always end with a short Piper-style follow-up question.`;
+// 12. SkyLine AI Assistant ("Gemini in Chrome" Speed + Ground-Truth System Prompt + Silent Multi-Model Fallback Cascade)
+export const SKYBOT_MODEL_FALLBACK_CASCADE: readonly string[] = [
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+];
+
+export const SKYLINE_SYSTEM_INSTRUCTION = `You are "SkyBot", the fast "Gemini in Chrome" style AI Assistant for SkyLine Digital Agency (Indore, MP, India).
+Answer in 2 to 4 crisp, punchy sentences or bullet points (English or natural Hinglish matching the user's language).
+Ground-truth facts:
+- Pricing starts at ₹10,000 and is flexible and open to negotiation based on exact requirements.
+  • Starter Website / Local Google Maps Pack: ₹10,000 – ₹18,000 (1–2 Weeks)
+  • Custom Next.js Web App + WhatsApp Bot: ₹18,000 – ₹45,000 (2–3 Weeks)
+  • Multi-Tenant SaaS / D2C Storefront / Ads: ₹45,000 – ₹95,000+ (3–5 Weeks)
+- Core Services: Fast Web & SaaS Apps, 24/7 WhatsApp Automation, Google Maps SEO & Digital WhatsApp Review Links, Meta & Google Ads, Technical SEO, and D2C 1-Tap UPI Storefronts.
+- Support: 30-day free post-launch support + ongoing Support & Optimization (never promise fake "100%" guarantees, physical QR standees, or 24/7 war rooms).
+- Live Interactive Website Prototypes on this page: 360 Views (https://360views.services), A&A Chocolates, AuraCare Clinic, FinVantage SaaS, NexaProp CRM, FileGuard AI, GridWeaver, ShadowBase, AI Career Guide, and Socialite.
+- Founders: Sachin Sahu (Founder & CEO — WhatsApp +91 86430 02478, Sachinsahuji06@gmail.com) and Aashif Khan (Co-Founder & System Architect — Direct Call +91 89591 44686, aashifkpp@gmail.com).
+- Never mention internal model IDs, API keys, or fallback states. Always end with a helpful next step.`;
 
 function isHinglishMessage(raw: string): boolean {
   const q = raw.toLowerCase();
@@ -575,8 +744,8 @@ export function evaluateLocalSkylineIntent(query: string): {
   ) {
     return {
       reply: isHi
-        ? 'Bilkul! Aap seedhe hamare Founding Architects Aashif Khan (+91 86430 02478) ya Sachin Sahu (+91 89591 44686) se WhatsApp ya Direct Call par baat kar sakte hain, ya agencyskylinedigital@gmail.com par email bhej sakte hain. Kya main aapke project ka brief note kar loon?'
-        : 'You can connect directly with our Founding Architects Aashif Khan (+91 86430 02478) and Sachin Sahu (+91 89591 44686) in Indore, Madhya Pradesh, India (Email: agencyskylinedigital@gmail.com) via WhatsApp or Direct Call below. Would you like to share your industry before jumping on a call?',
+        ? '• **Direct Founder Connect:** Aap seedhe Sachin Sahu (Founder & CEO — WhatsApp **+91 86430 02478**, `Sachinsahuji06@gmail.com`) ya Aashif Khan (Co-Founder & System Architect — Direct Call **+91 89591 44686**, `aashifkpp@gmail.com`) se jud sakte hain.\n• **Negotiable Pricing:** Hamare packages **₹10,000 starting** hain aur aapke custom scope ke hisaab se flexible hain. Kya main aapke project ka brief note kar loon?'
+        : '• **Direct Founder Access:** Connect directly with Sachin Sahu (Founder & CEO — WhatsApp **+91 86430 02478**, `Sachinsahuji06@gmail.com`) or Aashif Khan (Co-Founder & System Architect — Direct Call **+91 89591 44686**, `aashifkpp@gmail.com`).\n• **Negotiable Pricing:** Packages start at **₹10,000** and are tailored to your exact features. Would you like to share your project requirements?',
       needsHumanFallback: true,
       showFallbackActions: true,
     };
@@ -594,8 +763,8 @@ export function evaluateLocalSkylineIntent(query: string): {
   ) {
     return {
       reply: isHi
-        ? 'Hamare fixed-milestone packages bahut transparent hain: (1) Local Growth & Google Maps #Top Pack: ₹15,000 se ₹35,000, (2) Custom Next.js Website + WhatsApp AI Bot: ₹35,000 se ₹85,000, aur (3) Full-Stack SaaS / ERP / Performance Ad Engine: ₹90,000 se ₹2,50,000+. Har build 14 se 28 din mein launch hota hai aur 100% source-code ownership aapki hoti hai. Aapka business kis category mein aata hai?'
-        : 'SkyLine Digital Agency offers transparent, fixed-milestone tiers: (1) Local Business & Google Maps #Top Pack: ₹15,000 to ₹35,000, (2) Custom Next.js Website + WhatsApp Automation: ₹35,000 to ₹85,000, and (3) Full-Stack SaaS / Performance Ad Engine: ₹90,000 to ₹2,50,000+. Fast-Track launches take 14 to 28 days, and you retain 100% source-code ownership. Which industry is your business in?',
+        ? '• **₹10,000 Starting (Negotiable pricing):** Starter Website & Local Google Maps Pack **₹10,000 – ₹18,000** (1–2 Weeks).\n• **Custom Web App + WhatsApp Bot:** **₹18,000 – ₹45,000** (2–3 Weeks).\n• **Multi-Tenant SaaS / D2C Storefront:** **₹45,000 – ₹95,000+** (3–5 Weeks) with 30-day free post-launch support. Aapka business kis category mein aata hai?'
+        : '• **₹10,000 Starting (Negotiable pricing):** Starter Website & Local Google Maps Pack is **₹10,000 – ₹18,000** (1–2 Weeks).\n• **Custom Next.js Web App + WhatsApp Bot:** **₹18,000 – ₹45,000** (2–3 Weeks).\n• **Multi-Tenant SaaS / D2C Storefront / Ads:** **₹45,000 – ₹95,000+** (3–5 Weeks) with 30-day free post-launch support. Which tier fits your current project?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -607,12 +776,12 @@ export function evaluateLocalSkylineIntent(query: string): {
     q.includes('clinic') ||
     q.includes('salon') ||
     q.includes('review') ||
-    q.includes('qr')
+    q.includes('auracare')
   ) {
     return {
       reply: isHi
-        ? 'Local clinics, showrooms, aur retail stores ke liye hum Google Business Profile entity schema, local citation hubs, aur Smart QR 5-Star Review Standees deploy karte hain taaki aap Google Map Pack #Top mein rank karein, saath hi 24/7 WhatsApp appointment bot har inquiry ko 6 second mein book karta hai. Aapka clinic ya showroom kis city mein hai?'
-        : 'Our Local Business Growth Engine is built for clinics, salons, showrooms, and retail stores. We rank your business in the Google Map Pack #Top (Top 3 Local Pack), deploy Smart QR 5-Star Review Standees, and connect a 24/7 WhatsApp appointment booking bot. What city and category do you operate in?',
+        ? '• **Clinic & Local Business Growth (₹10,000 starting):** Hum Google Business Profile (GBP) SEO, digital WhatsApp review links, aur 24/7 WhatsApp slot booking bot setup karte hain.\n• **Live Demo:** Aap is page par **AuraCare Clinic** ka full-screen prototype ("Launch Live Prototype") open karke instant slot booking test kar sakte hain. Aapka clinic ya showroom kis city mein hai?'
+        : '• **Clinic & Local Growth System (₹10,000 starting):** We optimize your Google Business Profile (GBP), configure digital WhatsApp review links, and connect a 24/7 WhatsApp appointment bot.\n• **Live Demo:** Click **"Launch Live Prototype"** on the **AuraCare Clinic** card to test the full-screen appointment booker right now. Which city does your clinic or store serve?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -627,8 +796,8 @@ export function evaluateLocalSkylineIntent(query: string): {
   ) {
     return {
       reply: isHi
-        ? 'Hamare 24/7 Autonomous WhatsApp AI Bots (Official WhatsApp Cloud API) har lead ko 6 second ke andar reply karte hain, catalog/brochure share karte hain, budget qualify karte hain, aur calendar slot book kar dete hain. Aap is page par "Launch Live Interactive Prototype" button daba kar live demo test kar sakte hain. Kya aap appointment booking ya sales follow-up automate karna chahte hain?'
-        : 'Our 24/7 Autonomous WhatsApp AI Bots (powered by the Official WhatsApp Cloud API) reply to leads in under 6 seconds, share product catalogs, qualify budgets, and book calendar slots with Instant Webhook Capture. You can test the interactive simulator right now via the "Launch Live Interactive Prototype" button on our project cards. Are you looking to automate bookings or lead qualification?',
+        ? '• **24/7 WhatsApp Automation:** Official WhatsApp Cloud API ke zariye instant inquiry replies, brochure sharing, aur appointment slot booking automate hoti hai.\n• **Full-Screen Live Demos:** Kisi bhi project card par **"Launch Live Prototype"** click karke full-screen website demo test karein. Kya aap bookings automate karna chahte hain ya lead capture?'
+        : '• **24/7 WhatsApp Automation:** Powered by the Official WhatsApp Cloud API to automate instant inquiry replies, brochure sharing, and appointment slot booking.\n• **Full-Screen Prototypes:** Click **"Launch Live Prototype"** on any project card (such as 360 Views, AuraCare Clinic, or A&A Chocolates) to test the live application. Are you automating bookings or sales follow-ups?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -640,12 +809,17 @@ export function evaluateLocalSkylineIntent(query: string): {
     q.includes('who') ||
     q.includes('aashif') ||
     q.includes('sachin') ||
-    q.includes('email')
+    q.includes('email') ||
+    q.includes('360') ||
+    q.includes('shadowbase') ||
+    q.includes('gridweaver') ||
+    q.includes('fileguard') ||
+    q.includes('socialite')
   ) {
     return {
       reply: isHi
-        ? 'SkyLine Digital Agency (Indore, Madhya Pradesh, India • agencyskylinedigital@gmail.com) ko Co-Founders Aashif Khan (Principal Systems & Cybersecurity Architect) aur Sachin Sahu (Lead Full-Stack & Growth Architect) lead karte hain. Kya aap unke saath ek strategy call schedule karna chahenge?'
-        : 'SkyLine Digital Agency is led by Co-Founders & Lead Architects Aashif Khan (Full-Stack Cloud & Cybersecurity Architect) and Sachin Sahu (Full-Stack & Growth Systems Architect), based in Indore, Madhya Pradesh, India (Email: agencyskylinedigital@gmail.com). Would you like to connect with them on WhatsApp or a direct call below?',
+        ? '• **Sachin Sahu (Founder & CEO):** WhatsApp **+91 86430 02478** | `Sachinsahuji06@gmail.com` — Lead Architect of 360 Views (`https://360views.services`), ShadowBase & GridWeaver.\n• **Aashif Khan (Co-Founder & System Architect):** Direct Call **+91 89591 44686** | `aashifkpp@gmail.com` — Lead Architect of FileGuard AI, AI Career Guide & Socialite. Kya aap unse WhatsApp par baat karna chahenge?'
+        : '• **Sachin Sahu (Founder & CEO):** WhatsApp **+91 86430 02478** | `Sachinsahuji06@gmail.com` — Lead Architect of 360 Views (`https://360views.services`), ShadowBase & GridWeaver.\n• **Aashif Khan (Co-Founder & System Architect):** Direct Call **+91 89591 44686** | `aashifkpp@gmail.com` — Lead Architect of FileGuard AI, AI Career Guide & Socialite. Would you like to connect on WhatsApp or a direct call?',
       needsHumanFallback: true,
       showFallbackActions: true,
     };
@@ -661,8 +835,8 @@ export function evaluateLocalSkylineIntent(query: string): {
   ) {
     return {
       reply: isHi
-        ? 'Hum fixed milestones par kaam karte hain: Fast-Track Builds 14 se 21 din mein live ho jaate hain, aur full-scale SaaS ya multi-agent AI systems 3 se 5 weeks mein deliver hote hain. Aap apna project kab tak launch karna chahte hain?'
-        : 'We deliver on fixed milestones: Fast-Track Builds launch in 14 to 21 Days, while comprehensive Standard Sprints (custom SaaS, multi-agent AI, and full-funnel ad engines) take 3 to 5 Weeks with live staging previews. What is your target launch date?',
+        ? '• **Fast Milestone Delivery:** Starter business websites **1–2 Weeks** mein launch hoti hain, aur Custom Web Apps + WhatsApp Bots **2–3 Weeks** mein.\n• **Post-Launch Support:** Har project ke saath 30-day free post-launch support aur full source-code handover milta hai. Aap apna project kab tak live karna chahte hain?'
+        : '• **Fast Milestone Delivery:** Starter business websites launch in **1–2 Weeks**, while Custom Web Apps + WhatsApp Bots take **2–3 Weeks**.\n• **Post-Launch Support:** Every build includes 30-day free post-launch support and complete source-code ownership. What is your target launch timeline?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -678,8 +852,8 @@ export function evaluateLocalSkylineIntent(query: string): {
   ) {
     return {
       reply: isHi
-        ? 'SkyLine Partner Program mein kisi bhi client ko refer karne par aapko deal sign hote hi 15% direct UPI/bank commission milta hai. Saath hi B.Tech/BCA/MCA students ke liye 1-on-1 Engineering Mentorship Lab (₹599 se ₹3,999) bhi available hai. Aap kis program ki details chahte hain?'
-        : 'With the SkyLine Partner Program, you earn a direct 15% commission via UPI or bank transfer for every business you introduce that signs a project with us. We also offer a 1-on-1 Engineering Mentorship & Project Lab (₹599 to ₹3,999) for student builders. Which program are you interested in?',
+        ? '• **15% Partner Commission:** Kisi bhi business ko refer karne par deal sign hote hi aapko 15% direct UPI/bank payout milta hai.\n• **Student Mentorship Lab:** B.Tech/BCA/MCA students ke liye 1-on-1 project mentorship (**₹599 – ₹3,999**) bhi available hai. Aap kis program ki details chahte hain?'
+        : '• **15% Partner Referral Commission:** Earn a direct 15% UPI/bank payout within 48 hours of invoice settlement for every client you refer.\n• **Student Mentorship Lab:** 1-on-1 engineering & project guidance (**₹599 – ₹3,999**) for B.Tech/BCA/MCA builders. Which program would you like to explore?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -695,8 +869,8 @@ export function evaluateLocalSkylineIntent(query: string): {
   ) {
     return {
       reply: isHi
-        ? 'Hum 6 core systems engineer karte hain: (1) Sub-Second Next.js Web & SaaS Apps, (2) 24/7 WhatsApp AI Bots & CRM, (3) Local Business Google Map Pack #Top & QR Reviews, (4) High-ROAS Meta & Google CAPI Ads, (5) Technical SEO & AI Search Visibility, aur (6) D2C 1-Tap UPI Storefronts. Aapko inmein se kaunsa system chahiye?'
-        : 'We engineer 6 core systems: (1) Sub-Second Next.js Web & SaaS Apps, (2) 24/7 WhatsApp AI Bots & CRM, (3) Local Business Google Map Pack #Top & QR Reviews, (4) High-ROAS Meta & Google CAPI Ads, (5) Technical SEO & AI Search Visibility, and (6) D2C 1-Tap UPI Storefronts. Which of these fits your current priority?',
+        ? '• **6 Core Capabilities (₹10,000 starting • Negotiable pricing):** (1) Fast Web & SaaS Apps, (2) 24/7 WhatsApp Automation, (3) Google Maps SEO & Digital WhatsApp Review Links, (4) Meta & Google Ads, (5) Technical SEO, aur (6) D2C 1-Tap UPI Storefronts.\n• Aapko apne business ke liye inmein se kaunsa system chahiye?'
+        : '• **6 Core Capabilities (₹10,000 starting • Negotiable pricing):** (1) Fast Web & SaaS Apps, (2) 24/7 WhatsApp Automation, (3) Google Maps SEO & Digital WhatsApp Review Links, (4) Meta & Google Ads, (5) Technical SEO, and (6) D2C 1-Tap UPI Storefronts.\n• Which capability matches your immediate goal?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -704,88 +878,170 @@ export function evaluateLocalSkylineIntent(query: string): {
 
   return {
     reply: isHi
-      ? 'Custom enterprise architecture, tailored pricing, ya 15-minute live funnel teardown ke liye aap niche diye gaye WhatsApp ya Direct Call button se seedhe hamare Founding Architects se jud sakte hain. Aapka primary business goal kya hai?'
-      : 'For custom architecture specifications, tailored enterprise pricing, or a live 15-minute teardown of your business funnel, connect directly with our Founding Architects via WhatsApp or Direct Voice Call below. What is the main business goal you are targeting this quarter?',
+      ? '• **SkyLine Digital Agency (₹10,000 starting • Negotiable pricing):** Hum clinics, D2C brands, aur startups ke liye fast Next.js websites, 24/7 WhatsApp bots, aur Google Maps growth systems banate hain.\n• **Direct Connect:** Sachin Sahu (WhatsApp **+91 86430 02478**) ya Aashif Khan (Direct Call **+91 89591 44686**) se seedhe baat karein. Aapka primary business goal kya hai?'
+      : '• **SkyLine Digital Agency (₹10,000 starting • Negotiable pricing):** We engineer fast Next.js websites, 24/7 WhatsApp booking bots, and Google Maps growth systems with 30-day free post-launch support.\n• **Direct Connect:** Reach Sachin Sahu on WhatsApp (**+91 86430 02478**) or Aashif Khan via Direct Call (**+91 89591 44686**). What would you like to build?',
     needsHumanFallback: true,
     showFallbackActions: true,
   };
 }
 
-apiRouter.post('/ai/chat', async (req, res) => {
-  const { message, messages, mode } = req.body as {
-    message?: string;
-    messages?: { role: 'user' | 'model'; text: string }[];
+/**
+ * Silent Multi-Model Fallback Cascade:
+ * Tries each Gemini Flash model in order (`gemini-2.5-flash` -> `gemini-2.0-flash` -> `gemini-1.5-flash`).
+ * If one model fails (quota, 404, timeout, network), it automatically and silently tries the next model,
+ * and falls back to `evaluateLocalSkylineIntent` if all remote models fail or no API key is present.
+ */
+export async function generateSkyBotReplyWithFallback(params: {
+  cleanMessage: string;
+  messages?: { role: 'user' | 'model'; text: string }[];
+  currentSection?: string;
+  mode?: 'standard' | 'fast';
+  apiKey?: string;
+  customInvoker?: (modelName: string) => Promise<string | undefined>;
+}): Promise<{
+  reply: string;
+  needsHumanFallback: boolean;
+  showFallbackActions: boolean;
+  attemptedModels: string[];
+}> {
+  const {
+    cleanMessage,
+    messages,
+    currentSection = 'Hero & 3D Overview',
+    apiKey,
+    customInvoker,
+  } = params;
+  const localResult = evaluateLocalSkylineIntent(cleanMessage);
+  const attemptedModels: string[] = [];
+
+  const lowerQ = cleanMessage.toLowerCase();
+  const needsFallback =
+    localResult.needsHumanFallback ||
+    lowerQ.includes('discount') ||
+    lowerQ.includes('negotiate') ||
+    lowerQ.includes('custom contract') ||
+    lowerQ.includes('call') ||
+    lowerQ.includes('human') ||
+    lowerQ.includes('baat kar') ||
+    lowerQ.includes('sachin') ||
+    lowerQ.includes('aashif');
+
+  // Check 5.5 & 8.2: AgentShield Prompt-Injection Guard
+  if (detectPromptInjection(cleanMessage)) {
+    return {
+      reply:
+        'I am SkyBot, the AI Assistant for SkyLine Digital Agency. I can only assist with SkyLine Digital Agency services, pricing packages (starting at ₹10,000 and open to negotiation), our live interactive website prototypes, and founder consultations. How can I help with your project today?',
+      needsHumanFallback: false,
+      showFallbackActions: false,
+      attemptedModels,
+    };
+  }
+
+  if (!apiKey && !customInvoker) {
+    return {
+      ...localResult,
+      attemptedModels,
+    };
+  }
+
+  const ai = apiKey
+    ? new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          },
+        },
+      })
+    : null;
+
+  const cappedHistory = Array.isArray(messages)
+    ? messages.slice(-MAX_CHAT_HISTORY_TURNS)
+    : [];
+
+  const contextualUserText = `[Visitor Active Section: ${currentSection}] ${cleanMessage}`;
+
+  const historyContents =
+    cappedHistory.length > 0
+      ? cappedHistory.map((m, idx) => ({
+          role: m.role === 'model' ? 'model' : 'user',
+          parts: [
+            {
+              text:
+                idx === cappedHistory.length - 1 && m.role !== 'model'
+                  ? `[Visitor Active Section: ${currentSection}] ${m.text.slice(0, MAX_CHAT_MESSAGE_LENGTH)}`
+                  : m.text.slice(0, MAX_CHAT_MESSAGE_LENGTH),
+            },
+          ],
+        }))
+      : contextualUserText;
+
+  for (const candidateModel of SKYBOT_MODEL_FALLBACK_CASCADE) {
+    attemptedModels.push(candidateModel);
+    try {
+      let generatedText: string | undefined;
+      if (customInvoker) {
+        generatedText = await customInvoker(candidateModel);
+      } else if (ai) {
+        const response = await ai.models.generateContent({
+          model: candidateModel,
+          contents: historyContents,
+          config: {
+            systemInstruction: SKYLINE_SYSTEM_INSTRUCTION,
+            temperature: 0.35,
+            maxOutputTokens: MAX_CHAT_OUTPUT_TOKENS,
+          },
+        });
+        generatedText = response.text?.trim();
+      }
+
+      if (generatedText && generatedText.length > 0) {
+        return {
+          reply: generatedText,
+          needsHumanFallback: needsFallback,
+          showFallbackActions: needsFallback,
+          attemptedModels,
+        };
+      }
+    } catch {
+      // Silently advance to the next model in SKYBOT_MODEL_FALLBACK_CASCADE
+      continue;
+    }
+  }
+
+  return {
+    ...localResult,
+    attemptedModels,
+  };
+}
+
+apiRouter.post('/ai/chat', enforceRateLimitMiddleware, async (req, res) => {
+  const { message, messages, currentSection, mode } = req.body as {
+    message?: unknown;
+    messages?: unknown;
+    currentSection?: unknown;
     mode?: 'standard' | 'fast';
   };
-  const cleanMessage = (message ?? '').trim();
 
-  if (!cleanMessage) {
-    res.status(400).json({ error: 'Message is required.' });
+  const validation = validateAiChatPayload({ message, messages, currentSection });
+  if (!validation.valid) {
+    res.status(400).json({ error: validation.error });
     return;
   }
 
-  const localResult = evaluateLocalSkylineIntent(cleanMessage);
-  const apiKey = process.env.GEMINI_API_KEY;
-  const selectedModel = mode === 'fast' ? 'gemini-3.1-flash-lite' : 'gemini-3.8-flash';
+  const result = await generateSkyBotReplyWithFallback({
+    cleanMessage: validation.cleanMessage,
+    messages: validation.sanitizedHistory,
+    currentSection: validation.cleanSection,
+    mode,
+    apiKey: process.env.GEMINI_API_KEY,
+  });
 
-  if (!apiKey) {
-    res.json({
-      ...localResult,
-      modelUsed: selectedModel,
-    });
-    return;
-  }
-
-  try {
-    const ai = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        },
-      },
-    });
-
-    const historyContents =
-      Array.isArray(messages) && messages.length > 0
-        ? messages.map((m) => ({
-            role: m.role === 'model' ? 'model' : 'user',
-            parts: [{ text: m.text }],
-          }))
-        : cleanMessage;
-
-    const response = await ai.models.generateContent({
-      model: selectedModel,
-      contents: historyContents,
-      config: {
-        systemInstruction: SKYLINE_SYSTEM_INSTRUCTION,
-        temperature: mode === 'fast' ? 0.25 : 0.35,
-      },
-    });
-
-    const text = response.text?.trim() || localResult.reply;
-    const lowerQ = cleanMessage.toLowerCase();
-    const needsFallback =
-      localResult.needsHumanFallback ||
-      lowerQ.includes('discount') ||
-      lowerQ.includes('negotiate') ||
-      lowerQ.includes('custom contract') ||
-      lowerQ.includes('call') ||
-      lowerQ.includes('human') ||
-      lowerQ.includes('baat kar');
-
-    res.json({
-      reply: text,
-      needsHumanFallback: needsFallback,
-      showFallbackActions: needsFallback,
-      modelUsed: selectedModel,
-    });
-  } catch {
-    res.json({
-      ...localResult,
-      modelUsed: selectedModel,
-    });
-  }
+  res.json({
+    reply: result.reply,
+    needsHumanFallback: result.needsHumanFallback,
+    showFallbackActions: result.showFallbackActions,
+  });
 });
 
 apiRouter.post('/ai/transcribe', async (req, res) => {
@@ -803,7 +1059,6 @@ apiRouter.post('/ai/transcribe', async (req, res) => {
   if (!apiKey) {
     res.json({
       transcript: 'What are your pricing packages and timelines for a new project?',
-      modelUsed: 'gemini-3.5-transcribe',
     });
     return;
   }
@@ -835,13 +1090,12 @@ apiRouter.post('/ai/transcribe', async (req, res) => {
 
     res.json({
       transcript: response.text?.trim() || '',
-      modelUsed: 'gemini-3.5-transcribe',
     });
   } catch {
     res.json({
       transcript: 'Tell me about SkyLine Digital Agency pricing and WhatsApp AI bots.',
-      modelUsed: 'gemini-3.5-transcribe',
     });
   }
 });
+
 

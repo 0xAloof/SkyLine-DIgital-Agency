@@ -1,33 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  ArrowRight,
   ArrowUpRight,
+  Menu,
   X,
-  Phone,
-  PhoneCall,
-  Sparkles,
   Sun,
   Moon,
-  MapPin,
+  Gift,
+  PhoneCall,
 } from 'lucide-react';
 import {
-  SKYLINE_SACHIN_WHATSAPP_NUMBER,
   SKYLINE_CALL_NUMBER,
-  SKYLINE_PRIMARY_PHONE_DISPLAY,
-  SKYLINE_SACHIN_PHONE_DISPLAY,
-  SKYLINE_EMAIL,
-  SKYLINE_LOCATION,
+  SKYLINE_EMAIL_INQUIRY_URL,
+  SKYLINE_WHATSAPP_DIRECT_URL,
+  SKYLINE_LINKEDIN_URL,
+  SKYLINE_GITHUB_URL,
+  SKYLINE_INSTAGRAM_URL,
 } from '../data/agencyData';
 import {
-  SkyLineLogo,
   WhatsAppBrandBadge,
-  WhatsAppLogoIcon,
   GmailBrandIcon,
-  SocialIconBar,
 } from './BrandIcons';
-import { SkylineAiChatbot } from './SkylineAiChatbot';
+import { SkylineLogo } from './SkylineLogo';
 
-export type ActivePage =
+export type PageRoute =
   | 'home'
   | 'services'
   | 'work'
@@ -36,207 +31,134 @@ export type ActivePage =
   | 'referral'
   | 'contact';
 
-export type PageId = ActivePage;
+export type PageId = PageRoute;
 
 interface NavbarProps {
-  activePage: ActivePage;
-  onNavigate: (pageOrSection: string) => void;
-  theme: 'light' | 'dark';
+  theme: 'dark' | 'light';
   onToggleTheme: () => void;
+  activePage?: PageRoute;
+  onNavigate?: (page: PageRoute) => void;
 }
 
-export const PUBLIC_NAV_TABS: {
-  id: ActivePage;
-  label: string;
-  desc: string;
-}[] = [
-  { id: 'home', label: 'Home', desc: 'Agency Overview & 3D Geodesic Core' },
-  { id: 'services', label: 'Services', desc: '7-Track Architecture & 60s Estimator' },
-  { id: 'work', label: 'Our Work', desc: 'Verified Case Studies & Client Reviews' },
-  { id: 'who-we-are', label: 'Who We Are', desc: 'Founding Architects & Leadership' },
-  { id: 'how-we-deliver', label: 'How We Deliver', desc: '6-Stage Engineering & Growth Delivery System' },
-  { id: 'referral', label: 'Offer & Referral', desc: '15% Partner Payout & Mentorship Lab' },
-  { id: 'contact', label: 'Contact', desc: 'Project Quote & Strategy Call' },
+const NAV_ITEMS: { id: PageRoute; label: string; isPromo?: boolean }[] = [
+  { id: 'home', label: 'Home' },
+  { id: 'services', label: 'Services' },
+  { id: 'work', label: 'Our Projects' },
+  { id: 'who-we-are', label: 'Who We Are' },
+  { id: 'how-we-deliver', label: 'How We Deliver' },
+  { id: 'referral', label: 'Earn 15% Partner Offer', isPromo: true },
+  { id: 'contact', label: 'Contact' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
-  activePage,
-  onNavigate,
   theme,
   onToggleTheme,
+  activePage = 'home',
+  onNavigate,
 }) => {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 48);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+  const closeMenu = useCallback(() => {
+    setMobileMenuOpen(false);
   }, []);
 
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMenu();
     };
-  }, [menuOpen]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen, closeMenu]);
 
-  const handleNavClick = (id: string) => {
-    setMenuOpen(false);
-    onNavigate(id);
+  const handleNavClick = (page: PageRoute, e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    closeMenu();
+    if (onNavigate) {
+      onNavigate(page);
+    } else {
+      window.location.hash = page === 'home' ? '#home' : `#${page}`;
+    }
   };
-
-  // Primary WhatsApp CTA routes to Sachin's active WhatsApp (918959144686)
-  const primaryWhatsAppUrl = `https://wa.me/${SKYLINE_SACHIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    'Hi SkyLine Digital Agency! I want to discuss a project for my business.'
-  )}`;
 
   return (
     <>
-      {/* Unified Morphing Header (Single Brand Lockup — Zero Duplicate Links) */}
-      <header
-        className={`fixed left-0 right-0 z-40 transition-all duration-500 ${
-          scrolled ? 'top-3 px-3 sm:px-6' : 'top-0 px-0'
-        }`}
-      >
-        <div
-          className={`mx-auto transition-all duration-500 flex items-center justify-between gap-3 ${
-            scrolled
-              ? 'max-w-6xl bg-[#0B0C0E]/96 text-[#F4F4F5] border border-white/12 backdrop-blur-xl rounded-full px-4 sm:px-6 py-2.5 shadow-2xl'
-              : 'w-full px-4 sm:px-8 lg:px-12 h-20 border-b border-[var(--border-hairline)] bg-[var(--bg-canvas)]/92 backdrop-blur-md'
-          }`}
-        >
-          <button
-            type="button"
-            onClick={() => handleNavClick('home')}
-            className="text-left cursor-pointer group focus:outline-none shrink-0 min-h-[44px] flex items-center"
-            aria-label="SkyLine Digital Agency Home"
-          >
-            <SkyLineLogo size="md" dockStyle={scrolled} />
-          </button>
-
-          {/* Center Multi-Page Tab Navigation */}
-          <nav
-            aria-label="Primary Page Navigation"
-            className={`hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-full border transition-colors ${
-              scrolled
-                ? 'border-white/12 bg-white/[0.03]'
-                : 'border-[var(--border-hairline)] bg-[var(--bg-surface)]/80'
-            }`}
-          >
-            {PUBLIC_NAV_TABS.map((item) => {
-              const isActive = activePage === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleNavClick(item.id)}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`font-display text-xs font-semibold tracking-wide px-3.5 py-1.5 rounded-full transition-all cursor-pointer whitespace-nowrap min-h-[36px] ${
-                    isActive
-                      ? scrolled
-                        ? 'bg-white text-[#09090B] shadow-xs'
-                        : 'bg-[#09090B] text-[#F4F4F5] dark:bg-[#F4F4F5] dark:text-[#09090B] shadow-xs'
-                      : item.id === 'referral'
-                        ? scrolled
-                          ? 'text-white font-bold hover:opacity-85'
-                          : 'text-[var(--text-primary)] font-bold hover:opacity-85'
-                        : scrolled
-                          ? 'text-zinc-300 hover:text-white'
-                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Right Controls: Full-Size Gmail Icon + Theme Toggle + Strategy Call WhatsApp CTA + Mobile Menu */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+      <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 lg:px-10 pt-3 sm:pt-4 pointer-events-none">
+        <div className="max-w-7xl mx-auto pointer-events-auto">
+          <div className="h-16 sm:h-[68px] px-4 sm:px-6 rounded-2xl glass-header transition-all duration-300 flex items-center justify-between gap-2">
+            {/* Brand Logo Mark + Editorial Wordmark */}
             <a
-              href={primaryWhatsAppUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`hidden sm:inline-flex items-center gap-2 px-4 py-2.5 min-h-[42px] rounded-full text-xs font-semibold tracking-wide cursor-pointer whitespace-nowrap transition-all ${
-                scrolled
-                  ? 'bg-white text-[#09090B] hover:bg-zinc-100'
-                  : 'btn-platinum-primary'
-              }`}
+              href="#home"
+              onClick={(e) => handleNavClick('home', e)}
+              className="group shrink-0 focus:outline-none"
+              aria-label="SkyLine Digital Agency Home"
             >
-              <span>Strategy Call</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <SkylineLogo size="md" showWordmark subtitle="DIGITAL AGENCY" />
             </a>
 
-            <a
-              href={`mailto:${SKYLINE_EMAIL}`}
-              aria-label="Email SkyLine Digital Agency"
-              title={SKYLINE_EMAIL}
-              className={`w-10 h-10 rounded-full border flex items-center justify-center shrink-0 transition-all hover:scale-105 ${
-                scrolled
-                  ? 'border-white/15 bg-white/[0.06] hover:bg-white/[0.12]'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)]'
-              }`}
+            {/* Desktop Navigation Links */}
+            <nav
+              aria-label="Primary Navigation"
+              className="hidden xl:flex items-center gap-0.5 p-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)]"
             >
-              <GmailBrandIcon size="nav" />
-            </a>
+              {NAV_ITEMS.map((item) => {
+                const isActive = activePage === item.id;
+                if (item.isPromo) {
+                  return (
+                    <a
+                      key={item.id}
+                      href={`#${item.id}`}
+                      onClick={(e) => handleNavClick(item.id, e)}
+                      className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all flex items-center gap-1.5 ${
+                        isActive
+                          ? 'btn-platinum-primary shadow-sm'
+                          : 'badge-platinum hover:opacity-90'
+                      }`}
+                    >
+                      <Gift className="w-3.5 h-3.5" />
+                      <span>{item.label}</span>
+                    </a>
+                  );
+                }
 
-            <button
-              type="button"
-              onClick={onToggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              className={`w-10 h-10 rounded-full border flex items-center justify-center cursor-pointer shrink-0 transition-colors ${
-                scrolled
-                  ? 'border-white/15 bg-white/[0.04] hover:bg-white/[0.1] text-zinc-200'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-primary)]'
-              }`}
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-            </button>
+                return (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    onClick={(e) => handleNavClick(item.id, e)}
+                    className={`px-3.5 py-1.5 text-xs font-medium rounded-full transition-all ${
+                      isActive
+                        ? 'btn-platinum-primary font-semibold shadow-xs'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                );
+              })}
+            </nav>
 
-            <button
-              type="button"
-              onClick={() => setMenuOpen(true)}
-              aria-label="Open Navigation Menu"
-              className={`inline-flex items-center justify-center w-10 h-10 rounded-full border cursor-pointer transition-colors ${
-                scrolled
-                  ? 'border-white/15 bg-white/[0.04] hover:bg-white/[0.1] text-zinc-200'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-primary)]'
-              }`}
-            >
-              <span className="flex flex-col gap-1 w-4">
-                <span className="w-full h-[1.5px] bg-current block" />
-                <span className="w-2.5 h-[1.5px] bg-current block ml-auto" />
-              </span>
-            </button>
-          </div>
-        </div>
-      </header>
+            {/* Right Actions: Strategy Call CTA + Theme Toggle + Mobile Menu */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Primary Strategy Call / Project Brief CTA */}
+              <a
+                href="#contact"
+                onClick={(e) => handleNavClick('contact', e)}
+                className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2.5 rounded-full btn-platinum-primary"
+              >
+                <span>Strategy Call</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
 
-      {/* Full-Screen Curtain Overlay Menu */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col justify-between p-6 sm:p-10 lg:p-14 overflow-y-auto">
-          {/* Top Header */}
-          <div className="max-w-7xl w-full mx-auto flex items-center justify-between border-b border-[var(--border-hairline)] pb-6">
-            <SkyLineLogo size="md" />
-
-            <div className="flex items-center gap-3">
+              {/* Theme Toggle Button */}
               <button
                 type="button"
                 onClick={onToggleTheme}
-                aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                className="w-11 h-11 rounded-full btn-platinum-secondary inline-flex items-center justify-center cursor-pointer"
+                aria-label={
+                  theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'
+                }
+                title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                className="w-10 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
               >
                 {theme === 'dark' ? (
                   <Sun className="w-4 h-4 text-[var(--text-primary)]" />
@@ -245,205 +167,139 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </button>
 
+              {/* Hamburger Menu Trigger */}
               <button
                 type="button"
-                onClick={() => setMenuOpen(false)}
-                aria-label="Close Navigation Menu"
-                className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-full btn-platinum-primary text-xs font-mono-tech uppercase tracking-widest cursor-pointer"
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileMenuOpen}
+                className="w-10 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] flex items-center justify-center text-[var(--text-primary)] transition-colors cursor-pointer"
               >
-                <span>Close</span>
-                <X className="w-4 h-4" />
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
+        </div>
+      </header>
 
-          {/* Center Navigation List */}
-          <div className="max-w-7xl w-full mx-auto my-auto py-8 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div className="lg:col-span-7 space-y-2">
-              {PUBLIC_NAV_TABS.map((item) => {
+      {/* Slide-Over Navigation Drawer */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site Navigation Menu"
+        >
+          <div
+            className="fixed inset-0 bg-black/65 backdrop-blur-xs"
+            onClick={closeMenu}
+          />
+
+          <div className="fixed top-20 right-3 sm:right-6 w-[calc(100vw-1.5rem)] max-w-sm rounded-3xl surface-card p-5 shadow-2xl z-50 border border-[var(--border-strong)]">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--border-hairline)]">
+              <SkylineLogo size="sm" showWordmark subtitle="NAVIGATION" />
+              <button
+                type="button"
+                onClick={closeMenu}
+                className="text-xs font-mono-tech text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer"
+              >
+                ESC ✕
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-1.5">
+              {NAV_ITEMS.map((item) => {
                 const isActive = activePage === item.id;
                 return (
-                  <button
+                  <a
                     key={item.id}
-                    type="button"
-                    onClick={() => handleNavClick(item.id)}
-                    className={`w-full group flex items-baseline justify-between py-3.5 border-b border-[var(--border-hairline)] text-left hover:pl-3 transition-all duration-300 cursor-pointer ${
-                      isActive ? 'text-[var(--text-primary)] underline decoration-2 underline-offset-8' : ''
+                    href={`#${item.id}`}
+                    onClick={(e) => handleNavClick(item.id, e)}
+                    className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center justify-between transition-all ${
+                      isActive
+                        ? 'btn-platinum-primary'
+                        : 'surface-elevated text-[var(--text-primary)] hover:opacity-90'
                     }`}
                   >
-                    <div className="flex items-baseline gap-4">
-                      <span className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight group-hover:text-[var(--text-secondary)] transition-colors">
-                        {item.label}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="hidden sm:inline text-xs text-[var(--text-secondary)]">
-                        {item.desc}
-                      </span>
-                      <ArrowUpRight className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                    </div>
-                  </button>
+                    <span className="flex items-center gap-2">
+                      {item.isPromo && <Gift className="w-4 h-4" />}
+                      <span>{item.label}</span>
+                    </span>
+                    <ArrowUpRight className="w-4 h-4 opacity-70" />
+                  </a>
                 );
               })}
-            </div>
+            </nav>
 
-            {/* Right Column: Direct Channels & Referral Partner Card */}
-            <div className="lg:col-span-5 space-y-5">
-              <div className="surface-card rounded-3xl p-6 sm:p-7 space-y-5">
-                <div className="inline-flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[var(--text-primary)]" />
-                  <span className="font-mono-tech text-[10px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
-                    ACCEPTING NEW PROJECTS
-                  </span>
-                </div>
+            <div className="mt-4 pt-4 border-t border-[var(--border-hairline)] grid grid-cols-1 gap-2">
+              <a
+                href={SKYLINE_WHATSAPP_DIRECT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={closeMenu}
+                className="w-full py-3 px-4 rounded-xl btn-whatsapp-official font-semibold text-xs flex items-center justify-center gap-2"
+              >
+                <WhatsAppBrandBadge size="sm" className="border border-white/30" />
+                <span>WhatsApp Strategy Desk</span>
+              </a>
 
-                <div>
-                  <h3 className="font-display text-xl font-bold mb-1.5">
-                    SkyLine Digital Agency
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                    From sub-second web &amp; SaaS platforms to Google Maps #Top ranking and 24/7 WhatsApp AI bots.
-                  </p>
-                </div>
-
-                <div className="space-y-3 pt-1 text-xs">
-                  <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                    <MapPin className="w-4 h-4 text-[var(--text-primary)] shrink-0" />
-                    <span>{SKYLINE_LOCATION}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                    <GmailBrandIcon size="sm" />
-                    <a
-                      href={`mailto:${SKYLINE_EMAIL}`}
-                      className="hover:text-[var(--text-primary)] underline underline-offset-4 font-mono-tech"
-                    >
-                      {SKYLINE_EMAIL}
-                    </a>
-                  </div>
-                  <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                    <Phone className="w-4 h-4 text-[var(--text-primary)] shrink-0" />
-                    <div className="font-mono-tech flex flex-wrap items-center gap-2">
-                      <a
-                        href={`tel:${SKYLINE_CALL_NUMBER}`}
-                        className="font-semibold text-[var(--text-primary)] hover:underline"
-                      >
-                        {SKYLINE_PRIMARY_PHONE_DISPLAY}
-                      </a>
-                      <span>•</span>
-                      <a
-                        href={primaryWhatsAppUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-semibold text-[var(--text-primary)] hover:underline"
-                      >
-                        {SKYLINE_SACHIN_PHONE_DISPLAY}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 6 Brand-Color Social Icons in Mobile Menu Drawer */}
-                <div className="pt-3 border-t border-[var(--border-hairline)] flex items-center justify-between gap-2">
-                  <SocialIconBar size="sm" />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                  <a
-                    href={primaryWhatsAppUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] rounded-xl btn-whatsapp-official text-xs font-semibold"
-                  >
-                    <WhatsAppBrandBadge size="sm" className="border border-white/30" />
-                    <span>WhatsApp Chat</span>
-                  </a>
-                  <a
-                    href={`tel:${SKYLINE_CALL_NUMBER}`}
-                    className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] rounded-xl btn-call-black bg-[#000000] text-[#FFFFFF] text-xs font-semibold cursor-pointer"
-                  >
-                    <PhoneCall className="w-3.5 h-3.5 text-[#FFFFFF]" />
-                    <span>Direct Call</span>
-                  </a>
-                </div>
-              </div>
-
-              {/* Referral Highlight Box */}
-              <div className="surface-elevated rounded-2xl p-5 flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-1.5 text-[var(--text-primary)] font-mono-tech text-[10px] uppercase tracking-widest font-semibold">
-                    <Sparkles className="w-3.5 h-3.5 text-[var(--text-primary)]" />
-                    <span>PARTNER COMMISSION</span>
-                  </div>
-                  <p className="text-xs sm:text-sm font-semibold">
-                    Refer a client &amp; earn a direct 15% cash payout
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('referral')}
-                  className="px-3.5 py-2.5 min-h-[44px] rounded-xl btn-platinum-primary text-xs font-semibold shrink-0 cursor-pointer"
+              <div className="grid grid-cols-2 gap-2">
+                <a
+                  href={`tel:${SKYLINE_CALL_NUMBER}`}
+                  onClick={closeMenu}
+                  className="w-full py-2.5 px-3 rounded-xl btn-call-black bg-[#000000] text-[#FFFFFF] font-semibold text-xs flex items-center justify-center gap-1.5"
                 >
-                  Calculate
-                </button>
+                  <PhoneCall className="w-3.5 h-3.5 text-[#FFFFFF]" />
+                  <span>Direct Call</span>
+                </a>
+
+                <a
+                  href={SKYLINE_EMAIL_INQUIRY_URL}
+                  onClick={closeMenu}
+                  className="w-full py-2.5 px-3 rounded-xl btn-platinum-secondary font-semibold text-xs flex items-center justify-center gap-1.5"
+                >
+                  <GmailBrandIcon size="sm" />
+                  <span>Official Email</span>
+                </a>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                <a
+                  href={SKYLINE_LINKEDIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMenu}
+                  className="py-2 px-2 rounded-xl surface-elevated font-mono-tech text-[11px] font-semibold text-[var(--text-primary)] flex items-center justify-center gap-1"
+                >
+                  <span>LinkedIn ↗</span>
+                </a>
+                <a
+                  href={SKYLINE_GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMenu}
+                  className="py-2 px-2 rounded-xl surface-elevated font-mono-tech text-[11px] font-semibold text-[var(--text-primary)] flex items-center justify-center gap-1"
+                >
+                  <span>GitHub ↗</span>
+                </a>
+                <a
+                  href={SKYLINE_INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMenu}
+                  className="py-2 px-2 rounded-xl surface-elevated font-mono-tech text-[11px] font-semibold text-[var(--text-primary)] flex items-center justify-center gap-1"
+                >
+                  <span>Instagram ↗</span>
+                </a>
               </div>
             </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="max-w-7xl w-full mx-auto pt-4 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)] font-mono-tech">
-            <span>SKYLINE DIGITAL AGENCY • FULL-STACK, AI &amp; GROWTH</span>
-            <span>INDORE, MADHYA PRADESH, INDIA</span>
           </div>
         </div>
       )}
-
-      {/* Floating Bottom-Right Action Stack:
-          1) BroCodes-Style Expanding WhatsApp Hover Capsule (#25D366 -> Sachin Sahu, Founder & CEO)
-          2) BroCodes-Style Expanding Direct Call Hover Capsule (#09090B -> Aashif Khan, Co-Founder & System Architect)
-          3) Sky Bot AI SDR Agent Launcher (Custom Branded Chat-Logo Icon) */}
-      <div className="fixed bottom-5 right-4 sm:right-5 z-40 flex flex-col items-end gap-2.5">
-        <a
-          href={primaryWhatsAppUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Chat on WhatsApp • Sachin Sahu (Founder & CEO)"
-          title="Chat on WhatsApp • Sachin Sahu (Founder & CEO)"
-          className="group h-12 rounded-full bg-[#25D366] text-white border border-[#1DA851] shadow-2xl flex items-center px-3 hover:pr-4 hover:bg-[#1EBE5D] transition-all duration-300 overflow-hidden"
-        >
-          <span className="w-6 h-6 flex items-center justify-center shrink-0">
-            <WhatsAppLogoIcon className="w-6 h-6" />
-          </span>
-          <div className="max-w-0 opacity-0 group-hover:max-w-[260px] group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 overflow-hidden whitespace-nowrap text-left leading-tight">
-            <div className="font-display text-xs font-extrabold tracking-tight text-white">
-              Chat on WhatsApp • Sachin Sahu
-            </div>
-            <div className="font-mono-tech text-[10px] text-white/90 font-semibold">
-              Founder &amp; CEO
-            </div>
-          </div>
-        </a>
-
-        <a
-          href={`tel:${SKYLINE_CALL_NUMBER}`}
-          aria-label="Direct Voice Call • Aashif Khan (Co-Founder & System Architect)"
-          title="Direct Voice Call • Aashif Khan (Co-Founder & System Architect)"
-          className="group h-12 rounded-full btn-call-black bg-[#000000] text-[#FFFFFF] border border-white/20 shadow-2xl flex items-center px-3.5 hover:pr-4 transition-all duration-300 overflow-hidden"
-        >
-          <span className="w-5 h-5 flex items-center justify-center shrink-0 text-[#FFFFFF]">
-            <PhoneCall className="w-5 h-5" />
-          </span>
-          <div className="max-w-0 opacity-0 group-hover:max-w-[260px] group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 overflow-hidden whitespace-nowrap text-left leading-tight">
-            <div className="font-display text-xs font-extrabold tracking-tight text-[#FFFFFF]">
-              Direct Voice Call • Aashif Khan
-            </div>
-            <div className="font-mono-tech text-[10px] text-[#D4D4D8] font-semibold">
-              Co-Founder &amp; System Architect
-            </div>
-          </div>
-        </a>
-
-        <SkylineAiChatbot />
-      </div>
     </>
   );
 };

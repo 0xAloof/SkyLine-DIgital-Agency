@@ -50,7 +50,7 @@ const INITIAL_SEED_LEADS: LeadRecord[] = [
       'Technical SEO & AEO Search',
     ],
     projectScope:
-      'Want #Top Google Map Pack ranking across Indore branches, physical Smart QR 5-Star Review Standees at reception, and automated WhatsApp slot booking.',
+      'Want Google Map Pack ranking across Indore branches, automated digital WhatsApp review links after appointments, and automated WhatsApp slot booking.',
     status: 'new',
     notes: 'Inbound from Local Business Growth tab.',
     source: 'Website Inquiry Form',
@@ -63,13 +63,13 @@ const INITIAL_SEED_LEADS: LeadRecord[] = [
     contact: 'karan@veloced2c.in',
     contactType: 'email',
     inquiryType: 'inquiry',
-    budget: '₹1.5L to ₹3L',
+    budget: '₹45,000 to ₹95,000',
     selectedPillars: [
       'Conversion UI/UX & D2C Checkouts',
       'Performance Ads (Meta & Google)',
     ],
     projectScope:
-      'Looking to migrate from a slow template to a sub-100ms headless storefront with 1-Tap UPI checkout (GPay/PhonePe) and automated WhatsApp abandoned cart recovery.',
+      'Looking to migrate from a slow template to a fast headless storefront with 1-Tap UPI checkout (GPay/PhonePe) and automated WhatsApp abandoned cart recovery.',
     status: 'contacted',
     notes: 'Sent architecture teardown and fixed milestone roadmap.',
     source: 'Official Desk Email',
@@ -136,7 +136,14 @@ export function getDb(): DatabaseSchema {
       const hasLatestProjects =
         Array.isArray(parsed.projects) &&
         parsed.projects.length === SHOWCASE_PROJECTS.length &&
-        parsed.projects.some((p) => p.id === 'proj-shadowbase-cdc' && 'artifactId' in p);
+        parsed.projects.some(
+          (p) =>
+            p.id === 'proj-360-views' &&
+            p.imageUrl?.includes('photo-1582407947304-fd86f028f716') &&
+            'leadArchitect' in p
+        ) &&
+        Array.isArray(parsed.faqs) &&
+        parsed.faqs.some((f) => f.answer.includes('₹10,000'));
       memoryDb = {
         users: Array.isArray(parsed.users) && parsed.users.length > 0 ? parsed.users : seed.users,
         leads: Array.isArray(parsed.leads) ? parsed.leads : seed.leads,

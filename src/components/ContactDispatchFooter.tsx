@@ -33,6 +33,9 @@ import {
   SKYLINE_SACHIN_PHONE_DISPLAY,
   SKYLINE_EMAIL,
   SKYLINE_LOCATION,
+  SKYLINE_WHATSAPP_DIRECT_URL,
+  SKYLINE_SECONDARY_WHATSAPP_URL,
+  SKYLINE_EMAIL_INQUIRY_URL,
 } from '../data/agencyData';
 import {
   SkyLineLogo,
@@ -73,10 +76,10 @@ const PILLAR_CHOICES = [
 ];
 
 const BUDGET_OPTIONS = [
-  '₹25,000 to ₹60,000 (Local Business / Starter)',
-  '₹60,000 to ₹1,50,000 (Growth Website + Automation)',
-  '₹1,50,000 to ₹3,50,000 (Full-Stack SaaS / Ad Engine)',
-  '₹3,50,000+ (Enterprise / Custom Architecture)',
+  '₹10,000 to ₹18,000 (Starter Website / Local Business Setup — Open to Discussion)',
+  '₹18,000 to ₹45,000 (Growth Website + WhatsApp Automation)',
+  '₹45,000 to ₹95,000 (Custom Web App / D2C Storefront)',
+  '₹95,000+ (Custom SaaS / Enterprise Architecture)',
 ];
 
 const MEETING_SLOTS = [
@@ -229,8 +232,8 @@ const AutonomousRocketCanvas: React.FC = () => {
 
       ctx.clearRect(0, 0, width, height);
 
-      const isDark = document.documentElement.classList.contains('dark');
-      const strokeBase = isDark ? '244, 244, 246' : '24, 24, 27';
+      // Lower footer corridor is always crisp White/Platinum (#F4F4F5), so draw a dark charcoal paper-plane & trail
+      const strokeBase = '24, 24, 27';
 
       if (trail.length > 2) {
         ctx.save();
@@ -258,10 +261,7 @@ const AutonomousRocketCanvas: React.FC = () => {
       ctx.rotate(angle);
 
       const grad = ctx.createRadialGradient(-14, 0, 1, -14, 0, 12);
-      grad.addColorStop(
-        0,
-        isDark ? 'rgba(255,255,255,0.65)' : 'rgba(24,24,27,0.45)'
-      );
+      grad.addColorStop(0, 'rgba(24,24,27,0.45)');
       grad.addColorStop(1, 'rgba(113,113,122,0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -273,7 +273,7 @@ const AutonomousRocketCanvas: React.FC = () => {
       ctx.lineTo(-12, -10);
       ctx.lineTo(-6, -1);
       ctx.closePath();
-      ctx.fillStyle = isDark ? '#F4F4F6' : '#18181B';
+      ctx.fillStyle = '#09090B';
       ctx.fill();
 
       ctx.beginPath();
@@ -282,7 +282,7 @@ const AutonomousRocketCanvas: React.FC = () => {
       ctx.lineTo(-9, 5);
       ctx.lineTo(-4, 2);
       ctx.closePath();
-      ctx.fillStyle = isDark ? '#71717A' : '#52525B';
+      ctx.fillStyle = '#52525B';
       ctx.fill();
 
       ctx.beginPath();
@@ -290,7 +290,7 @@ const AutonomousRocketCanvas: React.FC = () => {
       ctx.lineTo(-4, 2);
       ctx.lineTo(-11, 10);
       ctx.closePath();
-      ctx.fillStyle = isDark ? '#D4D4D8' : '#3F3F46';
+      ctx.fillStyle = '#27272A';
       ctx.fill();
 
       ctx.restore();
@@ -452,20 +452,20 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
   return (
     <footer
       id="contact"
-      className={`${
-        showContactSection ? 'pt-28 sm:pt-32' : 'pt-8'
-      } pb-16 px-4 sm:px-8 lg:px-12 bg-[var(--bg-canvas)] relative overflow-hidden`}
+      className="relative overflow-hidden border-t border-[var(--border-hairline)]"
     >
-      <div className="max-w-7xl mx-auto">
-        {/* =================================================================
-            1. CONTACT & PROPOSAL DISPATCH SECTION (CONTACT PAGE ONLY)
-           ================================================================= */}
-        {showContactSection && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-20 border-b border-[var(--border-hairline)]">
+      {/* =================================================================
+          1. CONTACT & PROPOSAL DISPATCH SECTION (CONTACT PAGE ONLY)
+         ================================================================= */}
+      {showContactSection && (
+        <div className="pt-28 sm:pt-32 pb-20 px-4 sm:px-8 lg:px-12 bg-section-alt border-b border-[var(--border-hairline)]">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
             {/* Left Column: Agency Info & Direct Channels (5 Cols) */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="inline-flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[var(--text-primary)]" />
+              <div className="inline-flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl heading-icon-emerald flex items-center justify-center shrink-0">
+                  <PhoneCall className="w-4 h-4 text-white" />
+                </div>
                 <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
                   START YOUR PROJECT TODAY
                 </span>
@@ -484,11 +484,11 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
 
               {/* Contact Cards (Clean Numbers & Action Buttons Only) */}
               <div className="space-y-3 pt-2">
-                {/* Founder & CEO Sachin Sahu Card (WhatsApp Only, Zero Call Button) */}
+                {/* Founder & CEO Sachin Sahu Card (Direct Voice / WhatsApp) */}
                 <div className="p-4 rounded-2xl surface-card flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl surface-elevated flex items-center justify-center text-[var(--text-primary)]">
-                      <Phone className="w-4 h-4 text-[var(--text-primary)]" />
+                    <div className="w-9 h-9 rounded-xl bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] flex items-center justify-center">
+                      <Phone className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
@@ -499,22 +499,31 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                       </div>
                     </div>
                   </div>
-                  <a
-                    href={`https://wa.me/${SKYLINE_SACHIN_WHATSAPP_NUMBER}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3.5 py-2 rounded-xl btn-whatsapp-official text-xs font-semibold flex items-center gap-1.5"
-                  >
-                    <WhatsAppBrandBadge size="sm" className="border border-white/30" />
-                    <span>WhatsApp</span>
-                  </a>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href="tel:+918959144686"
+                      className="px-3.5 py-2 rounded-xl btn-call-black bg-[#000000] text-[#FFFFFF] text-xs font-semibold flex items-center gap-1.5"
+                    >
+                      <PhoneCall className="w-3.5 h-3.5 text-[#FFFFFF]" />
+                      <span>Call</span>
+                    </a>
+                    <a
+                      href={SKYLINE_SECONDARY_WHATSAPP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3.5 py-2 rounded-xl btn-whatsapp-official text-xs font-semibold flex items-center gap-1.5"
+                    >
+                      <WhatsAppBrandBadge size="sm" className="border border-white/30" />
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
                 </div>
 
                 {/* Co-Founder & System Architect Aashif Khan Card */}
                 <div className="p-4 rounded-2xl surface-card flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl surface-elevated flex items-center justify-center text-[var(--text-primary)]">
-                      <PhoneCall className="w-4 h-4 text-[var(--text-primary)]" />
+                    <div className="w-9 h-9 rounded-xl bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] flex items-center justify-center">
+                      <PhoneCall className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
@@ -534,7 +543,7 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                       <span>Call</span>
                     </a>
                     <a
-                      href={`https://wa.me/${SKYLINE_AASHIF_WHATSAPP_NUMBER}`}
+                      href={SKYLINE_WHATSAPP_DIRECT_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3.5 py-2 rounded-xl btn-whatsapp-official text-xs font-semibold flex items-center gap-1.5"
@@ -553,9 +562,12 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                       <div className="font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
                         OFFICIAL AGENCY EMAIL
                       </div>
-                      <div className="font-mono-tech text-xs sm:text-sm font-semibold text-[var(--text-primary)]">
+                      <a
+                        href={SKYLINE_EMAIL_INQUIRY_URL}
+                        className="font-mono-tech text-xs sm:text-sm font-semibold text-[var(--text-primary)] hover:underline"
+                      >
                         {SKYLINE_EMAIL}
-                      </div>
+                      </a>
                     </div>
                   </div>
                   <button
@@ -577,17 +589,12 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                   </button>
                 </div>
 
-                {/* Official Social Channels */}
-                <div className="p-4 rounded-2xl surface-card flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <div className="font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                      OFFICIAL SOCIAL CHANNELS
-                    </div>
-                    <div className="text-xs font-semibold text-[var(--text-primary)] mt-0.5">
-                      Connect with SkyLine Digital Agency
-                    </div>
+                {/* Official Social & Engineering Proof Channels (LinkedIn, GitHub, WhatsApp, Email, Phone) */}
+                <div className="p-4 rounded-2xl surface-card space-y-2.5">
+                  <div className="font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                    VERIFIED SOCIAL &amp; ENGINEERING CHANNELS
                   </div>
-                  <SocialIconBar size="sm" />
+                  <SocialIconBar size="sm" showLabels />
                 </div>
               </div>
             </div>
@@ -835,8 +842,10 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--text-muted)] font-mono-tech pt-1">
-                  <span className="inline-flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[var(--text-primary)]" />
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] inline-flex items-center justify-center">
+                      <CheckCircle2 className="w-3 h-3" />
+                    </span>
                     <span>100% Free Initial Consultation</span>
                   </span>
                   <span>No spam. Direct conversation with our engineering team.</span>
@@ -844,17 +853,24 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* =================================================================
-            2. ARCHITECTURAL 4-COLUMN FOOTER + LEGAL BAR + MONUMENTAL SILVER WORDMARK
-           ================================================================= */}
-        <div className="pt-14 pb-10 border-b border-[var(--border-hairline)] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
-          {/* Column 1 (4 Cols): Brand Lockup + Mission + 6 Original-Color Social Icons */}
+      {/* =================================================================
+          2. DARK UPPER FOOTER (LOGO, SOCIAL CTAs & PARALLEL 4-COLUMN LINKS)
+         ================================================================= */}
+      <div
+        data-testid="footer-dark-upper-band"
+        className="bg-[#09090B] text-[#F4F4F5] px-4 sm:px-8 lg:px-12 py-14 border-b border-[#27272A]"
+      >
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
+          {/* Column 1 (4 Cols): Brand Lockup + Mission + Verified Social Icons */}
           <div className="lg:col-span-4 space-y-5">
-            <SkyLineLogo size="md" />
+            <div className="text-[#FFFFFF]">
+              <SkyLineLogo size="md" />
+            </div>
 
-            <p className="font-sans-body text-[13px] text-[var(--text-secondary)] leading-relaxed max-w-sm">
+            <p className="font-sans-body text-[13px] text-[#A1A1AA] leading-relaxed max-w-sm">
               End-to-end software development and digital growth agency engineering high-performance web apps, mobile solutions, SaaS platforms, and WhatsApp automation for startups, local businesses, and enterprises.
             </p>
 
@@ -865,24 +881,24 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
 
           {/* Column 2 (2 Cols): QUICK LINKS */}
           <div className="lg:col-span-2 space-y-4">
-            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.14em] text-[#71717A] dark:text-[#A1A1AA]">
+            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.14em] text-[#A1A1AA]">
               QUICK LINKS
             </h4>
-            <ul className="space-y-2.5 text-[13px] font-medium text-[var(--text-primary)]">
+            <ul className="space-y-2.5 text-[13px] font-medium text-[#F4F4F5]">
               {[
-                { label: 'Home', pageId: 'home', icon: <Home className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'Services', pageId: 'services', icon: <Layers className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'Our Projects', pageId: 'work', icon: <Briefcase className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'Who We Are', pageId: 'who-we-are', icon: <Users className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'How We Deliver', pageId: 'how-we-deliver', icon: <Info className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'Partner Offer', pageId: 'referral', icon: <Percent className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'Client Reviews', pageId: 'work', icon: <Star className="w-3.5 h-3.5 text-[#71717A]" /> },
+                { label: 'Home', pageId: 'home', icon: <Home className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'Services', pageId: 'services', icon: <Layers className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'Our Projects', pageId: 'work', icon: <Briefcase className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'Who We Are', pageId: 'who-we-are', icon: <Users className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'How We Deliver', pageId: 'how-we-deliver', icon: <Info className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'Partner Offer', pageId: 'referral', icon: <Percent className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'Client Reviews', pageId: 'work', icon: <Star className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
               ].map((link) => (
                 <li key={link.label}>
                   <a
                     href={`#${link.pageId}`}
                     onClick={(e) => handleFooterNav(e, link.pageId)}
-                    className="inline-flex items-center gap-2.5 hover:text-[var(--text-secondary)] transition-colors"
+                    className="inline-flex items-center gap-2.5 text-[#E4E4E7] hover:text-[#FFFFFF] transition-colors"
                   >
                     {link.icon}
                     <span>{link.label}</span>
@@ -894,22 +910,22 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
 
           {/* Column 3 (3 Cols): CORE SOLUTIONS */}
           <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.14em] text-[#71717A] dark:text-[#A1A1AA]">
+            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.14em] text-[#A1A1AA]">
               CORE SOLUTIONS
             </h4>
-            <ul className="space-y-2.5 text-[13px] font-medium text-[var(--text-primary)]">
+            <ul className="space-y-2.5 text-[13px] font-medium text-[#F4F4F5]">
               {[
-                { label: 'Custom Web & Mobile Apps', pageId: 'services', icon: <Globe className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'SaaS & CRM Platforms', pageId: 'services', icon: <Layers className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'AI & Workflow Automation', pageId: 'services', icon: <Cpu className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: 'Cloud Deployment & DevOps', pageId: 'services', icon: <Cloud className="w-3.5 h-3.5 text-[#71717A]" /> },
-                { label: '60s Price & Timeline Estimator', pageId: 'services', icon: <LayoutGrid className="w-3.5 h-3.5 text-[#71717A]" /> },
+                { label: 'Custom Web & Mobile Apps', pageId: 'services', icon: <Globe className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'SaaS & CRM Platforms', pageId: 'services', icon: <Layers className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'AI & Workflow Automation', pageId: 'services', icon: <Cpu className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: 'Cloud Deployment & DevOps', pageId: 'services', icon: <Cloud className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
+                { label: '60s Price & Timeline Estimator', pageId: 'services', icon: <LayoutGrid className="w-3.5 h-3.5 text-[#FFFFFF]" /> },
               ].map((sol) => (
                 <li key={sol.label}>
                   <a
                     href={`#${sol.pageId}`}
                     onClick={(e) => handleFooterNav(e, sol.pageId)}
-                    className="inline-flex items-center gap-2.5 hover:text-[var(--text-secondary)] transition-colors"
+                    className="inline-flex items-center gap-2.5 text-[#E4E4E7] hover:text-[#FFFFFF] transition-colors"
                   >
                     {sol.icon}
                     <span>{sol.label}</span>
@@ -921,30 +937,30 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
 
           {/* Column 4 (3 Cols): GET IN TOUCH */}
           <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.14em] text-[#71717A] dark:text-[#A1A1AA]">
+            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.14em] text-[#A1A1AA]">
               GET IN TOUCH
             </h4>
-            <ul className="space-y-3 text-[13px] text-[var(--text-primary)]">
+            <ul className="space-y-3 text-[13px] text-[#F4F4F5]">
               <li className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-xl surface-elevated inline-flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4 text-[var(--text-primary)]" />
+                <span className="w-9 h-9 rounded-xl bg-[#18181B] border border-[#27272A] text-[#FFFFFF] inline-flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4 text-[#FFFFFF]" />
                 </span>
-                <span className="leading-snug">{SKYLINE_LOCATION}</span>
+                <span className="leading-snug text-[#E4E4E7]">{SKYLINE_LOCATION}</span>
               </li>
               <li className="flex items-center gap-3">
                 <GmailBrandIcon size="md" />
                 <a
-                  href={`mailto:${SKYLINE_EMAIL}`}
-                  className="hover:underline font-medium break-all"
+                  href={SKYLINE_EMAIL_INQUIRY_URL}
+                  className="text-[#FFFFFF] hover:underline font-medium break-all"
                 >
                   {SKYLINE_EMAIL}
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-xl surface-elevated inline-flex items-center justify-center shrink-0">
-                  <Phone className="w-4 h-4 text-[var(--text-primary)]" />
+                <span className="w-9 h-9 rounded-xl bg-[#18181B] border border-[#27272A] text-[#FFFFFF] inline-flex items-center justify-center shrink-0">
+                  <Phone className="w-4 h-4 text-[#FFFFFF]" />
                 </span>
-                <div className="font-display font-bold text-[13px] text-[var(--text-primary)] flex flex-wrap items-center gap-1.5">
+                <div className="font-display font-bold text-[13px] text-[#FFFFFF] flex flex-wrap items-center gap-1.5">
                   <a
                     href={`tel:${SKYLINE_CALL_NUMBER}`}
                     className="hover:underline"
@@ -953,7 +969,7 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                   </a>
                   <span className="text-[#71717A]">•</span>
                   <a
-                    href={`https://wa.me/${SKYLINE_SACHIN_WHATSAPP_NUMBER}`}
+                    href={SKYLINE_SECONDARY_WHATSAPP_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"
@@ -965,59 +981,84 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
             </ul>
           </div>
         </div>
+      </div>
 
-        {/* Dedicated Paper-Plane Flight Corridor */}
-        <div
-          className="w-full h-16 sm:h-20 relative overflow-hidden border-b border-[var(--border-hairline)]/60 pr-16 sm:pr-24"
-          aria-hidden="true"
-        >
-          <AutonomousRocketCanvas />
-        </div>
-
-        {/* Copyright, Interactive Legal Drawer Triggers & Back to Top Pill */}
-        <div className="py-6 pr-16 sm:pr-24 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-secondary)]">
-          <div>
-            © {new Date().getFullYear()} SkyLine Digital Agency. All rights reserved.
-          </div>
-
-          <div className="flex flex-wrap items-center gap-6">
-            <button
-              type="button"
-              onClick={() => setActiveLegalModal('privacy')}
-              className="hover:text-[var(--text-primary)] transition-colors cursor-pointer underline-offset-4 hover:underline"
-            >
-              Privacy Policy
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveLegalModal('terms')}
-              className="hover:text-[var(--text-primary)] transition-colors cursor-pointer underline-offset-4 hover:underline"
-            >
-              Terms of Service
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveLegalModal('llms')}
-              className="hover:text-[var(--text-primary)] transition-colors cursor-pointer underline-offset-4 hover:underline"
-            >
-              LLMs.txt
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full btn-platinum-primary text-xs font-semibold cursor-pointer shrink-0"
+      {/* =================================================================
+          3. WHITE / PLATINUM LOWER FOOTER (ANIMATED PAPER-PLANE ARROW + BOUNCING SKYLINE WORDMARK)
+         ================================================================= */}
+      <div
+        data-testid="footer-white-lower-band"
+        className="bg-[#F4F4F5] text-[#09090B] px-4 sm:px-8 lg:px-12 pb-14"
+      >
+        <div className="max-w-7xl mx-auto">
+          {/* Dedicated Paper-Plane Flight Corridor */}
+          <div
+            className="w-full h-16 sm:h-20 relative overflow-hidden border-b border-[#D4D4D8] pr-16 sm:pr-24"
+            aria-hidden="true"
           >
-            <span>Back to top</span>
-            <ArrowUp className="w-3.5 h-3.5" />
-          </button>
-        </div>
+            <AutonomousRocketCanvas />
+          </div>
 
-        {/* Monumental Metallic Silver Bottom Wordmark */}
-        <div className="pt-2 pb-12 pr-16 sm:pr-28 relative select-none overflow-hidden text-center">
-          <div className="font-display font-black text-[15.5vw] sm:text-[14.2vw] leading-[0.84] tracking-[-0.04em] bg-gradient-to-b from-[#71717A] via-[#A1A1AA] to-[#E4E4E7] dark:from-[#E4E4E7] dark:via-[#71717A] dark:to-[#27272A] bg-clip-text text-transparent">
-            SKYLINE
+          {/* Copyright, Interactive Legal Drawer Triggers & Back to Top Pill */}
+          <div className="py-6 pr-16 sm:pr-24 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#3F3F46]">
+            <div className="font-medium text-[#09090B]">
+              © {new Date().getFullYear()} SkyLine Digital Agency. All rights reserved.
+            </div>
+
+            <div className="flex flex-wrap items-center gap-6 font-medium">
+              <button
+                type="button"
+                onClick={() => setActiveLegalModal('privacy')}
+                className="text-[#3F3F46] hover:text-[#09090B] transition-colors cursor-pointer underline-offset-4 hover:underline"
+              >
+                Privacy Policy
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveLegalModal('terms')}
+                className="text-[#3F3F46] hover:text-[#09090B] transition-colors cursor-pointer underline-offset-4 hover:underline"
+              >
+                Terms of Service
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveLegalModal('llms')}
+                className="text-[#3F3F46] hover:text-[#09090B] transition-colors cursor-pointer underline-offset-4 hover:underline"
+              >
+                LLMs.txt
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#09090B] text-[#FFFFFF] hover:bg-[#18181B] text-xs font-semibold cursor-pointer shrink-0 shadow-sm"
+            >
+              <span>Back to top</span>
+              <ArrowUp className="w-3.5 h-3.5 text-[#FFFFFF]" />
+            </button>
+          </div>
+
+          {/* Monumental Sequential Letter-by-Letter Wave Bouncing Bottom Wordmark */}
+          <div
+            data-testid="footer-skyline-bounce-wordmark"
+            className="pt-8 pb-6 pr-16 sm:pr-28 relative select-none overflow-hidden text-center"
+          >
+            <div
+              aria-label="SKYLINE"
+              className="font-display font-black text-[15.2vw] sm:text-[14vw] leading-[0.88] tracking-[-0.04em] inline-flex items-center justify-center"
+            >
+              {(['S', 'K', 'Y', 'L', 'I', 'N', 'E'] as const).map((letter, idx) => (
+                <span
+                  key={`${letter}-${idx}`}
+                  data-testid={`footer-skyline-letter-${idx}`}
+                  style={{ animationDelay: `${idx * 0.16}s` }}
+                  className="animate-skyline-letter bg-gradient-to-b from-[#09090B] via-[#27272A] to-[#52525B] bg-clip-text text-transparent"
+                >
+                  {letter}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -1144,7 +1185,7 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                   <div>Official Email: {SKYLINE_EMAIL}</div>
                   <div>Primary WhatsApp: +{SKYLINE_SACHIN_WHATSAPP_NUMBER} (Sachin Sahu)</div>
                   <div>Direct Call & WhatsApp: {SKYLINE_CALL_NUMBER} (Aashif Khan)</div>
-                  <div>Core Tracks: Custom Next.js 15 & Spring Boot Web/SaaS, Official WhatsApp Cloud API Bots, Local Business #Top Google Map Pack SEO & Smart QR Standees, Meta CAPI & Google Performance Ads, 360° Interactive WebGL Tours, and 1-on-1 Student Engineering Mentorship.</div>
+                  <div>Core Tracks: Custom Next.js 15 & Spring Boot Web/SaaS, Official WhatsApp Cloud API Bots, Local Business Google Map Pack SEO & Digital WhatsApp Review Links, Meta CAPI & Google Performance Ads, 360° Interactive WebGL Tours, and 1-on-1 Student Engineering Mentorship.</div>
                 </div>
               )}
             </div>

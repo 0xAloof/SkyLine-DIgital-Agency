@@ -1,493 +1,333 @@
 import React from 'react';
-import { SKYLINE_INSTAGRAM_URL, SKYLINE_SOCIAL_LINKS } from '../data/agencyData';
+import { PhoneCall } from 'lucide-react';
+import {
+  SKYLINE_LINKEDIN_URL,
+  SKYLINE_GITHUB_URL,
+  SKYLINE_INSTAGRAM_URL,
+  SKYLINE_WHATSAPP_DIRECT_URL,
+  SKYLINE_EMAIL_INQUIRY_URL,
+  SKYLINE_CALL_NUMBER,
+} from '../data/agencyData';
+import { SkylineLogo, SkylineLogoSvg } from './SkylineLogo';
 
 /**
- * Official SkyLine Digital Agency Brand Mark & Wordmark
- * 3D Metallic "S + A" Interlocking Monogram:
- *  - Back Layer ("S") & Front Layer ("A"): Both rendered in the exact same high-contrast bright brushed silver-white metallic gradient (#FFFFFF -> #F4F4F5 -> #D4D8E0) against the #050505 badge
- *  - Overlap Cutout: Crisp 2.5px #050505 cutout stroke where the front "A" crosses over the back "S"
- *  - 3 Square Pixels: Detaching in a stepped diagonal pattern outward from the bottom-right leg/foot of the front "A"
- *  - Wordmark: Bold metallic "Skyline" (Montserrat ExtraBold) + spaced "DIGITAL AGENCY" (Montserrat SemiBold, tracking-[0.28em])
+ * 1. OFFICIAL SKYLINE DIGITAL AGENCY BRAND MARK & EDITORIAL WORDMARK
+ * Uses the redesigned 4-color geometric ribbon 'S' with origami upward arrow/crown
+ * (#0B63F6 Royal Blue, #DC2626 Crimson Red, #F59E0B Amber Gold, #10B981 Emerald Green)
+ * paired with crisp editorial typography: "SkyLine" (-0.03em) & "DIGITAL AGENCY" (0.14em).
  */
 export const SkyLineLogo: React.FC<{
-  className?: string;
-  iconClassName?: string;
-  showWordmark?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  showText?: boolean;
+  subtitle?: string;
+  iconClassName?: string;
   dockStyle?: boolean;
-}> = ({
-  className = '',
-  iconClassName = '',
-  showWordmark = true,
-  size = 'md',
-  dockStyle = false,
-}) => {
-  const dimensions =
-    size === 'sm' ? 'w-9 h-9' : size === 'lg' ? 'w-12 h-12' : 'w-10 h-10';
-
+  className?: string;
+}> = ({ size = 'md', showText = true, subtitle = 'DIGITAL AGENCY', className = '' }) => {
   return (
-    <div className={`inline-flex items-center gap-3 select-none ${className}`}>
-      <div
-        className={`relative ${
-          iconClassName || dimensions
-        } rounded-xl bg-[#050505] border border-white/15 shadow-[0_6px_18px_rgba(0,0,0,0.45)] flex items-center justify-center shrink-0 overflow-hidden`}
-      >
-        {/* Subtle top radial metallic sheen */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(circle at 25% 15%, rgba(255,255,255,0.16), transparent 62%)',
-          }}
-        />
-        <svg
-          viewBox="0 0 64 64"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-[88%] h-[88%] relative z-10"
-          aria-hidden="true"
-        >
-          <defs>
-            {/* Unified Bright Brushed Silver-White Metallic Gradient (#FFFFFF -> #F4F4F5 -> #D4D8E0) for Both "S", "A", and Pixels */}
-            <linearGradient id="skylineBrightSilverGrad" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#FFFFFF" />
-              <stop offset="50%" stopColor="#F4F4F5" />
-              <stop offset="100%" stopColor="#D4D8E0" />
-            </linearGradient>
-
-            {/* Subtle 3D Facet Highlight on "A" */}
-            <linearGradient id="skylineABevelGrad" x1="28" y1="10" x2="48" y2="54" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#FFFFFF" />
-              <stop offset="55%" stopColor="#F4F4F5" />
-              <stop offset="100%" stopColor="#D4D8E0" />
-            </linearGradient>
-          </defs>
-
-          {/* BACK LAYER: Bright Brushed Silver-White "S" Ribbon */}
-          <path
-            d="M44.5 16C39.8 11.2 31.2 10 23.2 11.8C15.2 13.6 11.2 19.2 13 25.4C14.6 30.8 21.2 33 29.8 34.8C38.2 36.5 42.2 39 41 44.2C39.8 49.2 32.4 51.4 23.8 49.8C18.2 48.8 13.8 46.2 11.2 43"
-            stroke="url(#skylineBrightSilverGrad)"
-            strokeWidth="7.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-
-          {/* FRONT LAYER: Razor-Sharp Brushed Silver-White "A" with Crisp 2.5px #050505 Overlap Cutout Stroke */}
-          <g>
-            {/* 2.5px #050505 Overlap Cutout Underlay so "A" Crossing Over "S" is 100% Distinct */}
-            <path
-              d="M30.5 9.5L13.5 52H22.2L30.5 28.5L39.2 52H47.5L30.5 9.5Z"
-              fill="url(#skylineBrightSilverGrad)"
-              stroke="#050505"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-            />
-            {/* Right Bevel Chisel Facet of "A" */}
-            <path
-              d="M30.5 9.5L34.2 19.5L42.8 52H47.5L30.5 9.5Z"
-              fill="url(#skylineABevelGrad)"
-            />
-            {/* Dynamic Ascending Crossbar of "A" with 2.5px #050505 Overlap Cutout Stroke */}
-            <path
-              d="M19.5 39.5L41.5 34.5L43.8 40.5L17.2 45.2L19.5 39.5Z"
-              fill="url(#skylineBrightSilverGrad)"
-              stroke="#050505"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-            />
-          </g>
-
-          {/* CRITICAL DETAIL: 3 Square Pixels Detaching Outward from the Bottom-Right Leg/Foot of "A" */}
-          <rect
-            x="48.5"
-            y="46.5"
-            width="4.4"
-            height="4.4"
-            rx="0.7"
-            fill="url(#skylineBrightSilverGrad)"
-          />
-          <rect
-            x="54.2"
-            y="41.8"
-            width="3.6"
-            height="3.6"
-            rx="0.6"
-            fill="url(#skylineBrightSilverGrad)"
-          />
-          <rect
-            x="58.8"
-            y="37.5"
-            width="2.8"
-            height="2.8"
-            rx="0.5"
-            fill="url(#skylineBrightSilverGrad)"
-          />
-        </svg>
-      </div>
-
-      {showWordmark && (
-        <div className="flex flex-col leading-none">
-          <span
-            style={{ fontFamily: "'Montserrat', 'Poppins', sans-serif" }}
-            className={`font-extrabold tracking-tight ${
-              size === 'sm' ? 'text-base' : size === 'lg' ? 'text-xl' : 'text-[18px]'
-            } ${
-              dockStyle
-                ? 'text-[#F8F9FA]'
-                : 'text-[var(--text-primary)]'
-            }`}
-          >
-            Skyline
-          </span>
-          <span
-            style={{ fontFamily: "'Montserrat', 'Inter', sans-serif" }}
-            className={`text-[9px] uppercase tracking-[0.28em] font-semibold mt-1 ${
-              dockStyle ? 'text-zinc-400' : 'text-[var(--text-muted)]'
-            }`}
-          >
-            DIGITAL AGENCY
-          </span>
-        </div>
-      )}
-    </div>
+    <SkylineLogo
+      size={size}
+      showWordmark={showText}
+      subtitle={subtitle}
+      className={className}
+    />
   );
 };
 
 /**
- * Custom Sky Bot Chat-Monogram Icon
- * Renders a sleek Chat-Bubble silhouette with a glowing #10B981 active AI node
- * and the bright brushed silver-white "SA" monogram seamlessly integrated inside
- * the chat bubble so it is immediately recognizable as an AI chat assistant
- * rather than a duplicate of the top-left navbar logo.
+ * 2. CUSTOM SKY BOT AI CHAT LAUNCHER & HEADER AVATAR ICON
+ * Renders the new 4-color geometric ribbon 'S' mark inside a sleek container with live status indicator.
  */
 export const SkyLineAiChatIcon: React.FC<{
-  className?: string;
   size?: 'sm' | 'md' | 'lg';
-}> = ({ className = '', size = 'md' }) => {
-  const dim =
-    size === 'sm' ? 'w-8 h-8' : size === 'lg' ? 'w-12 h-12' : 'w-10 h-10';
+  className?: string;
+}> = ({ size = 'md', className }) => {
+  const defaultSize =
+    size === 'sm' ? 'w-9 h-9' : size === 'lg' ? 'w-12 h-12' : 'w-11 h-11';
+  const boxClass = className || defaultSize;
 
   return (
-    <div
-      className={`relative ${
-        className || dim
-      } rounded-full bg-[#050505] text-[#F8F8F6] border border-white/20 shadow-md flex items-center justify-center shrink-0 overflow-hidden select-none`}
-      aria-hidden="true"
+    <span
+      className={`relative ${boxClass} rounded-xl bg-white dark:bg-[#0D1017] border border-white/20 shadow-md inline-flex items-center justify-center p-1 shrink-0 select-none overflow-hidden`}
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle at 28% 20%, rgba(255,255,255,0.18), transparent 60%)',
-        }}
+      <SkylineLogoSvg className="w-full h-full" />
+      <span
+        className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full bg-[#10B981] ring-1 ring-[#050505]"
+        aria-hidden="true"
       />
-      <svg
-        viewBox="0 0 64 64"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-[82%] h-[82%] relative z-10 overflow-visible"
-      >
-        <defs>
-          <linearGradient id="skyBotBrightSilverGrad" x1="12" y1="8" x2="52" y2="54" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="50%" stopColor="#F4F4F5" />
-            <stop offset="100%" stopColor="#D4D8E0" />
-          </linearGradient>
-          <linearGradient id="skyBotBubbleShell" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#1E1E24" />
-            <stop offset="100%" stopColor="#09090D" />
-          </linearGradient>
-        </defs>
-
-        {/* Sleek Chat-Bubble Silhouette with Tail */}
-        <path
-          d="M11 14C11 10.134 14.134 7 18 7H46C49.866 7 53 10.134 53 14V38C53 41.866 49.866 45 46 45H25.5L14 54.5V45H18C14.134 45 11 41.866 11 38V14Z"
-          fill="url(#skyBotBubbleShell)"
-          stroke="url(#skyBotBrightSilverGrad)"
-          strokeWidth="2.4"
-          strokeLinejoin="round"
-        />
-
-        {/* Subtle AI Chat Signal Dots Inside Top-Left of Bubble */}
-        <circle cx="17.5" cy="14" r="1.4" fill="#10B981" />
-        <circle cx="22" cy="14" r="1.4" fill="#A1A1AA" />
-
-        {/* Seamlessly Integrated "SA" Monogram Inside the Chat Bubble */}
-        <g transform="translate(5.5, 4) scale(0.82)">
-          {/* Back "S" Bright Brushed Silver-White Curve */}
-          <path
-            d="M40 17C36.2 14 29.8 13.4 24.2 14.8C18.6 16.2 16.2 20 17.5 24.2C18.6 27.8 23.2 29.4 29.2 30.8C35 32.1 38 34 37.2 37.4C36.4 40.8 31.2 42.4 25 41.2C21 40.5 18 38.8 16.2 36.8"
-            stroke="url(#skyBotBrightSilverGrad)"
-            strokeWidth="5.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-
-          {/* Front "A" Bright Brushed Silver-White Monogram with 2.5px #050505 Overlap Cutout Stroke */}
-          <path
-            d="M29.8 13L18 41.5H23.8L29.8 25.8L35.8 41.5H41.5L29.8 13Z"
-            fill="url(#skyBotBrightSilverGrad)"
-            stroke="#050505"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M21.8 33L37.5 29.5L39 33.6L20.4 37L21.8 33Z"
-            fill="url(#skyBotBrightSilverGrad)"
-            stroke="#050505"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-          />
-
-          {/* 3 Square Pixels Detaching from Bottom-Right Foot of "A" */}
-          <rect x="42.5" y="37.5" width="3.2" height="3.2" rx="0.5" fill="url(#skyBotBrightSilverGrad)" />
-          <rect x="46.5" y="34" width="2.6" height="2.6" rx="0.4" fill="url(#skyBotBrightSilverGrad)" />
-          <rect x="49.8" y="30.8" width="2.1" height="2.1" rx="0.4" fill="url(#skyBotBrightSilverGrad)" />
-        </g>
-
-        {/* Glowing #10B981 Active AI Node on Top-Right Corner of Chat Bubble */}
-        <circle cx="50" cy="11" r="7.5" fill="#10B981" fillOpacity="0.28" />
-        <circle
-          cx="50"
-          cy="11"
-          r="4.8"
-          fill="#10B981"
-          stroke="#050505"
-          strokeWidth="2"
-        />
-        <circle cx="48.8" cy="9.8" r="1.4" fill="#FFFFFF" />
-      </svg>
-    </div>
+    </span>
   );
 };
 
 /**
- * Official WhatsApp Vector Icon (Clean Transparent Glyph for Buttons & Badges)
+ * 3. OFFICIAL WHATSAPP VECTOR LOGO ICON (#25D366 GREEN CIRCLE + WHITE PHONE)
  */
 export const WhatsAppLogoIcon: React.FC<{ className?: string }> = ({
-  className = 'w-4 h-4',
+  className = 'w-5 h-5',
 }) => (
   <svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
+    viewBox="0 0 32 32"
+    fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className={`shrink-0 ${className}`}
+    className={`shrink-0 block ${className}`}
     aria-hidden="true"
   >
-    <path d="M12.031 2C6.508 2 2.023 6.485 2.023 12.008c0 1.766.461 3.49 1.337 5.01L2 22l5.122-1.343a9.963 9.963 0 0 0 4.909 1.298h.004c5.522 0 10.006-4.485 10.006-10.008C22.041 6.485 17.553 2 12.031 2Zm5.828 14.129c-.246.693-1.432 1.326-1.988 1.409-.51.076-1.155.108-1.868-.118-.434-.137-.991-.322-1.703-.63-2.996-1.293-4.952-4.312-5.101-4.512-.149-.199-1.218-1.621-1.218-3.092 0-1.471.77-2.194 1.044-2.493.274-.299.597-.374.796-.374.199 0 .398.002.572.01.183.009.429-.07.671.512.249.598.845 2.068.92 2.218.075.149.125.324.025.523-.099.2-.149.324-.298.498-.149.175-.314.391-.448.524-.149.149-.304.311-.131.61.174.299.773 1.275 1.66 2.066 1.141 1.017 2.103 1.332 2.401 1.481.299.15.473.125.647-.075.175-.199.746-.872.945-1.171.199-.299.398-.249.672-.149.274.099 1.741.822 2.039.971.299.15.498.225.572.349.075.125.075.723-.171 1.416Z" />
+    <circle cx="16" cy="16" r="16" fill="#25D366" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M16.02 6.2c-5.36 0-9.72 4.35-9.72 9.71 0 1.83.51 3.61 1.48 5.15L6.2 26l5.08-1.52a9.7 9.7 0 0 0 4.74 1.23h.01c5.36 0 9.72-4.35 9.72-9.71 0-2.6-1.01-5.04-2.85-6.87A9.66 9.66 0 0 0 16.02 6.2Zm0 17.75h-.01a8.02 8.02 0 0 1-4.19-1.17l-.3-.18-3.01.9.91-2.94-.2-.31a8.01 8.01 0 0 1-1.26-4.34c0-4.44 3.62-8.05 8.06-8.05 2.15 0 4.17.84 5.69 2.36a8.01 8.01 0 0 1 2.36 5.69c0 4.44-3.62 8.04-8.05 8.04Zm4.42-6.02c-.24-.12-1.43-.71-1.65-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.95-1.2-.72-.64-1.21-1.44-1.35-1.68-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.42.06-.65.3-.22.24-.85.83-.85 2.02 0 1.2.87 2.35.99 2.51.12.16 1.71 2.62 4.15 3.67.58.25 1.03.4 1.38.51.59.18 1.11.15 1.53.09.47-.07 1.43-.59 1.63-1.15.2-.57.2-1.06.14-1.15-.06-.1-.22-.16-.47-.28Z"
+      fill="#FFFFFF"
+    />
   </svg>
 );
 
 /**
- * Official WhatsApp Green (#25D366) Circular Brand Badge
+ * Official WhatsApp Brand Badge
  */
 export const WhatsAppBrandBadge: React.FC<{
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }> = ({ size = 'md', className = '' }) => {
-  const dims =
-    size === 'sm' ? 'w-6 h-6' : size === 'lg' ? 'w-10 h-10' : 'w-8 h-8';
-  const iconDims =
-    size === 'sm' ? 'w-3.5 h-3.5' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4';
+  const sizeClass =
+    size === 'sm' ? 'w-5 h-5' : size === 'lg' ? 'w-10 h-10' : 'w-8 h-8';
 
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-full bg-[#25D366] text-white shadow-xs shrink-0 ${dims} ${className}`}
+      className={`inline-flex items-center justify-center shrink-0 rounded-full overflow-hidden ${sizeClass} ${className}`}
       aria-hidden="true"
     >
-      <WhatsAppLogoIcon className={iconDims} />
+      <WhatsAppLogoIcon className="w-full h-full" />
     </span>
   );
 };
 
 /**
- * Official 4-Color Google Gmail Envelope Mark.
- * When `size === 'nav'`, renders a crisp unboxed `w-5 h-5` 4-color `M` glyph
- * designed to sit inside the circular `w-10 h-10 rounded-full` navbar action button.
+ * 4. OFFICIAL 4-COLOR GOOGLE GMAIL "M" ICON
  */
 export const GmailBrandIcon: React.FC<{
-  size?: 'sm' | 'md' | 'lg' | 'nav';
+  size?: 'sm' | 'nav' | 'md' | 'lg';
   className?: string;
 }> = ({ size = 'md', className = '' }) => {
   if (size === 'nav') {
     return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className={`w-5 h-5 shrink-0 ${className}`}
+      <span
+        className={`w-10 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] inline-flex items-center justify-center shrink-0 shadow-xs transition-transform hover:scale-105 ${className}`}
         aria-hidden="true"
       >
-        <path
-          d="M2 6.2V18c0 1.1.9 2 2 2h2V9.8l6 4.5 6-4.5V20h2c1.1 0 2-.9 2-2V6.2c0-1.8-2.1-2.8-3.5-1.7L12 10 5.5 4.5C4.1 3.4 2 4.4 2 6.2Z"
-          fill="#EA4335"
-        />
-        <path d="M2 6.2V18c0 1.1.9 2 2 2h2V9.8L2 6.2Z" fill="#4285F4" />
-        <path d="M22 6.2V18c0 1.1-.9 2-2 2h-2V9.8l4-3.6Z" fill="#34A853" />
-        <path
-          d="M18 9.8V4.8l-6 4.5-6-4.5v5l6 4.5 6-4.5Z"
-          fill="#FBBC05"
-        />
-      </svg>
+        <svg viewBox="0 0 48 48" className="w-5 h-5" fill="none">
+          <path d="M6 12.5V36c0 2.2 1.8 4 4 4h4V19.8l-8-6V12.5Z" fill="#4285F4" />
+          <path d="M34 40h4c2.2 0 4-1.8 4-4V12.5l-8 7.3V40Z" fill="#34A853" />
+          <path d="M34 11.2V21l8-6v-3.2c0-3.3-3.8-5.2-6.4-3.2L34 11.2Z" fill="#FBBC05" />
+          <path d="M14 21v-9.8L24 18.7l10-7.5V21L24 28.5 14 21Z" fill="#EA4335" />
+          <path d="M6 11.8v3.2l8 6v-9.8l-1.6-1.2C9.8 8 6 9.9 6 13.2v-1.4Z" fill="#C5221F" />
+        </svg>
+      </span>
     );
   }
 
-  const containerDims =
-    size === 'sm' ? 'w-8 h-8' : size === 'lg' ? 'w-11 h-11' : 'w-9 h-9';
-  const svgDims =
-    size === 'sm' ? 'w-5 h-5' : size === 'lg' ? 'w-7 h-7' : 'w-6 h-6';
+  const dimClass =
+    size === 'sm'
+      ? 'w-5 h-5 rounded-md'
+      : size === 'lg'
+        ? 'w-11 h-11 rounded-2xl'
+        : 'w-9 h-9 rounded-xl';
 
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-xl bg-white dark:bg-[#141518] border border-black/12 dark:border-white/15 shadow-xs shrink-0 ${containerDims} ${className}`}
+      className={`${dimClass} inline-flex items-center justify-center shrink-0 overflow-hidden shadow-xs ${className}`}
       aria-hidden="true"
     >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className={svgDims}
-      >
-        <path
-          d="M2 6.2V18c0 1.1.9 2 2 2h2V9.8l6 4.5 6-4.5V20h2c1.1 0 2-.9 2-2V6.2c0-1.8-2.1-2.8-3.5-1.7L12 10 5.5 4.5C4.1 3.4 2 4.4 2 6.2Z"
-          fill="#EA4335"
-        />
-        <path d="M2 6.2V18c0 1.1.9 2 2 2h2V9.8L2 6.2Z" fill="#4285F4" />
-        <path d="M22 6.2V18c0 1.1-.9 2-2 2h-2V9.8l4-3.6Z" fill="#34A853" />
-        <path
-          d="M18 9.8V4.8l-6 4.5-6-4.5v5l6 4.5 6-4.5Z"
-          fill="#FBBC05"
-        />
+      <svg viewBox="0 0 48 48" className="w-full h-full block" fill="none">
+        <rect width="48" height="48" rx="10" fill="#FFFFFF" />
+        <path d="M6 12.5V36c0 2.2 1.8 4 4 4h4V19.8l-8-6V12.5Z" fill="#4285F4" />
+        <path d="M34 40h4c2.2 0 4-1.8 4-4V12.5l-8 7.3V40Z" fill="#34A853" />
+        <path d="M34 11.2V21l8-6v-3.2c0-3.3-3.8-5.2-6.4-3.2L34 11.2Z" fill="#FBBC05" />
+        <path d="M14 21v-9.8L24 18.7l10-7.5V21L24 28.5 14 21Z" fill="#EA4335" />
+        <path d="M6 11.8v3.2l8 6v-9.8l-1.6-1.2C9.8 8 6 9.9 6 13.2v-1.4Z" fill="#C5221F" />
       </svg>
     </span>
   );
 };
 
 /**
- * Standalone Original-Brand-Color Instagram Gradient Icon for Referral & Partner CTAs
+ * 5. OFFICIAL INSTAGRAM GRADIENT ICON
  */
 export const InstagramBrandIcon: React.FC<{
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }> = ({ size = 'md', className = '' }) => {
+  const uid = React.useId().replace(/:/g, '');
   const dim =
-    size === 'sm' ? 'w-5 h-5' : size === 'lg' ? 'w-7 h-7' : 'w-6 h-6';
+    size === 'sm'
+      ? 'w-5 h-5 rounded-md'
+      : size === 'lg'
+        ? 'w-11 h-11 rounded-2xl'
+        : 'w-9 h-9 rounded-xl';
+
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={`${className || dim} block p-0 m-0 shrink-0 rounded-[5px] overflow-hidden`}
+    <span
+      className={`${dim} inline-flex items-center justify-center shrink-0 overflow-hidden shadow-sm ${className}`}
       aria-hidden="true"
     >
-      <defs>
-        <linearGradient id="igCtaGrad" x1="0" y1="24" x2="24" y2="0" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#F58529" />
-          <stop offset="50%" stopColor="#DD2A7B" />
-          <stop offset="100%" stopColor="#8134AF" />
-        </linearGradient>
-      </defs>
-      <rect x="0" y="0" width="24" height="24" fill="url(#igCtaGrad)" />
-      <rect x="4.5" y="4.5" width="15" height="15" rx="4.2" stroke="#FFFFFF" strokeWidth="1.9" />
-      <circle cx="12" cy="12" r="3.6" stroke="#FFFFFF" strokeWidth="1.9" />
-      <circle cx="16.4" cy="7.6" r="1.15" fill="#FFFFFF" />
-    </svg>
+      <svg viewBox="0 0 36 36" className="w-full h-full block" fill="none">
+        <defs>
+          <radialGradient id={`ig-grad-${uid}`} cx="30%" cy="107%" r="150%">
+            <stop offset="0%" stopColor="#FDF497" />
+            <stop offset="5%" stopColor="#FDF497" />
+            <stop offset="45%" stopColor="#FD5949" />
+            <stop offset="60%" stopColor="#D6249F" />
+            <stop offset="90%" stopColor="#285AEB" />
+          </radialGradient>
+        </defs>
+        <rect width="36" height="36" rx="8" fill={`url(#ig-grad-${uid})`} />
+        <rect
+          x="6.5"
+          y="6.5"
+          width="23"
+          height="23"
+          rx="6.2"
+          stroke="#FFFFFF"
+          strokeWidth="2.4"
+        />
+        <circle
+          cx="18"
+          cy="18"
+          r="5.3"
+          stroke="#FFFFFF"
+          strokeWidth="2.4"
+        />
+        <circle cx="24.4" cy="11.6" r="1.5" fill="#FFFFFF" />
+      </svg>
+    </span>
   );
 };
 
 /**
- * Individual Social Brand SVG App Icons in Official Brand Colors with ZERO outer margin.
- * Strictly the 5 Official Platforms: GitHub, LinkedIn, Instagram, Telegram, X (Twitter)
- * Each SVG fills the entire 24x24 viewBox (0,0 to 24,24) edge-to-edge with zero margin outside the logo.
+ * 6. OFFICIAL VERIFIED 5-ICON SOCIAL BAR FOR FOOTER & CONTACT
+ * Edge-to-edge full-bleed icons with zero outer margins inside each squircle:
+ * 1) LinkedIn (#0A66C2 -> https://www.linkedin.com/in/skyline-digital-agency-678585450)
+ * 2) GitHub (#181717 -> https://github.com/agencyskylinedigital-create)
+ * 3) Instagram (Original Gradient -> https://www.instagram.com/sky_line_digital)
+ * 4) Telegram (#26A5E4 -> https://t.me/+918959144686)
+ * 5) X (#000000 -> https://x.com/skylinedigital)
  */
-export const SocialPlatformSvg: React.FC<{
-  id: 'github' | 'linkedin' | 'instagram' | 'telegram' | 'x';
-  className?: string;
-}> = ({ id, className = 'w-full h-full block' }) => {
-  switch (id) {
-    case 'github':
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={`${className} block p-0 m-0`} aria-hidden="true">
-          <rect x="0" y="0" width="24" height="24" fill="#181717" />
+export const SocialIconBar: React.FC<{
+  size?: 'sm' | 'md';
+  showLabels?: boolean;
+}> = ({ size = 'md', showLabels = false }) => {
+  const uid = React.useId().replace(/:/g, '');
+  const iconBox =
+    size === 'sm' ? 'w-9 h-9 rounded-xl' : 'w-10 h-10 rounded-xl';
+
+  const channels = [
+    {
+      id: 'linkedin',
+      label: 'LinkedIn',
+      href: SKYLINE_LINKEDIN_URL,
+      external: true,
+      icon: (
+        <svg viewBox="0 0 36 36" className="w-full h-full block" fill="none">
+          <rect width="36" height="36" fill="#0A66C2" />
+          <path
+            d="M11.2 14.8H7.4V27H11.2V14.8ZM9.3 13.1C10.5 13.1 11.5 12.1 11.5 10.9C11.5 9.7 10.5 8.7 9.3 8.7C8.1 8.7 7.1 9.7 7.1 10.9C7.1 12.1 8.1 13.1 9.3 13.1ZM28.6 27H24.8V21.1C24.8 19.7 24.8 17.9 22.8 17.9C20.8 17.9 20.5 19.4 20.5 21V27H16.7V14.8H20.3V16.5H20.4C20.9 15.5 22.2 14.5 24 14.5C27.8 14.5 28.6 17 28.6 20.3V27Z"
+            fill="#FFFFFF"
+          />
+        </svg>
+      ),
+    },
+    {
+      id: 'github',
+      label: 'GitHub',
+      href: SKYLINE_GITHUB_URL,
+      external: true,
+      icon: (
+        <svg viewBox="0 0 36 36" className="w-full h-full block" fill="none">
+          <rect width="36" height="36" fill="#181717" />
           <path
             fillRule="evenodd"
             clipRule="evenodd"
-            d="M12 3.3C7.03 3.3 3 7.33 3 12.3C3 16.28 5.58 19.65 9.16 20.84C9.61 20.92 9.77 20.64 9.77 20.4C9.77 20.18 9.76 19.47 9.76 18.7C7.5 19.12 6.92 18.15 6.74 17.63C6.64 17.37 6.2 16.56 5.82 16.34C5.5 16.17 5.06 15.75 5.81 15.74C6.51 15.73 7.02 16.4 7.19 16.66C8 18.02 9.29 17.64 9.81 17.4C9.89 16.81 10.12 16.42 10.38 16.19C8.39 15.96 6.3 15.19 6.3 11.75C6.3 10.77 6.65 9.96 7.22 9.33C7.13 9.1 6.82 8.17 7.31 6.92C7.31 6.92 8.07 6.68 9.79 7.85C10.5 7.65 11.26 7.55 12.02 7.55C12.78 7.55 13.54 7.65 14.26 7.85C15.98 6.67 16.73 6.92 16.73 6.92C17.23 8.17 16.91 9.1 16.82 9.33C17.4 9.96 17.74 10.76 17.74 11.75C17.74 15.2 15.64 15.96 13.65 16.19C13.97 16.47 14.25 17.01 14.25 17.85C14.25 19.05 14.24 20.02 14.24 20.4C14.24 20.64 14.4 20.93 14.86 20.84C18.43 19.65 21 16.28 21 12.3C21 7.33 16.97 3.3 12 3.3Z"
+            d="M18 5.6C11.15 5.6 5.6 11.15 5.6 18C5.6 23.49 9.15 28.13 14.08 29.77C14.7 29.88 14.93 29.5 14.93 29.17C14.93 28.88 14.92 28.1 14.91 27.06C11.46 27.81 10.73 25.4 10.73 25.4C10.17 23.97 9.35 23.59 9.35 23.59C8.23 22.82 9.44 22.84 9.44 22.84C10.68 22.93 11.34 24.12 11.34 24.12C12.44 26.01 14.24 25.46 14.95 25.15C15.06 24.35 15.38 23.8 15.74 23.49C12.98 23.18 10.09 22.11 10.09 17.36C10.09 16 10.57 14.9 11.37 14.03C11.24 13.72 10.81 12.46 11.49 10.75C11.49 10.75 12.53 10.42 14.9 12.02C15.89 11.75 16.95 11.61 18 11.6C19.05 11.61 20.11 11.75 21.1 12.02C23.47 10.42 24.51 10.75 24.51 10.75C25.19 12.46 24.76 13.72 24.63 14.03C25.43 14.9 25.91 16 25.91 17.36C25.91 22.12 23.01 23.17 20.25 23.48C20.7 23.87 21.09 24.63 21.09 25.8C21.09 27.47 21.08 28.76 21.08 29.17C21.08 29.5 21.3 29.89 21.93 29.77C26.85 28.13 30.4 23.48 30.4 18C30.4 11.15 24.85 5.6 18 5.6Z"
             fill="#FFFFFF"
           />
         </svg>
-      );
-    case 'linkedin':
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={`${className} block p-0 m-0`} aria-hidden="true">
-          <rect x="0" y="0" width="24" height="24" fill="#0A66C2" />
-          <path
-            d="M5.8 9.6H8.7V18.6H5.8V9.6ZM7.25 5C8.19 5 8.95 5.76 8.95 6.7C8.95 7.64 8.19 8.4 7.25 8.4C6.31 8.4 5.55 7.64 5.55 6.7C5.55 5.76 6.31 5 7.25 5ZM10.5 9.6H13.3V10.83C13.69 10.09 14.65 9.35 16.06 9.35C19 9.35 19.55 11.29 19.55 13.8V18.6H16.65V14.35C16.65 13.34 16.63 12.04 15.24 12.04C13.83 12.04 13.62 13.14 13.62 14.28V18.6H10.5V9.6Z"
-            fill="#FFFFFF"
-          />
-        </svg>
-      );
-    case 'instagram':
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={`${className} block p-0 m-0`} aria-hidden="true">
+      ),
+    },
+    {
+      id: 'instagram',
+      label: 'Instagram',
+      href: SKYLINE_INSTAGRAM_URL,
+      external: true,
+      icon: (
+        <svg viewBox="0 0 36 36" className="w-full h-full block" fill="none">
           <defs>
-            <linearGradient id="igSocialGrad" x1="0" y1="24" x2="24" y2="0" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#F58529" />
-              <stop offset="50%" stopColor="#DD2A7B" />
-              <stop offset="100%" stopColor="#8134AF" />
-            </linearGradient>
+            <radialGradient id={`ig-bar-${uid}`} cx="30%" cy="107%" r="150%">
+              <stop offset="0%" stopColor="#FDF497" />
+              <stop offset="5%" stopColor="#FDF497" />
+              <stop offset="45%" stopColor="#FD5949" />
+              <stop offset="60%" stopColor="#D6249F" />
+              <stop offset="90%" stopColor="#285AEB" />
+            </radialGradient>
           </defs>
-          <rect x="0" y="0" width="24" height="24" fill="url(#igSocialGrad)" />
-          <rect x="4.5" y="4.5" width="15" height="15" rx="4.2" stroke="#FFFFFF" strokeWidth="1.95" />
-          <circle cx="12" cy="12" r="3.6" stroke="#FFFFFF" strokeWidth="1.95" />
-          <circle cx="16.4" cy="7.6" r="1.2" fill="#FFFFFF" />
+          <rect width="36" height="36" fill={`url(#ig-bar-${uid})`} />
+          <rect x="7" y="7" width="22" height="22" rx="6" stroke="#FFFFFF" strokeWidth="2.4" />
+          <circle cx="18" cy="18" r="5.2" stroke="#FFFFFF" strokeWidth="2.4" />
+          <circle cx="24.2" cy="11.8" r="1.5" fill="#FFFFFF" />
         </svg>
-      );
-    case 'telegram':
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={`${className} block p-0 m-0`} aria-hidden="true">
-          <rect x="0" y="0" width="24" height="24" fill="#26A5E4" />
+      ),
+    },
+    {
+      id: 'telegram',
+      label: 'Telegram',
+      href: 'https://t.me/+918959144686',
+      external: true,
+      icon: (
+        <svg viewBox="0 0 36 36" className="w-full h-full block" fill="none">
+          <rect width="36" height="36" fill="#26A5E4" />
           <path
-            d="M18.65 6.4L5.15 11.6C4.23 11.97 4.24 12.48 4.99 12.71L8.45 13.79L16.46 8.74C16.84 8.51 17.19 8.64 16.9 8.89L10.42 14.74H10.41L10.42 14.75L10.18 18.3C10.53 18.3 10.69 18.14 10.88 17.95L12.58 16.3L16.11 18.91C16.76 19.27 17.23 19.08 17.39 18.31L19.7 7.42C19.94 6.48 19.34 6.05 18.65 6.4Z"
+            d="M27.4 10.3L23.9 26.8C23.6 28 22.9 28.3 21.9 27.7L16.4 23.7L13.7 26.3C13.4 26.6 13.2 26.8 12.6 26.8L13 21.2L23.2 12C23.6 11.6 23.1 11.4 22.5 11.8L9.9 19.7L4.5 18C3.3 17.6 3.3 16.8 4.7 16.2L26 8C27 7.6 27.8 8.2 27.4 10.3Z"
             fill="#FFFFFF"
           />
         </svg>
-      );
-    case 'x':
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={`${className} block p-0 m-0`} aria-hidden="true">
-          <rect x="0" y="0" width="24" height="24" fill="#000000" />
+      ),
+    },
+    {
+      id: 'x',
+      label: 'X',
+      href: 'https://x.com/skylinedigital',
+      external: true,
+      icon: (
+        <svg viewBox="0 0 36 36" className="w-full h-full block" fill="none">
+          <rect width="36" height="36" fill="#000000" />
           <path
-            d="M13.52 10.77L18.84 4.59H17.58L12.96 9.95L9.27 4.59H5.02L10.6 12.71L5.02 19.19H6.28L11.16 13.52L15.05 19.19H19.3L13.52 10.77ZM11.79 12.78L11.23 11.97L6.73 5.54H8.67L12.3 10.72L12.86 11.53L17.58 18.28H15.64L11.79 12.78Z"
+            d="M20.2 16.2L28.1 7H26.2L19.4 14.9L13.9 7H7.6L15.9 19.1L7.6 28.7H9.5L16.7 20.3L22.5 28.7H28.8L20.2 16.2ZM17.6 19.2L16.8 18L10.2 8.5H13.1L18.5 16.3L19.3 17.5L26.2 27.3H23.3L17.6 19.2Z"
             fill="#FFFFFF"
           />
         </svg>
-      );
-  }
-};
-
-/**
- * Social Media Brand Icon Bar (Strictly 5 Platforms in Original Brand Colors — Zero outer margin outside logo)
- * GitHub, LinkedIn, Instagram, Telegram, X (Twitter)
- */
-export const SocialIconBar: React.FC<{
-  className?: string;
-  size?: 'sm' | 'md';
-}> = ({ className = '', size = 'md' }) => {
-  const btnDim = size === 'sm' ? 'w-9 h-9' : 'w-10 h-10';
+      ),
+    },
+  ];
 
   return (
-    <div className={`inline-flex flex-wrap items-center gap-2.5 ${className}`}>
-      {SKYLINE_SOCIAL_LINKS.map((item) => (
+    <div className="flex flex-wrap items-center gap-2.5">
+      {channels.map((item) => (
         <a
           key={item.id}
-          href={SKYLINE_INSTAGRAM_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Follow SkyLine Digital Agency on ${item.label}`}
-          title={item.label}
-          className={`${btnDim} rounded-xl overflow-hidden p-0 m-0 border-0 inline-flex items-center justify-center shrink-0 hover:scale-105 hover:shadow-md transition-all`}
+          href={item.href}
+          target={item.external ? '_blank' : undefined}
+          rel={item.external ? 'noopener noreferrer' : undefined}
+          aria-label={`SkyLine Digital Agency on ${item.label}`}
+          title={`SkyLine Digital Agency • ${item.label}`}
+          className={
+            showLabels
+              ? 'inline-flex items-center gap-2 px-3 py-1.5 rounded-xl surface-elevated border border-[var(--border-hairline)] hover:border-[var(--border-strong)] transition-all text-xs font-semibold text-[var(--text-primary)]'
+              : `${iconBox} p-0 inline-flex items-center justify-center overflow-hidden shadow-sm hover:-translate-y-0.5 hover:scale-105 transition-all duration-200`
+          }
         >
-          <SocialPlatformSvg id={item.id} className="w-full h-full block" />
+          <span className={showLabels ? 'w-5 h-5 rounded-md overflow-hidden shrink-0 inline-flex' : 'w-full h-full block'}>
+            {item.icon}
+          </span>
+          {showLabels && <span>{item.label}</span>}
         </a>
       ))}
     </div>
@@ -495,8 +335,7 @@ export const SocialIconBar: React.FC<{
 };
 
 /**
- * Full-Size Original-Brand-Color Vector Icons for the Tech Stack Marquee & Service Cards.
- * Zero emojis, zero grey monochrome placeholders — every technology renders in its authentic brand color.
+ * 7. TECH STACK BRAND ICON FOR MVP-STACK-2026 & CORE ENGINEERING TICKER
  */
 export const TechStackBrandIcon: React.FC<{
   name: string;
@@ -504,287 +343,409 @@ export const TechStackBrandIcon: React.FC<{
 }> = ({ name, className = 'w-4 h-4' }) => {
   const n = name.toLowerCase();
 
-  if (n.includes('whatsapp')) {
-    return <WhatsAppLogoIcon className={`${className} text-[#25D366]`} />;
-  }
-
-  if (n.includes('next.js') || n.includes('nextjs')) {
+  if (n.includes('next')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <circle cx="12" cy="12" r="10" fill="#09090B" stroke="#E4E4E7" strokeWidth="1.4" />
-        <path d="M8.5 16V8L16.5 18.2" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
-        <path d="M15.5 8V13" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" fill="#09090B" stroke="#E4E4E7" strokeWidth="1.5" />
+        <path d="M8.5 16V8L16.5 17.5" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M15.5 8V13" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     );
   }
-
   if (n.includes('react')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <circle cx="12" cy="12" r="2.1" fill="#61DAFB" />
-        <ellipse cx="12" cy="12" rx="9.5" ry="3.8" stroke="#61DAFB" strokeWidth="1.6" />
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="2.2" fill="#61DAFB" />
+        <ellipse cx="12" cy="12" rx="9.5" ry="3.8" stroke="#61DAFB" strokeWidth="1.5" />
         <ellipse
           cx="12"
           cy="12"
           rx="9.5"
           ry="3.8"
-          transform="rotate(60 12 12)"
           stroke="#61DAFB"
-          strokeWidth="1.6"
+          strokeWidth="1.5"
+          transform="rotate(60 12 12)"
         />
         <ellipse
           cx="12"
           cy="12"
           rx="9.5"
           ry="3.8"
-          transform="rotate(120 12 12)"
           stroke="#61DAFB"
-          strokeWidth="1.6"
+          strokeWidth="1.5"
+          transform="rotate(120 12 12)"
         />
       </svg>
     );
   }
-
   if (n.includes('typescript')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
         <rect x="2" y="2" width="20" height="20" rx="4" fill="#3178C6" />
         <path
-          d="M7 10H12.5M9.75 10V17.5M14.2 16.7C14.7 17.2 15.6 17.5 16.5 17.5C17.8 17.5 18.6 16.8 18.6 15.8C18.6 14.9 18 14.4 16.7 13.9C15.5 13.4 14.8 12.9 14.8 11.9C14.8 10.8 15.7 10 17 10C17.8 10 18.5 10.2 19 10.6"
+          d="M7 11H12M9.5 11V17.5M14 16.5C14.6 17.1 15.5 17.4 16.5 17.4C17.8 17.4 18.6 16.7 18.6 15.7C18.6 14.7 17.9 14.3 16.4 13.8C15 13.3 14.3 12.8 14.3 11.8C14.3 10.9 15.1 10.2 16.4 10.2C17.3 10.2 18 10.5 18.5 10.9"
           stroke="#FFFFFF"
-          strokeWidth="1.85"
+          strokeWidth="1.7"
           strokeLinecap="round"
         />
       </svg>
     );
   }
-
-  if (n.includes('java')) {
+  if (n.includes('java') && !n.includes('javascript')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
         <path
-          d="M9.5 17.5C7 18.2 14.2 19.3 16.8 17.5M8.5 14.8C6.8 15.5 13.5 16.3 16.2 14.8"
-          stroke="#5382A1"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        <path
-          d="M17.2 14.2C18.8 14.2 19.8 15.2 18.2 16.5"
-          stroke="#5382A1"
+          d="M9 17.5C9 17.5 7 18.5 11 19C14.5 19.4 17 18.4 17 17.4M10.5 13C8.5 11.2 12.5 9.5 12.5 7C12.5 5.2 10.5 4 10.5 4C10.5 4 14.5 5 13.5 8C12.7 10.2 10 11.2 12 13M13.5 12.5C14.5 11 16 10 15 7.5"
+          stroke="#EA4335"
           strokeWidth="1.7"
           strokeLinecap="round"
         />
         <path
-          d="M11.5 4.2C13.2 6.2 9.4 7.8 11.6 10.5C13.5 8.5 15.2 7.2 13.6 5.2"
-          stroke="#F89820"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M6.5 19.8C10 21 15.5 20.8 18.5 19.4"
-          stroke="#E76F00"
-          strokeWidth="1.8"
-          strokeLinecap="round"
+          d="M6.5 15H16.5C18 15 19 15.8 19 16.8C19 17.8 17.8 18.5 16.2 18.5H7.2C5.8 18.5 5 17.7 5 16.7C5 15.8 5.6 15 6.5 15Z"
+          stroke="#3178C6"
+          strokeWidth="1.6"
         />
       </svg>
     );
   }
-
   if (n.includes('spring')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <polygon
-          points="12,2 20.5,7 20.5,17 12,22 3.5,17 3.5,7"
-          fill="#6DB33F"
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <path
+          d="M19.5 4.5C15 3.5 8 4.5 5 9.5C2.5 13.7 4.5 19 9.5 20.5C14.8 22 20 18.5 20.5 12.5C20.8 9 19.5 4.5 19.5 4.5Z"
+          fill="#34A853"
         />
         <path
-          d="M8.5 15.5C11.5 16.5 15.8 14.2 16.5 9C13 9.5 9.2 11.5 8.5 15.5Z"
+          d="M8.5 15.5C11.5 16 15 13.8 16.5 9.5"
+          stroke="#FFFFFF"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+        <circle cx="7.5" cy="15.5" r="1.2" fill="#FFFFFF" />
+      </svg>
+    );
+  }
+  if (n.includes('python')) {
+    return (
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <path
+          d="M12 3C8.5 3 8 4.5 8 6.5V8.5H12.5V9.5H6.5C4.5 9.5 3 10.8 3 13.5C3 16.2 4.5 17.5 6.5 17.5H8V15.2C8 13.5 9.2 12.2 11 12.2H15C16.2 12.2 17 11.3 17 10V6.5C17 4.2 15.5 3 12 3Z"
+          fill="#3776AB"
+        />
+        <path
+          d="M12 21C15.5 21 16 19.5 16 17.5V15.5H11.5V14.5H17.5C19.5 14.5 21 13.2 21 10.5C21 7.8 19.5 6.5 17.5 6.5H16V8.8C16 10.5 14.8 11.8 13 11.8H9C7.8 11.8 7 12.7 7 14V17.5C7 19.8 8.5 21 12 21Z"
+          fill="#FBBC05"
+        />
+      </svg>
+    );
+  }
+  if (n.includes('node')) {
+    return (
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <polygon
+          points="12,2.5 20.5,7.3 20.5,16.7 12,21.5 3.5,16.7 3.5,7.3"
+          fill="#339933"
+        />
+        <path
+          d="M10 9.5V14.5L14.5 12L10 9.5Z"
           fill="#FFFFFF"
         />
       </svg>
     );
   }
-
-  if (n.includes('kafka')) {
+  if (n.includes('postgres')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <circle cx="9.5" cy="12" r="2.8" stroke="#00B4D8" strokeWidth="2" />
-        <circle cx="16.5" cy="6.5" r="2.1" fill="#00B4D8" />
-        <circle cx="16.5" cy="17.5" r="2.1" fill="#00B4D8" />
-        <circle cx="9.5" cy="4.5" r="1.8" fill="#38BDF8" />
-        <circle cx="9.5" cy="19.5" r="1.8" fill="#38BDF8" />
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <ellipse cx="12" cy="6.5" rx="7" ry="3.2" fill="#336791" />
         <path
-          d="M9.5 6.3V9.2M9.5 14.8V17.7M11.8 10.4L14.8 7.8M11.8 13.6L14.8 16.2"
-          stroke="#00B4D8"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (n.includes('python') || n.includes('fastapi')) {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <path
-          d="M11.9 3C8.5 3 8.2 4.5 8.2 4.5V7H12.2V8H6.5C6.5 8 4 7.7 4 11.8C4 15.9 6.2 15.7 6.2 15.7H8V13.4C8 13.4 7.9 11.2 10.2 11.2H14.5C14.5 11.2 16.5 11.2 16.5 9.2V5.2C16.5 5.2 16.8 3 11.9 3Z"
-          fill="#3776AB"
-        />
-        <path
-          d="M12.1 21C15.5 21 15.8 19.5 15.8 19.5V17H11.8V16H17.5C17.5 16 20 16.3 20 12.2C20 8.1 17.8 8.3 17.8 8.3H16V10.6C16 10.6 16.1 12.8 13.8 12.8H9.5C9.5 12.8 7.5 12.8 7.5 14.8V18.8C7.5 18.8 7.2 21 12.1 21Z"
-          fill="#FFD43B"
-        />
-      </svg>
-    );
-  }
-
-  if (n.includes('node')) {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <polygon
-          points="12,2 20.5,7 20.5,17 12,22 3.5,17 3.5,7"
-          fill="#339933"
-        />
-        <path
-          d="M9.5 15V9L14.5 15V9"
-          stroke="#FFFFFF"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
-  if (n.includes('postgres') || n.includes('mysql') || n.includes('sql') || n.includes('redis')) {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <ellipse cx="12" cy="6" rx="7.5" ry="3.2" fill="#336791" />
-        <path
-          d="M4.5 6V12C4.5 13.8 7.86 15.2 12 15.2C16.14 15.2 19.5 13.8 19.5 12V6"
+          d="M5 6.5V12C5 13.8 8.1 15.2 12 15.2C15.9 15.2 19 13.8 19 12V6.5"
           stroke="#336791"
-          strokeWidth="1.9"
+          strokeWidth="1.8"
         />
         <path
-          d="M4.5 12V18C4.5 19.8 7.86 21.2 12 21.2C16.14 21.2 19.5 19.8 19.5 18V12"
-          stroke="#5B9BD5"
-          strokeWidth="1.9"
+          d="M5 12V17.5C5 19.3 8.1 20.7 12 20.7C15.9 20.7 19 19.3 19 17.5V12"
+          stroke="#336791"
+          strokeWidth="1.8"
         />
       </svg>
     );
   }
-
+  if (n.includes('supabase')) {
+    return (
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <path d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" fill="#10B981" />
+      </svg>
+    );
+  }
   if (n.includes('docker')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <rect x="6" y="9" width="3" height="2.6" rx="0.4" fill="#2496ED" />
-        <rect x="9.6" y="9" width="3" height="2.6" rx="0.4" fill="#2496ED" />
-        <rect x="13.2" y="9" width="3" height="2.6" rx="0.4" fill="#2496ED" />
-        <rect x="9.6" y="5.8" width="3" height="2.6" rx="0.4" fill="#2496ED" />
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <rect x="4" y="10" width="3" height="2.6" rx="0.4" fill="#2496ED" />
+        <rect x="7.5" y="10" width="3" height="2.6" rx="0.4" fill="#2496ED" />
+        <rect x="11" y="10" width="3" height="2.6" rx="0.4" fill="#2496ED" />
+        <rect x="7.5" y="7" width="3" height="2.6" rx="0.4" fill="#2496ED" />
+        <rect x="11" y="7" width="3" height="2.6" rx="0.4" fill="#2496ED" />
         <path
-          d="M3 13.2H18.5C19.5 12.2 20.8 12.1 21.5 12.6C21 14.2 19.8 15 18.4 15.2C17.4 18.2 14.2 19.5 10.2 19.5C5.8 19.5 3.4 17.2 3 13.2Z"
+          d="M2.5 13.5H17.5C18.8 13.5 20.2 12.6 21 11.4C21.5 12.6 21 14.5 19.8 15.6C18.2 17.2 15.2 18.5 11 18.5C6.2 18.5 3.2 16.6 2.5 13.5Z"
           fill="#2496ED"
         />
       </svg>
     );
   }
-
-  if (n.includes('aws') || n.includes('oracle') || n.includes('cloud')) {
+  if (n.includes('kafka')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <circle cx="8" cy="12" r="2.3" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="16.5" cy="6" r="2" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="16.5" cy="18" r="2" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="18" cy="12" r="1.8" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M10 10.8L14.8 7.2M10 13.2L14.8 16.8M10.3 12H16.2" stroke="currentColor" strokeWidth="1.6" />
+      </svg>
+    );
+  }
+  if (n.includes('aws')) {
+    return (
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
         <path
-          d="M6.5 15.5H17.5C19.4 15.5 21 13.9 21 12C21 10.2 19.6 8.7 17.8 8.5C17.1 5.9 14.8 4 12 4C8.9 4 6.4 6.3 6.1 9.3C4.3 9.7 3 11.3 3 13.2C3 14.5 4.5 15.5 6.5 15.5Z"
-          fill="#FF9900"
-        />
-        <path
-          d="M6.5 18.2C10.2 20.4 14.8 20.4 18.2 18.2"
+          d="M4.5 15.5C8.5 18.5 15.5 18.5 19.5 15.5"
           stroke="#FF9900"
           strokeWidth="2"
           strokeLinecap="round"
         />
+        <path
+          d="M17.5 14.5L20 15.2L19 17.6"
+          stroke="#FF9900"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M6.5 12L8.2 7.5L9.9 12M7 10.8H9.4M11.5 7.5L12.6 12L13.8 8.8L15 12L16.1 7.5"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     );
   }
-
   if (n.includes('tailwind')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
         <path
-          d="M12 6C9.33 6 7.67 7.33 7 10C8 8.67 9.17 8.17 10.5 8.5C11.26 8.69 11.8 9.24 12.41 9.85C13.4 10.85 14.55 12 17 12C19.67 12 21.33 10.67 22 8C21 9.33 19.83 9.83 18.5 9.5C17.74 9.31 17.2 8.76 16.59 8.15C15.6 7.15 14.45 6 12 6ZM7 12C4.33 12 2.67 13.33 2 16C3 14.67 4.17 14.17 5.5 14.5C6.26 14.69 6.8 15.24 7.41 15.85C8.4 16.85 9.55 18 12 18C14.67 18 16.33 16.67 17 14C16 15.33 14.83 15.83 13.5 15.5C12.74 15.31 12.2 14.76 11.59 14.15C10.6 13.15 9.45 12 7 12Z"
-          fill="#06B6D4"
+          d="M12 6.5C9.3 6.5 7.7 7.8 7 10.5C8 9.2 9.2 8.7 10.5 9C11.3 9.2 11.8 9.8 12.5 10.5C13.5 11.5 14.7 12.5 17 12.5C19.7 12.5 21.3 11.2 22 8.5C21 9.8 19.8 10.3 18.5 10C17.7 9.8 17.2 9.2 16.5 8.5C15.5 7.5 14.3 6.5 12 6.5ZM7 12.5C4.3 12.5 2.7 13.8 2 16.5C3 15.2 4.2 14.7 5.5 15C6.3 15.2 6.8 15.8 7.5 16.5C8.5 17.5 9.7 18.5 12 18.5C14.7 18.5 16.3 17.2 17 14.5C16 15.8 14.8 16.3 13.5 16C12.7 15.8 12.2 15.2 11.5 14.5C10.5 13.5 9.3 12.5 7 12.5Z"
+          fill="#26A5E4"
         />
       </svg>
     );
   }
-
-  if (n.includes('meta') || n.includes('capi')) {
+  if (n.includes('three') || n.includes('webgl')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <path
-          d="M4.2 14.6C4.2 11.1 6.6 8 9.2 8C10.9 8 12.2 9.3 13.7 11.7L14.9 13.6C15.8 15 16.6 15.8 17.6 15.8C19 15.8 19.8 14.6 19.8 13C19.8 10.8 18.2 9 16.6 9C15.5 9 14.5 9.7 13.6 10.9M11.6 13.5C10.4 15.1 9.2 16 7.6 16C5.6 16 4.2 14.6 4.2 14.6Z"
-          stroke="#0668E1"
-          strokeWidth="2.2"
-          strokeLinecap="round"
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <polygon
+          points="5,4 20,8.5 9.5,20"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinejoin="round"
+        />
+        <polygon
+          points="10,7 16,9 11.5,14"
+          stroke="currentColor"
+          strokeWidth="1.4"
           strokeLinejoin="round"
         />
       </svg>
     );
   }
-
-  if (n.includes('google') || n.includes('map') || n.includes('seo') || n.includes('aeo')) {
+  if (n.includes('vercel')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <path
-          d="M12 2C7.86 2 4.5 5.36 4.5 9.5C4.5 14.8 12 22 12 22C12 22 19.5 14.8 19.5 9.5C19.5 5.36 16.14 2 12 2Z"
-          fill="#EA4335"
-        />
-        <circle cx="12" cy="9.5" r="3.4" fill="#FBBC05" />
-        <path d="M12 2C7.86 2 4.5 5.36 4.5 9.5H8.6C8.6 7.62 10.12 6.1 12 6.1V2Z" fill="#4285F4" />
-        <path d="M12 22C12 22 19.5 14.8 19.5 9.5H15.4C15.4 11.38 13.88 12.9 12 12.9V22Z" fill="#34A853" />
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <polygon points="12,4 21,19.5 3,19.5" fill="currentColor" />
       </svg>
     );
   }
-
-  if (n.includes('razorpay') || n.includes('upi')) {
+  if (n.includes('razorpay') || n.includes('upi') || n.includes('dodo')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <polygon points="11,3 5,14 11.5,14 9.5,21 19,10 12.5,10" fill="#3395FF" />
-        <polygon points="14.5,5 12.5,10 19,10" fill="#10B981" />
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+        <path d="M14.5 3L7 13.5H12.5L9.5 21L18.5 9.5H13L14.5 3Z" fill="#0B63F6" />
       </svg>
     );
   }
-
-  if (n.includes('sha-256') || n.includes('zero-trust') || n.includes('rbac') || n.includes('security')) {
+  if (n.includes('whatsapp')) {
+    return <WhatsAppLogoIcon className={className} />;
+  }
+  if (n.includes('cloudflare') || n.includes('turnstile')) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
         <path
-          d="M12 2.5L4.5 5.8V11.4C4.5 16.35 7.7 20.92 12 22C16.3 20.92 19.5 16.35 19.5 11.4V5.8L12 2.5Z"
-          fill="#10B981"
-        />
-        <path
-          d="M9 12.2L11.1 14.3L15.4 10"
-          stroke="#FFFFFF"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          d="M6.5 17.5H17.5C19.7 17.5 21 16 21 14C21 12.2 19.8 10.8 18 10.6C17.4 7.7 14.9 5.5 11.8 5.5C8.5 5.5 5.8 8 5.5 11.2C3.8 11.6 2.5 13.1 2.5 14.9C2.5 16.4 4.2 17.5 6.5 17.5Z"
+          fill="#F59E0B"
         />
       </svg>
     );
   }
-
   return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="4.5" fill="#6366F1" />
-      <path
-        d="M8 15L11 9L14 15M9 13.5H13"
-        stroke="#FFFFFF"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="16.5" cy="8.5" r="1.4" fill="#38BDF8" />
+    <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="#10B981" strokeWidth="2" />
+      <circle cx="12" cy="12" r="3.5" fill="#10B981" />
     </svg>
   );
 };
+
+/**
+ * 8. SKYLINE MONOGRAM (4-Color Geometric Ribbon 'S' SVG Wrapper)
+ */
+export const SkyLineMonogram: React.FC<{ className?: string }> = ({
+  className = 'w-8 h-8',
+}) => (
+  <span className={`inline-flex items-center justify-center shrink-0 select-none ${className}`}>
+    <SkylineLogoSvg className="w-full h-full" />
+  </span>
+);
+
+export interface TechStackOfficialLogoItem {
+  id: string;
+  name: string;
+  category: string;
+  renderSvg: (className?: string) => React.ReactNode;
+}
+
+export const TECH_STACK_OFFICIAL_LOGOS: TechStackOfficialLogoItem[] = [
+  {
+    id: 'nextjs',
+    name: 'Next.js 15',
+    category: 'App Router & SSR',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="nextjs" className={cls} />,
+  },
+  {
+    id: 'react',
+    name: 'React 19',
+    category: 'Interactive UI',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="react" className={cls} />,
+  },
+  {
+    id: 'typescript',
+    name: 'TypeScript',
+    category: 'Strict Type Safety',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="typescript" className={cls} />,
+  },
+  {
+    id: 'java',
+    name: 'Java 21',
+    category: 'Enterprise Core',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="java" className={cls} />,
+  },
+  {
+    id: 'springboot',
+    name: 'Spring Boot 3',
+    category: 'Microservices API',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="springboot" className={cls} />,
+  },
+  {
+    id: 'python',
+    name: 'Python & FastAPI',
+    category: 'AI & Data Engine',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="python" className={cls} />,
+  },
+  {
+    id: 'nodejs',
+    name: 'Node.js',
+    category: 'Event Webhooks',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="nodejs" className={cls} />,
+  },
+  {
+    id: 'postgresql',
+    name: 'PostgreSQL',
+    category: 'Relational ACID DB',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="postgresql" className={cls} />,
+  },
+  {
+    id: 'supabase',
+    name: 'Supabase RLS',
+    category: 'Auth & Realtime',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="supabase" className={cls} />,
+  },
+  {
+    id: 'docker',
+    name: 'Docker',
+    category: 'Container Runtime',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="docker" className={cls} />,
+  },
+  {
+    id: 'kafka',
+    name: 'Apache Kafka',
+    category: 'Event Streaming',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="kafka" className={cls} />,
+  },
+  {
+    id: 'aws',
+    name: 'AWS Cloud',
+    category: 'EC2, S3 & RDS',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="aws" className={cls} />,
+  },
+  {
+    id: 'tailwind',
+    name: 'Tailwind CSS',
+    category: 'Design System',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="tailwind" className={cls} />,
+  },
+  {
+    id: 'threejs',
+    name: 'Three.js WebGL',
+    category: '3D Spatial Engine',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="threejs" className={cls} />,
+  },
+  {
+    id: 'whatsapp',
+    name: 'WhatsApp Cloud API',
+    category: '24/7 Booking Bots',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="whatsapp" className={cls} />,
+  },
+  {
+    id: 'vercel',
+    name: 'Vercel Edge',
+    category: 'Global CDN Deploy',
+    renderSvg: (cls = 'w-4 h-4') => <TechStackBrandIcon name="vercel" className={cls} />,
+  },
+];
+
+export const OfficialTechStackFloatingBar: React.FC = () => {
+  return (
+    <div
+      data-testid="tech-stack-floating-grid"
+      className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 py-2"
+    >
+      {TECH_STACK_OFFICIAL_LOGOS.map((item, idx) => {
+        const floatClass =
+          idx % 2 === 0 ? 'animate-tech-float-a' : 'animate-tech-float-b';
+        return (
+          <div
+            key={item.id}
+            data-testid={`tech-stack-card-${item.id}`}
+            style={{ animationDelay: `${(idx % 8) * 260}ms` }}
+            className={`${floatClass} group p-3 rounded-2xl surface-card border border-[var(--border-hairline)] hover:bg-[#09090B] hover:text-white dark:hover:bg-[#F4F4F5] dark:hover:text-[#09090B] transition-colors duration-200 flex flex-col justify-between gap-2.5 cursor-default shadow-xs`}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="w-7 h-7 rounded-xl bg-[#18181B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] group-hover:bg-white/15 group-hover:text-white dark:group-hover:bg-[#18181B] dark:group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
+                {item.renderSvg('w-4 h-4')}
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#18181B] dark:bg-[#F4F4F5] group-hover:bg-white dark:group-hover:bg-[#09090B]" />
+            </div>
+            <div>
+              <div className="font-display font-bold text-xs leading-tight">
+                {item.name}
+              </div>
+              <div className="font-mono-tech text-[10px] opacity-75 mt-0.5 truncate">
+                {item.category}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+
+
 

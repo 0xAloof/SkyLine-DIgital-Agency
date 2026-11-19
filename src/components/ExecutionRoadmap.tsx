@@ -34,14 +34,16 @@ export const ExecutionRoadmap: React.FC<ExecutionRoadmapProps> = ({
       id="how-we-deliver"
       className={`${
         isDedicatedPage ? 'pt-28 sm:pt-32 pb-20 sm:pb-28' : 'py-20 sm:py-28'
-      } px-4 sm:px-8 lg:px-12 border-b border-[var(--border-hairline)] bg-architectural-grid`}
+      } px-4 sm:px-8 lg:px-12 bg-section-contrast`}
     >
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[var(--text-primary)]" />
+            <div className="inline-flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl heading-icon-blue flex items-center justify-center shrink-0">
+                <Layers className="w-4 h-4 text-white" />
+              </div>
               <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
                 HOW WE DELIVER • 6-STAGE ENGINEERING &amp; GROWTH SYSTEM
               </span>
@@ -102,11 +104,11 @@ export const ExecutionRoadmap: React.FC<ExecutionRoadmapProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2 items-center">
             <div className="lg:col-span-7 space-y-3">
               <div className="inline-flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full badge-platinum font-mono-tech text-[10px] font-bold uppercase tracking-widest">
+                <span className="px-3 py-1 rounded-full bg-[#09090B] text-[#FFFFFF] dark:bg-[#F4F4F5] dark:text-[#09090B] font-mono-tech text-[11px] font-bold tracking-wider">
                   {activeStage.phase}
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full surface-elevated font-mono-tech text-xs font-semibold text-[var(--text-primary)]">
-                  <Clock className="w-3.5 h-3.5" />
+                  <Clock className="w-3.5 h-3.5 text-[#09090B] dark:text-[#F4F4F5]" />
                   <span>{activeStage.duration}</span>
                 </span>
               </div>
@@ -119,34 +121,41 @@ export const ExecutionRoadmap: React.FC<ExecutionRoadmapProps> = ({
             </div>
 
             <div className="lg:col-span-5 p-5 rounded-2xl surface-elevated border border-[var(--border-hairline)] space-y-3">
-              <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-muted)] font-bold flex items-center gap-1.5">
-                <FileCode2 className="w-3.5 h-3.5 text-[var(--text-primary)]" />
-                <span>STAGE DELIVERABLES &amp; VERIFICATION GATE</span>
+              <div className="font-mono-tech text-[10px] uppercase tracking-widest text-[var(--text-primary)] font-bold flex items-center gap-2">
+                <span className="w-6 h-6 rounded-lg bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] inline-flex items-center justify-center shrink-0">
+                  <FileCode2 className="w-3.5 h-3.5" />
+                </span>
+                <span>STEP DELIVERABLES &amp; VERIFICATION GATE</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {activeStage.deliverables.map((del) => (
                   <div
                     key={del}
-                    className="flex items-start gap-2 text-xs text-[var(--text-primary)] font-medium"
+                    className="flex items-start gap-2.5 text-xs text-[var(--text-primary)] font-semibold"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-[var(--text-primary)] shrink-0 mt-0.5" />
+                    <span className="w-5 h-5 rounded-full bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] inline-flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    </span>
                     <span>{del}</span>
                   </div>
                 ))}
               </div>
-              <div className="pt-3 border-t border-[var(--border-hairline)] flex items-center gap-2 text-[11px] font-mono-tech text-[var(--text-primary)] font-semibold">
-                <Shield className="w-4 h-4 text-[var(--text-primary)] shrink-0" />
+              <div className="pt-3 border-t border-[var(--border-hairline)] flex items-center gap-2.5 text-[11px] font-mono-tech text-[var(--text-primary)] font-bold">
+                <span className="w-6 h-6 rounded-lg bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] inline-flex items-center justify-center shrink-0 shadow-xs">
+                  <Shield className="w-3.5 h-3.5" />
+                </span>
                 <span>{activeStage.verificationGate}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* All 6 Stages Full Architectural Grid */}
+        {/* All 6 Steps Full Architectural Grid (Clean Step 1..Step 6 + High-Contrast Dark Icons) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {EXECUTION_ROADMAP.map((item, idx) => (
             <div
               key={item.phase}
+              data-testid={`roadmap-step-card-${idx + 1}`}
               onClick={() => setSelectedStageIndex(idx)}
               className={`surface-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between relative group overflow-hidden cursor-pointer transition-all border ${
                 idx === selectedStageIndex
@@ -155,11 +164,11 @@ export const ExecutionRoadmap: React.FC<ExecutionRoadmapProps> = ({
               }`}
             >
               <div>
-                <div className="flex items-center justify-between mb-6">
-                  <span className="px-3 py-1 rounded-full font-mono-tech text-[10px] font-semibold uppercase tracking-widest badge-platinum">
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-[var(--border-hairline)] font-mono-tech text-xs font-bold tracking-wider">
+                  <span className="px-3 py-1 rounded-full bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] text-[11px] font-extrabold">
                     {item.phase}
                   </span>
-                  <span className="px-3 py-1 rounded-full surface-elevated font-mono-tech text-xs text-[var(--text-primary)] font-semibold">
+                  <span className="text-[var(--text-primary)] font-semibold uppercase">
                     {item.duration}
                   </span>
                 </div>
@@ -176,20 +185,22 @@ export const ExecutionRoadmap: React.FC<ExecutionRoadmapProps> = ({
                   {item.deliverables.map((del) => (
                     <div
                       key={del}
-                      className="flex items-start gap-2.5 text-xs sm:text-sm text-[var(--text-primary)]"
+                      className="flex items-start gap-2.5 text-xs sm:text-sm text-[var(--text-primary)] font-medium"
                     >
-                      <CheckCircle2 className="w-4 h-4 text-[var(--text-secondary)] shrink-0 mt-0.5" />
+                      <span className="w-5 h-5 rounded-full bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] inline-flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      </span>
                       <span>{del}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-[var(--border-hairline)]">
-                <div className="p-3 rounded-xl surface-elevated flex items-center gap-2 text-[11px] font-mono-tech text-[var(--text-primary)]">
-                  <Shield className="w-3.5 h-3.5 text-[var(--text-secondary)] shrink-0" />
-                  <span>{item.verificationGate}</span>
-                </div>
+              <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center gap-2.5 text-[11px] font-mono-tech text-[var(--text-primary)] font-bold">
+                <span className="w-6 h-6 rounded-lg bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] inline-flex items-center justify-center shrink-0 shadow-xs">
+                  <Shield className="w-3.5 h-3.5" />
+                </span>
+                <span>{item.verificationGate}</span>
               </div>
             </div>
           ))}
@@ -218,7 +229,7 @@ export const ExecutionRoadmap: React.FC<ExecutionRoadmapProps> = ({
               key={item.badge}
               className="surface-card rounded-2xl p-6 border border-[var(--border-hairline)] space-y-2"
             >
-              <div className="font-mono-tech text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">
+              <div className="font-mono-tech text-[10px] font-bold uppercase tracking-widest text-[var(--text-primary)]">
                 {item.badge}
               </div>
               <div className="font-display text-base sm:text-lg font-bold text-[var(--text-primary)]">
@@ -231,13 +242,113 @@ export const ExecutionRoadmap: React.FC<ExecutionRoadmapProps> = ({
           ))}
         </div>
 
+        {/* 85-Check Pre-Launch Security & AgentShield Protocol Section — BOLD DARK OBSIDIAN VAULT BOX */}
+        <div
+          id="security-audit-85"
+          data-testid="security-audit-85-dark-box"
+          className="rounded-3xl p-6 sm:p-9 bg-[#09090B] text-[#F4F4F5] border border-[#27272A] shadow-2xl space-y-6"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#27272A] pb-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-lg bg-[#FFFFFF] text-[#09090B] inline-flex items-center justify-center shrink-0">
+                  <Shield className="w-4 h-4 text-[#09090B]" />
+                </span>
+                <span className="font-mono-tech text-[11px] uppercase tracking-widest font-bold text-[#FFFFFF]">
+                  SECURITY-AUDIT-85 &amp; AGENTSHIELD CERTIFIED PROTOCOL
+                </span>
+              </div>
+              <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-[#FFFFFF]">
+                85-Check Pre-Launch Security &amp; AgentShield Hardening.
+              </h3>
+              <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
+                Every web platform, payment checkout, and AI workflow passes our 85-point pre-launch security gate before production deployment.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <a
+                href="https://github.com/agencyskylinedigital-create"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#18181B] border border-[#3F3F46] hover:bg-[#FFFFFF] hover:text-[#09090B] transition-colors text-xs font-semibold text-[#FFFFFF]"
+              >
+                <span>Verify on GitHub ↗</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/skyline-digital-agency-678585450"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#18181B] border border-[#3F3F46] hover:bg-[#FFFFFF] hover:text-[#09090B] transition-colors text-xs font-semibold text-[#FFFFFF]"
+              >
+                <span>Connect on LinkedIn ↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-tech text-[10px] font-bold uppercase tracking-wider text-[#A1A1AA]">
+                  CHECKS 3.1 &amp; 4.5
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#FFFFFF] text-[#09090B] font-mono-tech text-[10px] font-bold">
+                  Zero IDOR
+                </span>
+              </div>
+              <h4 className="font-display text-base font-bold text-[#FFFFFF]">
+                Access Control &amp; DB Isolation
+              </h4>
+              <p className="text-xs text-[#D4D4D8] leading-relaxed">
+                Supabase PostgreSQL Row-Level Security (<code className="font-mono text-[11px] text-[#FFFFFF]">auth.uid() = user_id</code>) &amp; strict server-side IDOR ownership checks on every read, update, and delete mutation.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-tech text-[10px] font-bold uppercase tracking-wider text-[#A1A1AA]">
+                  CHECKS 6.6, 7.1 &amp; 7.2
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#FFFFFF] text-[#09090B] font-mono-tech text-[10px] font-bold">
+                  HMAC Verified
+                </span>
+              </div>
+              <h4 className="font-display text-base font-bold text-[#FFFFFF]">
+                Payment &amp; Webhook Integrity
+              </h4>
+              <p className="text-xs text-[#D4D4D8] leading-relaxed">
+                Server-side price lookup (never trusting client cart totals) paired with Razorpay, Dodo &amp; Stripe HMAC SHA-256 raw-body webhook signature verification and idempotency locks.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono-tech text-[10px] font-bold uppercase tracking-wider text-[#A1A1AA]">
+                  CHECKS 1.1 &amp; 8.1–8.5
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#FFFFFF] text-[#09090B] font-mono-tech text-[10px] font-bold">
+                  AgentShield
+                </span>
+              </div>
+              <h4 className="font-display text-base font-bold text-[#FFFFFF]">
+                AI &amp; AgentShield Protection
+              </h4>
+              <p className="text-xs text-[#D4D4D8] leading-relaxed">
+                OWASP LLM Top 10 prompt-injection guardrails, per-IP rate limiting, token &amp; history caps, tool-scope isolation, and zero hardcoded or client-exposed API secrets.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Bottom Conversion Bar */}
         <div className="surface-card rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 border border-[var(--border-hairline)]">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2">
-              <Rocket className="w-4 h-4 text-[var(--text-primary)]" />
+              <span className="w-6 h-6 rounded-lg bg-[#09090B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] inline-flex items-center justify-center shrink-0">
+                <Rocket className="w-3.5 h-3.5" />
+              </span>
               <span className="font-mono-tech text-[10px] uppercase tracking-widest font-bold text-[var(--text-primary)]">
-                START STAGE 01 TODAY
+                START STEP 1 TODAY
               </span>
             </div>
             <h3 className="font-display text-lg sm:text-xl font-bold text-[var(--text-primary)]">

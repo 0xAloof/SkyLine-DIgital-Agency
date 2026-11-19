@@ -5,6 +5,7 @@
  */
 
 export type GeometrySculptureMode = 'dual-monolith' | 'prism-core' | 'geodesic-sphere';
+export type SculptureMode = GeometrySculptureMode;
 
 export interface PlatinumPaletteTheme {
   isDark: boolean;
@@ -67,27 +68,26 @@ const FORBIDDEN_GOLD_BRONZE_HEXES = new Set([
   0xb8860b,
   0xcd7f32,
   0xdaa520,
-  0xf59e0b,
 ]);
 
 /**
- * Returns the verified Monochromatic Silver / Platinum / Obsidian 3D palette
- * for Light and Dark modes. Guarantees zero golden/bronze tones.
+ * Returns the clean, minimal Monochromatic Platinum, Brushed Silver & Obsidian 3D palette
+ * matching https://skylinedigital.vercel.app/ for both Light and Dark modes.
  */
 export function getMonochromaticPlatinumPalette(isDark: boolean): PlatinumPaletteTheme {
   if (isDark) {
     return {
       isDark: true,
-      prismCoreHex: 0xe4e4e7, // Brushed Platinum Silver (roughness 0.14, metalness 0.92)
-      prismInnerHex: 0x71717a, // Matte Anodized Titanium Core (roughness 0.44, metalness 0.72)
-      prismEmissiveHex: 0x27272a, // Deep Titanium Glow
-      prismEdgeHex: 0xffffff, // Specular White Facet Edge
-      sphereWireframeHex: 0xa1a1aa, // Anodized Silver Lattice
-      sphereVertexNodeHex: 0xf4f4f5, // Pure Platinum Vertex Spheres
-      orbitalRingHex: 0xd4d4d8, // Machined Chrome Ring
+      prismCoreHex: 0xd4d4d8, // Brushed Platinum Outer Prism
+      prismInnerHex: 0x71717a, // Dark Titanium Inner Core
+      prismEmissiveHex: 0x27272a, // Subtle Obsidian Emissive
+      prismEdgeHex: 0xffffff, // Pure White Specular Facet Edge
+      sphereWireframeHex: 0xa1a1aa, // Metallic Silver Geodesic Lattice
+      sphereVertexNodeHex: 0xf4f4f5, // Luminous Platinum Vertex Nodes
+      orbitalRingHex: 0xd4d4d8, // Brushed Silver Orbital Ring
       activeSatelliteHex: 0xffffff, // Pure White Active Beacon
-      inactiveSatelliteHex: 0xa1a1aa, // Muted Silver Satellite
-      keyLightHex: 0xf8fafc,
+      inactiveSatelliteHex: 0x71717a, // Muted Silver Satellite
+      keyLightHex: 0xffffff,
       hemiSkyHex: 0xe4e4e7,
       hemiGroundHex: 0x18181b,
       rimLightHex: 0xd4d4d8,
@@ -97,20 +97,20 @@ export function getMonochromaticPlatinumPalette(isDark: boolean): PlatinumPalett
 
   return {
     isDark: false,
-    prismCoreHex: 0x27272a, // Sculpted Obsidian Titanium Core (roughness 0.15, metalness 0.90)
-    prismInnerHex: 0x71717a, // Brushed Satin Steel Inner Core (roughness 0.45, metalness 0.74)
-    prismEmissiveHex: 0x18181b, // Subtle Charcoal Depth
-    prismEdgeHex: 0xf4f4f5, // Crisp Platinum Edge Bevel
-    sphereWireframeHex: 0x52525b, // Precision Zinc Geodesic Lattice
-    sphereVertexNodeHex: 0x18181b, // Dark Titanium Vertex Spheres
-    orbitalRingHex: 0x71717a, // Brushed Steel Orbital Ring
+    prismCoreHex: 0x27272a, // Deep Matte Obsidian Outer Prism in Light Mode
+    prismInnerHex: 0x52525b, // Brushed Gunmetal Inner Core
+    prismEmissiveHex: 0x18181b, // Charcoal Depth
+    prismEdgeHex: 0x09090b, // Crisp Obsidian Facet Bevel
+    sphereWireframeHex: 0x52525b, // Architectural Gunmetal Geodesic Lattice
+    sphereVertexNodeHex: 0x18181b, // Obsidian Vertex Spheres
+    orbitalRingHex: 0x3f3f46, // Charcoal Orbital Ring
     activeSatelliteHex: 0x09090b, // High-Contrast Obsidian Active Beacon
-    inactiveSatelliteHex: 0x71717a, // Muted Steel Satellite
+    inactiveSatelliteHex: 0x71717a, // Silver Satellite
     keyLightHex: 0xffffff,
-    hemiSkyHex: 0xf8f8f6,
-    hemiGroundHex: 0x52525b,
-    rimLightHex: 0xe4e4e7,
-    fogHex: 0xf0efe9,
+    hemiSkyHex: 0xf4f4f5,
+    hemiGroundHex: 0x71717a,
+    rimLightHex: 0xa1a1aa,
+    fogHex: 0xf4f4f5,
   };
 }
 

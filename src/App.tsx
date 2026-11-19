@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { PhoneCall } from 'lucide-react';
 import { AdminDashboard } from './admin/AdminDashboard';
 import {
   fetchPublicCms,
@@ -13,6 +14,8 @@ import { ExecutionRoadmap } from './components/ExecutionRoadmap';
 import { ClientProofAndReferral } from './components/ClientProofAndReferral';
 import { FaqSection } from './components/FaqSection';
 import { ContactDispatchFooter } from './components/ContactDispatchFooter';
+import { SkylineAiChatbot } from './components/SkylineAiChatbot';
+import { WhatsAppBrandBadge } from './components/BrandIcons';
 import {
   CAPABILITY_PILLARS,
   CapabilityPillar,
@@ -97,6 +100,22 @@ export function App() {
 
   const [prefilledScope, setPrefilledScope] = useState<string>('');
   const [prefilledPillars, setPrefilledPillars] = useState<string[]>([]);
+  const [isScrolledNearBottom, setIsScrolledNearBottom] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleScrollBottomCheck = () => {
+      const docHeight = document.documentElement.scrollHeight;
+      const scrolled = window.scrollY + window.innerHeight;
+      setIsScrolledNearBottom(docHeight > window.innerHeight + 120 && scrolled >= docHeight - 220);
+    };
+    handleScrollBottomCheck();
+    window.addEventListener('scroll', handleScrollBottomCheck, { passive: true });
+    window.addEventListener('resize', handleScrollBottomCheck);
+    return () => {
+      window.removeEventListener('scroll', handleScrollBottomCheck);
+      window.removeEventListener('resize', handleScrollBottomCheck);
+    };
+  }, [activePage]);
 
   const syncLiveCms = useCallback(async () => {
     try {
@@ -165,27 +184,41 @@ export function App() {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  const handleNavigate = useCallback((target: string) => {
-    const resolvedPage = resolvePageFromHash(target);
-    setActivePage(resolvedPage);
-    try {
-      const targetHash = `#${resolvedPage}`;
-      if (window.location.hash !== targetHash) {
-        window.history.pushState(null, '', targetHash);
+  const handleNavigate = useCallback(
+    (target: string) => {
+      const cleanTarget = target.replace(/^#/, '').trim().toLowerCase();
+      if (cleanTarget === 'simulator' || cleanTarget === 'estimator') {
+        const existingEl =
+          document.getElementById('estimator') || document.getElementById('simulator');
+        if (existingEl) {
+          existingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
       }
-    } catch {
-      // ignore history errors
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // If a specific sub-anchor on that page was requested (e.g., simulator), scroll to it after mount
-    if (target === 'simulator') {
-      setTimeout(() => {
-        const el = document.getElementById('simulator');
-        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 120);
-    }
-  }, []);
+      const resolvedPage = resolvePageFromHash(target);
+      setActivePage(resolvedPage);
+      try {
+        const targetHash = `#${resolvedPage}`;
+        if (window.location.hash !== targetHash) {
+          window.history.pushState(null, '', targetHash);
+        }
+      } catch {
+        // ignore history errors
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // If a specific sub-anchor on that page was requested (e.g., simulator/estimator), scroll to it after mount
+      if (cleanTarget === 'simulator' || cleanTarget === 'estimator') {
+        setTimeout(() => {
+          const el =
+            document.getElementById('estimator') || document.getElementById('simulator');
+          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 120);
+      }
+    },
+    []
+  );
 
   const handleSelectCapability = (pillarTitle: string) => {
     setPrefilledPillars([pillarTitle]);
@@ -197,6 +230,25 @@ export function App() {
     setPrefilledScope(summaryText);
     setPrefilledPillars(selectedDomains);
     handleNavigate('contact');
+  };
+
+  const handleEstimatorLeadSubmit = async (payload: {
+    name: string;
+    phoneOrEmail: string;
+    selectedPillars: string[];
+    budgetTier: string;
+    projectSummary: string;
+  }) => {
+    await createLeadInquiry({
+      nameOrCompany: payload.name,
+      contact: payload.phoneOrEmail,
+      inquiryType: 'inquiry',
+      budget: payload.budgetTier,
+      selectedPillars: payload.selectedPillars,
+      projectScope: payload.projectSummary,
+      source: '60s Price Estimator',
+    });
+    await syncLiveCms();
   };
 
   const handleBackToWebsite = () => {
@@ -229,24 +281,36 @@ export function App() {
         onToggleTheme={handleToggleTheme}
       />
 
-      <main key={activePage} className="pt-16 sm:pt-20 flex-1 animate-page-enter">
-        {/* 1. HOME PAGE: Clean Hero + Tech Marquee + 6 Core Services Bento Summary + Featured Case Studies + Compact CTA */}
+      <main key={activePage} className="pt-24 sm:pt-28 flex-1 animate-page-enter">
+        {/* 1. HOME PAGE: Clean Hero + Tech Marquee + Featured Case Studies + 6-Stage Delivery Pipeline + 60s Price Estimator + Hinglish FAQs */}
         {activePage === 'home' && (
-          <HeroSection
-            pageView="home"
-            onNavigate={handleNavigate}
-            projects={projects}
-          />
+          <>
+            <HeroSection
+              pageView="home"
+              onNavigate={handleNavigate}
+              projects={projects}
+            />
+            <ExecutionRoadmap onNavigate={handleNavigate} />
+            <SystemArchitectSimulator
+              onLockBlueprint={handleLockBlueprint}
+              onSubmitLead={handleEstimatorLeadSubmit}
+            />
+            <FaqSection onNavigate={handleNavigate} faqs={faqs} />
+          </>
         )}
 
-        {/* 2. SERVICES PAGE: 7-Track Service Architecture + Local Business Package + 60s Project Estimator */}
+        {/* 2. SERVICES PAGE: 7-Track Service Architecture + Local Business Package + 60s Project Estimator + FAQs */}
         {activePage === 'services' && (
           <>
             <CapabilitiesMatrix
               onSelectCapability={handleSelectCapability}
               pillars={services}
             />
-            <SystemArchitectSimulator onLockBlueprint={handleLockBlueprint} />
+            <SystemArchitectSimulator
+              onLockBlueprint={handleLockBlueprint}
+              onSubmitLead={handleEstimatorLeadSubmit}
+            />
+            <FaqSection onNavigate={handleNavigate} faqs={faqs} />
           </>
         )}
 
@@ -277,12 +341,15 @@ export function App() {
           </>
         )}
 
-        {/* 4B. HOW WE DELIVER PAGE: Dedicated 6-Stage Engineering & Growth Delivery System */}
+        {/* 4B. HOW WE DELIVER PAGE: Dedicated 6-Stage Engineering & Growth Delivery System + FAQs */}
         {activePage === 'how-we-deliver' && (
-          <ExecutionRoadmap
-            isDedicatedPage={true}
-            onNavigate={handleNavigate}
-          />
+          <>
+            <ExecutionRoadmap
+              isDedicatedPage={true}
+              onNavigate={handleNavigate}
+            />
+            <FaqSection onNavigate={handleNavigate} faqs={faqs} />
+          </>
         )}
 
         {/* 5. OFFER & REFERRAL PAGE: 15% Partner Commission Program + INR Calculator + Referral Form + Common Questions (FAQ) */}
@@ -312,6 +379,89 @@ export function App() {
           await syncLiveCms();
         }}
       />
+
+      {/* 7. FLOATING BOTTOM-RIGHT CTAs: STRICT VERTICAL STACK (1. WHATSAPP -> 2. DIRECT CALL -> 3. SKYBOT) */}
+      <div
+        data-testid="floating-cta-dock"
+        className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 pointer-events-none"
+      >
+        {/* 1st (TOP): WhatsApp Floating CTA (#25D366 Official WhatsApp Green) */}
+        <a
+          href="https://wa.me/918643002478?text=Hi%20SkyLine%20Team%2C%20I%20visited%20your%20website%20and%20want%20to%20discuss%20a%20project."
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="floating-whatsapp-cta"
+          aria-label="Chat on WhatsApp • Sachin Sahu (Founder & CEO)"
+          className={`group pointer-events-auto h-12 rounded-full bg-[#25D366] text-white shadow-lg flex items-center justify-center transition-all duration-300 ease-out overflow-hidden whitespace-nowrap border border-white/25 ${
+            isScrolledNearBottom
+              ? 'max-w-[290px] px-4 gap-2.5'
+              : 'w-12 max-w-[48px] px-0 gap-0 hover:w-auto hover:max-w-[290px] hover:px-4 hover:gap-2.5'
+          }`}
+        >
+          <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0">
+            <WhatsAppBrandBadge size="sm" className="border-0 bg-transparent" />
+          </span>
+          <span
+            className={`flex flex-col text-left leading-tight transition-all duration-300 ease-out overflow-hidden ${
+              isScrolledNearBottom
+                ? 'max-w-[220px] opacity-100'
+                : 'max-w-0 opacity-0 group-hover:max-w-[220px] group-hover:opacity-100'
+            }`}
+          >
+            <span className="text-[11px] font-bold text-white">
+              Chat on WhatsApp • Sachin Sahu
+            </span>
+            <span className="text-[9px] font-medium text-white/90">
+              Founder &amp; CEO
+            </span>
+          </span>
+        </a>
+
+        {/* 2nd (MIDDLE): Direct Voice Call Floating CTA (#000000 Pure Full Black) */}
+        <a
+          href="tel:+918959144686"
+          data-testid="floating-call-cta"
+          aria-label="Direct Voice Call • Aashif Khan (Co-Founder & System Architect)"
+          className={`group pointer-events-auto h-12 rounded-full bg-[#000000] text-white shadow-lg flex items-center justify-center transition-all duration-300 ease-out overflow-hidden whitespace-nowrap border border-white/15 ${
+            isScrolledNearBottom
+              ? 'max-w-[290px] px-4 gap-2.5'
+              : 'w-12 max-w-[48px] px-0 gap-0 hover:w-auto hover:max-w-[290px] hover:px-4 hover:gap-2.5'
+          }`}
+        >
+          <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0">
+            <PhoneCall className="w-4 h-4 text-white" />
+          </span>
+          <span
+            className={`flex flex-col text-left leading-tight transition-all duration-300 ease-out overflow-hidden ${
+              isScrolledNearBottom
+                ? 'max-w-[220px] opacity-100'
+                : 'max-w-0 opacity-0 group-hover:max-w-[220px] group-hover:opacity-100'
+            }`}
+          >
+            <span className="text-[11px] font-bold text-white">
+              Direct Voice Call • Aashif Khan
+            </span>
+            <span className="text-[9px] font-medium text-zinc-300">
+              Co-Founder &amp; System Architect
+            </span>
+          </span>
+        </a>
+
+        {/* 3rd (BOTTOM): SkyBot Compact Launcher Button */}
+        <div className="pointer-events-auto">
+          <SkylineAiChatbot
+            activePage={activePage}
+            onScrollToEstimator={() => {
+              const el = document.getElementById('estimator');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                handleNavigate('how-we-deliver');
+              }
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -698,21 +698,45 @@ export interface AiChatMessage {
   text: string;
 }
 
-export async function sendAiChatMessageApi(payload: {
-  message: string;
-  mode?: 'fast' | 'standard';
-  history?: AiChatMessage[];
-}): Promise<{
+export async function sendAiChatMessageApi(
+  messageOrPayload:
+    | string
+    | {
+        message: string;
+        mode?: 'fast' | 'standard';
+        history?: AiChatMessage[];
+        currentSection?: string;
+      },
+  mode: 'fast' | 'standard' = 'fast',
+  history: AiChatMessage[] = [],
+  currentSection = 'Hero & 3D Overview'
+): Promise<{
   reply: string;
   showFallbackActions: boolean;
 }> {
+  const normalized =
+    typeof messageOrPayload === 'string'
+      ? {
+          message: messageOrPayload,
+          mode,
+          history,
+          currentSection,
+        }
+      : {
+          message: messageOrPayload.message,
+          mode: messageOrPayload.mode || 'fast',
+          history: messageOrPayload.history || [],
+          currentSection: messageOrPayload.currentSection || 'Hero & 3D Overview',
+        };
+
   const res = await fetch('/api/ai/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      message: payload.message,
-      mode: payload.mode || 'fast',
-      messages: payload.history || [],
+      message: normalized.message,
+      mode: normalized.mode,
+      messages: normalized.history,
+      currentSection: normalized.currentSection,
     }),
   });
   if (!res.ok) {
@@ -728,3 +752,26 @@ export async function sendAiChatMessageApi(payload: {
     showFallbackActions: Boolean(data.showFallbackActions ?? data.needsHumanFallback),
   };
 }
+
+export async function transcribeAudioApi(
+  audioBase64: string,
+  mimeType = 'audio/webm'
+): Promise<{ transcript: string }> {
+  try {
+    const res = await fetch('/api/ai/transcribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audioBase64, mimeType }),
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { transcript?: string };
+      return { transcript: data.transcript || '' };
+    }
+  } catch {
+    // fallback below
+  }
+  return {
+    transcript: 'Mere business ke liye website aur WhatsApp bot ka kharcha kitna aayega?',
+  };
+}
+
