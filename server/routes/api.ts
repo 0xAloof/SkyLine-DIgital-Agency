@@ -683,22 +683,36 @@ apiRouter.post('/admin/reset', requireAdminAuth, (_req, res) => {
 
 // 12. SkyLine AI Assistant ("Gemini in Chrome" Speed + Ground-Truth System Prompt + Silent Multi-Model Fallback Cascade)
 export const SKYBOT_MODEL_FALLBACK_CASCADE: readonly string[] = [
-  'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-4-hydrogen',
 ];
 
-export const SKYLINE_SYSTEM_INSTRUCTION = `You are "SkyBot", the fast "Gemini in Chrome" style AI Assistant for SkyLine Digital Agency (Indore, MP, India).
-Answer in 2 to 4 crisp, punchy sentences or bullet points (English or natural Hinglish matching the user's language).
+export const SKYLINE_SYSTEM_INSTRUCTION = `You are "SkyBot", the fast AI Assistant for SkyLine Digital Agency (Indore, MP, India).
+STRICT DOMAIN BOUNDARY:
+- You MUST ONLY answer questions related to SkyLine Digital Agency, our website, our services, our pricing & timelines, our live projects & interactive landing page prototypes, our 15% Partner Referral Program, our Student Mentorship Lab, and our founders (Sachin Sahu & Aashif Khan).
+- If a visitor asks anything unrelated to SkyLine Digital Agency or software/digital growth services (e.g., general trivia, recipes, movies, politics, homework, unrelated coding), politely decline in 1 sentence and steer the conversation back to how SkyLine Digital Agency can help their business grow.
+- Answer in 2 to 4 crisp, helpful sentences or bullet points (English or natural Hinglish matching the user's language). Never repeat the same canned paragraph across different questions—tailor every response directly to the user's specific message.
 Ground-truth facts:
-- Pricing starts at ₹10,000 and is flexible and open to negotiation based on exact requirements.
-  • Starter Website / Local Google Maps Pack: ₹10,000 – ₹18,000 (1–2 Weeks)
-  • Custom Next.js Web App + WhatsApp Bot: ₹18,000 – ₹45,000 (2–3 Weeks)
-  • Multi-Tenant SaaS / D2C Storefront / Ads: ₹45,000 – ₹95,000+ (3–5 Weeks)
-- Core Services: Fast Web & SaaS Apps, 24/7 WhatsApp Automation, Google Maps SEO & Digital WhatsApp Review Links, Meta & Google Ads, Technical SEO, and D2C 1-Tap UPI Storefronts.
-- Support: 30-day free post-launch support + ongoing Support & Optimization (never promise fake "100%" guarantees, physical QR standees, or 24/7 war rooms).
-- Live Interactive Website Prototypes on this page: 360 Views (https://360views.services), A&A Chocolates, AuraCare Clinic, FinVantage SaaS, NexaProp CRM, FileGuard AI, GridWeaver, ShadowBase, AI Career Guide, and Socialite.
-- Founders: Sachin Sahu (Founder & CEO — WhatsApp +91 86430 02478, Sachinsahuji06@gmail.com) and Aashif Khan (Co-Founder & System Architect — Direct Call +91 89591 44686, aashifkpp@gmail.com).
+- Pricing starts at ₹10,000 for starter packages and is flexible and open to negotiation based on exact scope:
+  • Starter Website / Local Business Pack: Starts at ₹10,000 (1–2 Weeks)
+  • Local Maps & Search SEO (LOCAL SEO): Starting from ₹15,000 (Timeline: 2 to 4 Weeks)
+  • Meta & Google Ads Funnel (PAID ADS): Starting with ₹20,000 (Timeline: 4 to 6 Weeks)
+  • WhatsApp Bot & Lead Automation (WHATSAPP AI): Starting from ₹25,000 (Timeline: 1 to 4 Weeks)
+  • Website, Web App or SaaS (WEB / SAAS): Starting from ₹30,000 (Timeline: 2 to 6 Weeks)
+- Core Services: Custom Next.js Websites & SaaS Web Apps, 24/7 WhatsApp Booking & Lead Automation Bots, Google Maps SEO & Digital WhatsApp Review Links, Meta & Google Search Ad Funnels, On-Page & Technical SEO, and D2C 1-Tap UPI Storefronts.
+- Support & Ownership: 100% source code & GitHub/domain ownership from Day 1 + 30-day free post-launch support window.
+- Live Portfolio Projects & Single-Page Prototypes on this website:
+  • 360 Views (Live: https://360views.services) — Interactive 360° Real Estate & PropTech Virtual Tour Platform
+  • GridWeaver (Live: https://gridweaver-virid.vercel.app/) — Smart Solar & IoT Microgrid Control Dashboard
+  • Shivangi Hair Salon (Live: https://shivangi-hair-salon.vercel.app/ • Pradeep Sen) — React & Node.js Salon Website & Online Slot Booking
+  • LocalLoom (Live: https://localloom-nu.vercel.app/ • Akram Khan) — Handloom E-Commerce & Admin Inventory Portal
+  • A&A Chocolates (Niquehat Khan) — Next.js & Payment Authentication D2C Storefront + Custom Gift Box Builder
+  • ShadowBase — Safe SQL Schema Migration & Debezium CDC Testing Studio
+  • FileGuard AI — SHA-256 & OriginStamp Blockchain Document Integrity Verifier
+  • AuraCare Clinic, FinVantage GST SaaS, AI Career Guide & Mentor, and Socialite Community Hub.
+- Founders & Direct Contact:
+  • Sachin Sahu (Founder & CEO — Full Stack, Principal Backend & CTO): WhatsApp +91 89591 44686 | Sachinsahuji06@gmail.com | Tech Stack: Spring Boot, Java Full Stack, API & JWT Integration, Apache Kafka, React & Kotlin.
+  • Aashif Khan (Co-Founder & System Architect — System Architect, AI Generalist & Cybersecurity): Direct Call & WhatsApp +91 86430 02478 | aashifkpp@gmail.com | Tech Stack: Next.js 16, FastAPI & SQL, Node.js, Reverse Engineering & AI Implementation.
 - Never mention internal model IDs, API keys, or fallback states. Always end with a helpful next step.`;
 
 function isHinglishMessage(raw: string): boolean {
@@ -722,6 +736,8 @@ function isHinglishMessage(raw: string): boolean {
     'paisa',
     'aap',
     'karo',
+    'namaste',
+    'bhai',
   ];
   return markers.some((m) => q.includes(m));
 }
@@ -731,21 +747,42 @@ export function evaluateLocalSkylineIntent(query: string): {
   needsHumanFallback: boolean;
   showFallbackActions: boolean;
 } {
-  const q = query.toLowerCase();
+  const q = query.toLowerCase().trim();
   const isHi = isHinglishMessage(query);
+
+  if (
+    q === 'hi' ||
+    q === 'hello' ||
+    q === 'hey' ||
+    q === 'namaste' ||
+    q.startsWith('hi ') ||
+    q.startsWith('hello ') ||
+    q.startsWith('hey ')
+  ) {
+    return {
+      reply: isHi
+        ? '• **Namaste! Main SkyBot hoon** — SkyLine Digital Agency ka AI Assistant.\n• Hum **Website/SaaS (₹30K+)**, **WhatsApp AI Bot (₹25K+)**, **Meta & Google Ads (₹20K+)**, aur **Local Maps SEO (₹15K+)** (Starter packages **₹10,000** se shuru) banate hain.\n• Aap apne business ke liye website, WhatsApp automation, ya local growth mein se kya plan kar rahe hain?'
+        : '• **Hello! I am SkyBot**, the AI Assistant for **SkyLine Digital Agency**.\n• We engineer **Websites & SaaS Apps (from ₹30K)**, **24/7 WhatsApp Bots (from ₹25K)**, **Meta & Google Ad Funnels (from ₹20K)**, and **Local Maps & Search SEO (from ₹15K)**, with starter setups beginning at **₹10,000**.\n• What type of project or business growth system are you looking to build?',
+      needsHumanFallback: false,
+      showFallbackActions: false,
+    };
+  }
 
   if (
     q.includes('human') ||
     q.includes('talk') ||
     q.includes('call') ||
+    q.includes('contact') ||
+    q.includes('number') ||
+    q.includes('phone') ||
     q.includes('baat kar') ||
     q.includes('negotiate') ||
     q.includes('discount')
   ) {
     return {
       reply: isHi
-        ? '• **Direct Founder Connect:** Aap seedhe Sachin Sahu (Founder & CEO — WhatsApp **+91 86430 02478**, `Sachinsahuji06@gmail.com`) ya Aashif Khan (Co-Founder & System Architect — Direct Call **+91 89591 44686**, `aashifkpp@gmail.com`) se jud sakte hain.\n• **Negotiable Pricing:** Hamare packages **₹10,000 starting** hain aur aapke custom scope ke hisaab se flexible hain. Kya main aapke project ka brief note kar loon?'
-        : '• **Direct Founder Access:** Connect directly with Sachin Sahu (Founder & CEO — WhatsApp **+91 86430 02478**, `Sachinsahuji06@gmail.com`) or Aashif Khan (Co-Founder & System Architect — Direct Call **+91 89591 44686**, `aashifkpp@gmail.com`).\n• **Negotiable Pricing:** Packages start at **₹10,000** and are tailored to your exact features. Would you like to share your project requirements?',
+        ? '• **Direct Founder Connect:** Aap seedhe **Sachin Sahu** (Founder & CEO — WhatsApp **+91 89591 44686**, `Sachinsahuji06@gmail.com`) ya **Aashif Khan** (Co-Founder & System Architect — Direct Call & WhatsApp **+91 86430 02478**, `aashifkpp@gmail.com`) se jud sakte hain.\n• **Negotiable Pricing:** Hamare packages **₹10,000 starting** hain aur aapke custom scope ke hisaab se flexible hain. Kya main aapke project ka brief note kar loon?'
+        : '• **Direct Founder Access:** Connect directly with **Sachin Sahu** (Founder & CEO — WhatsApp **+91 89591 44686**, `Sachinsahuji06@gmail.com`) or **Aashif Khan** (Co-Founder & System Architect — Direct Call & WhatsApp **+91 86430 02478**, `aashifkpp@gmail.com`).\n• **Negotiable Pricing:** Packages start at **₹10,000** and are tailored to your exact features. Would you like to share your project requirements?',
       needsHumanFallback: true,
       showFallbackActions: true,
     };
@@ -759,12 +796,13 @@ export function evaluateLocalSkylineIntent(query: string): {
     q.includes('budget') ||
     q.includes('charge') ||
     q.includes('kharcha') ||
-    q.includes('kitna')
+    q.includes('kitna') ||
+    q.includes('rate')
   ) {
     return {
       reply: isHi
-        ? '• **₹10,000 Starting (Negotiable pricing):** Starter Website & Local Google Maps Pack **₹10,000 – ₹18,000** (1–2 Weeks).\n• **Custom Web App + WhatsApp Bot:** **₹18,000 – ₹45,000** (2–3 Weeks).\n• **Multi-Tenant SaaS / D2C Storefront:** **₹45,000 – ₹95,000+** (3–5 Weeks) with 30-day free post-launch support. Aapka business kis category mein aata hai?'
-        : '• **₹10,000 Starting (Negotiable pricing):** Starter Website & Local Google Maps Pack is **₹10,000 – ₹18,000** (1–2 Weeks).\n• **Custom Next.js Web App + WhatsApp Bot:** **₹18,000 – ₹45,000** (2–3 Weeks).\n• **Multi-Tenant SaaS / D2C Storefront / Ads:** **₹45,000 – ₹95,000+** (3–5 Weeks) with 30-day free post-launch support. Which tier fits your current project?',
+        ? '• **Updated SkyLine Service Pricing (Flexible & Negotiable • Starts at ₹10,000):**\n  1. **Website, Web App or SaaS:** Starting from **₹30,000** (Timeline: 2 to 6 Weeks)\n  2. **WhatsApp Bot & Lead Automation:** Starting from **₹25,000** (Timeline: 1 to 4 Weeks)\n  3. **Meta & Google Ads Funnel:** Starting with **₹20,000** (Timeline: 4 to 6 Weeks)\n  4. **Local Maps & Search SEO:** Starting from **₹15,000** (Timeline: 2 to 4 Weeks)\n• Aap is page ke **Scope Your Project** calculator mein ₹10K se ₹1L+ slider chala kar live roadmap dekh sakte hain!'
+        : '• **Transparent SkyLine Service Pricing (Flexible & Negotiable • Starter from ₹10,000):**\n  1. **Website, Web App or SaaS:** Starting from **₹30,000** (Timeline: 2 to 6 Weeks)\n  2. **WhatsApp Bot & Lead Automation:** Starting from **₹25,000** (Timeline: 1 to 4 Weeks)\n  3. **Meta & Google Ads Funnel:** Starting with **₹20,000** (Timeline: 4 to 6 Weeks)\n  4. **Local Maps & Search SEO:** Starting from **₹15,000** (Timeline: 2 to 4 Weeks)\n• You can also use our interactive **₹10K – ₹1L+ Price Line Calculator** in the Scope Your Project section. Which service fits your goal?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -775,13 +813,15 @@ export function evaluateLocalSkylineIntent(query: string): {
     q.includes('map') ||
     q.includes('clinic') ||
     q.includes('salon') ||
+    q.includes('shivangi') ||
+    q.includes('localloom') ||
     q.includes('review') ||
     q.includes('auracare')
   ) {
     return {
       reply: isHi
-        ? '• **Clinic & Local Business Growth (₹10,000 starting):** Hum Google Business Profile (GBP) SEO, digital WhatsApp review links, aur 24/7 WhatsApp slot booking bot setup karte hain.\n• **Live Demo:** Aap is page par **AuraCare Clinic** ka full-screen prototype ("Launch Live Prototype") open karke instant slot booking test kar sakte hain. Aapka clinic ya showroom kis city mein hai?'
-        : '• **Clinic & Local Growth System (₹10,000 starting):** We optimize your Google Business Profile (GBP), configure digital WhatsApp review links, and connect a 24/7 WhatsApp appointment bot.\n• **Live Demo:** Click **"Launch Live Prototype"** on the **AuraCare Clinic** card to test the full-screen appointment booker right now. Which city does your clinic or store serve?',
+        ? '• **Local Maps & Search SEO (Starting from ₹15,000 • 2 to 4 Weeks):** Hum Google Business Profile (GBP) SEO, digital WhatsApp review links, aur online booking websites banate hain.\n• **Live Client Examples:** **Shivangi Hair Salon** (`https://shivangi-hair-salon.vercel.app/`), **LocalLoom** (`https://localloom-nu.vercel.app/`), aur **AuraCare Clinic** ke live prototypes is page par test karein. Aapka business kis city mein hai?'
+        : '• **Local Maps & Search SEO (Starting from ₹15,000 • 2 to 4 Weeks):** We optimize your Google Business Profile (GBP), configure digital WhatsApp review links, and launch fast booking websites.\n• **Live Portfolio:** Test **Shivangi Hair Salon** (`https://shivangi-hair-salon.vercel.app/`), **LocalLoom** (`https://localloom-nu.vercel.app/`), or **AuraCare Clinic** directly from our Projects section. Which city does your business serve?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -791,13 +831,13 @@ export function evaluateLocalSkylineIntent(query: string): {
     q.includes('whatsapp') ||
     q.includes('bot') ||
     q.includes('crm') ||
-    q.includes('demo') ||
-    q.includes('ai')
+    q.includes('automation') ||
+    q.includes('lead')
   ) {
     return {
       reply: isHi
-        ? '• **24/7 WhatsApp Automation:** Official WhatsApp Cloud API ke zariye instant inquiry replies, brochure sharing, aur appointment slot booking automate hoti hai.\n• **Full-Screen Live Demos:** Kisi bhi project card par **"Launch Live Prototype"** click karke full-screen website demo test karein. Kya aap bookings automate karna chahte hain ya lead capture?'
-        : '• **24/7 WhatsApp Automation:** Powered by the Official WhatsApp Cloud API to automate instant inquiry replies, brochure sharing, and appointment slot booking.\n• **Full-Screen Prototypes:** Click **"Launch Live Prototype"** on any project card (such as 360 Views, AuraCare Clinic, or A&A Chocolates) to test the live application. Are you automating bookings or sales follow-ups?',
+        ? '• **WhatsApp Bot & Lead Automation (Starting from ₹25,000 • 1 to 4 Weeks):** Official WhatsApp Cloud API ke zariye 24/7 instant inquiry replies, PDF brochure sharing, aur appointment slot booking automate hoti hai.\n• **Live Demo:** Kisi bhi project card par **"Launch Live Prototype"** click karke full single-page website demo test karein. Kya aap bookings automate karna chahte hain ya sales follow-ups?'
+        : '• **WhatsApp Bot & Lead Automation (Starting from ₹25,000 • 1 to 4 Weeks):** Powered by the Official WhatsApp Cloud API to automate 24/7 customer replies, catalog/brochure sharing, and slot booking.\n• **Interactive Prototypes:** Click **"Launch Live Prototype"** on any project card to test our full single-page landing page demos. Are you looking to automate appointment bookings or lead capture?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -814,12 +854,14 @@ export function evaluateLocalSkylineIntent(query: string): {
     q.includes('shadowbase') ||
     q.includes('gridweaver') ||
     q.includes('fileguard') ||
-    q.includes('socialite')
+    q.includes('socialite') ||
+    q.includes('project') ||
+    q.includes('portfolio')
   ) {
     return {
       reply: isHi
-        ? '• **Sachin Sahu (Founder & CEO):** WhatsApp **+91 86430 02478** | `Sachinsahuji06@gmail.com` — Lead Architect of 360 Views (`https://360views.services`), ShadowBase & GridWeaver.\n• **Aashif Khan (Co-Founder & System Architect):** Direct Call **+91 89591 44686** | `aashifkpp@gmail.com` — Lead Architect of FileGuard AI, AI Career Guide & Socialite. Kya aap unse WhatsApp par baat karna chahenge?'
-        : '• **Sachin Sahu (Founder & CEO):** WhatsApp **+91 86430 02478** | `Sachinsahuji06@gmail.com` — Lead Architect of 360 Views (`https://360views.services`), ShadowBase & GridWeaver.\n• **Aashif Khan (Co-Founder & System Architect):** Direct Call **+91 89591 44686** | `aashifkpp@gmail.com` — Lead Architect of FileGuard AI, AI Career Guide & Socialite. Would you like to connect on WhatsApp or a direct call?',
+        ? '• **Sachin Sahu (Founder & CEO — Full Stack, Principal Backend & CTO):** WhatsApp **+91 89591 44686** | `Sachinsahuji06@gmail.com` — Stack: Spring Boot, Java Full Stack, API & JWT Integration, Apache Kafka, React & Kotlin. Live builds: **360 Views** (`https://360views.services`), **GridWeaver** (`https://gridweaver-virid.vercel.app/`) & **ShadowBase**.\n• **Aashif Khan (Co-Founder & System Architect — System Architect, AI Generalist & Cybersecurity):** Direct Call & WhatsApp **+91 86430 02478** | `aashifkpp@gmail.com` — Stack: Next.js 16, FastAPI & SQL, Node.js, Reverse Engineering & AI Implementation. Live builds: **LocalLoom** (`https://localloom-nu.vercel.app/`), **Shivangi Hair Salon** (`https://shivangi-hair-salon.vercel.app/`), **A&A Chocolates** & **FileGuard AI**.'
+        : '• **Sachin Sahu (Founder & CEO — Full Stack, Principal Backend & CTO):** WhatsApp **+91 89591 44686** | `Sachinsahuji06@gmail.com` — Stack: Spring Boot, Java Full Stack, API & JWT Integration, Apache Kafka, React & Kotlin. Creator of **360 Views** (`https://360views.services`), **GridWeaver** (`https://gridweaver-virid.vercel.app/`), and **ShadowBase**.\n• **Aashif Khan (Co-Founder & System Architect — System Architect, AI Generalist & Cybersecurity):** Direct Call & WhatsApp **+91 86430 02478** | `aashifkpp@gmail.com` — Stack: Next.js 16, FastAPI & SQL, Node.js, Reverse Engineering & AI Implementation. Creator of **LocalLoom** (`https://localloom-nu.vercel.app/`), **Shivangi Hair Salon** (`https://shivangi-hair-salon.vercel.app/`), **A&A Chocolates**, and **FileGuard AI**.',
       needsHumanFallback: true,
       showFallbackActions: true,
     };
@@ -835,8 +877,8 @@ export function evaluateLocalSkylineIntent(query: string): {
   ) {
     return {
       reply: isHi
-        ? '• **Fast Milestone Delivery:** Starter business websites **1–2 Weeks** mein launch hoti hain, aur Custom Web Apps + WhatsApp Bots **2–3 Weeks** mein.\n• **Post-Launch Support:** Har project ke saath 30-day free post-launch support aur full source-code handover milta hai. Aap apna project kab tak live karna chahte hain?'
-        : '• **Fast Milestone Delivery:** Starter business websites launch in **1–2 Weeks**, while Custom Web Apps + WhatsApp Bots take **2–3 Weeks**.\n• **Post-Launch Support:** Every build includes 30-day free post-launch support and complete source-code ownership. What is your target launch timeline?',
+        ? '• **Delivery Timelines:** WhatsApp Bot & Lead Automation **1 to 4 Weeks**, Local Maps & Search SEO **2 to 4 Weeks**, Website / Web App / SaaS **2 to 6 Weeks**, aur Meta & Google Ads Funnel **4 to 6 Weeks**.\n• **100% Code Ownership:** Har project ke saath 30-day free post-launch support aur full GitHub/domain handover milta hai. Aap apna project kab tak launch karna chahte hain?'
+        : '• **Delivery Timelines:** WhatsApp Bot & Lead Automation takes **1 to 4 Weeks**, Local Maps & Search SEO takes **2 to 4 Weeks**, Website / Web App / SaaS takes **2 to 6 Weeks**, and Meta & Google Ads Funnels run **4 to 6 Weeks**.\n• **100% Ownership:** Every project includes 30-day free post-launch support and complete GitHub & domain ownership. What is your target launch date?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -852,8 +894,8 @@ export function evaluateLocalSkylineIntent(query: string): {
   ) {
     return {
       reply: isHi
-        ? '• **15% Partner Commission:** Kisi bhi business ko refer karne par deal sign hote hi aapko 15% direct UPI/bank payout milta hai.\n• **Student Mentorship Lab:** B.Tech/BCA/MCA students ke liye 1-on-1 project mentorship (**₹599 – ₹3,999**) bhi available hai. Aap kis program ki details chahte hain?'
-        : '• **15% Partner Referral Commission:** Earn a direct 15% UPI/bank payout within 48 hours of invoice settlement for every client you refer.\n• **Student Mentorship Lab:** 1-on-1 engineering & project guidance (**₹599 – ₹3,999**) for B.Tech/BCA/MCA builders. Which program would you like to explore?',
+        ? '• **15% Partner Commission:** Kisi bhi business ko SkyLine refer karne par deal confirm hote hi aapko 15% direct UPI/bank payout milta hai.\n• **Student Mentorship Lab:** B.Tech/BCA/MCA students ke liye 1-on-1 architecture & project mentorship (**₹599 – ₹3,999**) bhi available hai. Aap kis program ki details chahte hain?'
+        : '• **15% Partner Referral Commission:** Earn a direct 15% UPI/bank payout within 48 hours of invoice settlement for every client you introduce.\n• **Student Mentorship Lab:** 1-on-1 engineering & project guidance (**₹599 – ₹3,999**) for B.Tech/BCA/MCA builders. Which program would you like to explore?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
@@ -865,21 +907,26 @@ export function evaluateLocalSkylineIntent(query: string): {
     q.includes('saas') ||
     q.includes('ads') ||
     q.includes('seo') ||
-    q.includes('upi')
+    q.includes('upi') ||
+    q.includes('app') ||
+    q.includes('store') ||
+    q.includes('ecommerce')
   ) {
     return {
       reply: isHi
-        ? '• **6 Core Capabilities (₹10,000 starting • Negotiable pricing):** (1) Fast Web & SaaS Apps, (2) 24/7 WhatsApp Automation, (3) Google Maps SEO & Digital WhatsApp Review Links, (4) Meta & Google Ads, (5) Technical SEO, aur (6) D2C 1-Tap UPI Storefronts.\n• Aapko apne business ke liye inmein se kaunsa system chahiye?'
-        : '• **6 Core Capabilities (₹10,000 starting • Negotiable pricing):** (1) Fast Web & SaaS Apps, (2) 24/7 WhatsApp Automation, (3) Google Maps SEO & Digital WhatsApp Review Links, (4) Meta & Google Ads, (5) Technical SEO, and (6) D2C 1-Tap UPI Storefronts.\n• Which capability matches your immediate goal?',
+        ? '• **SkyLine Core Services:**\n  • **WEB / SAAS:** Custom Next.js Websites, Web Apps & SaaS Portals (2–6 Weeks • From **₹30,000**)\n  • **WHATSAPP AI:** 24/7 WhatsApp Booking & Lead Automation Bots (1–4 Weeks • From **₹25,000**)\n  • **PAID ADS:** Meta Reels & Google Search Ad Funnels (4–6 Weeks • From **₹20,000**)\n  • **LOCAL SEO:** Google Business Profile & Search SEO (2–4 Weeks • From **₹15,000**)\n• Aapko apne business ke liye inmein se kaunsa system chahiye?'
+        : '• **SkyLine Core Services:**\n  • **WEB / SAAS:** Custom Next.js Websites, Web Apps & SaaS Portals (2–6 Weeks • Starting from **₹30,000**)\n  • **WHATSAPP AI:** 24/7 WhatsApp Booking & Lead Automation Bots (1–4 Weeks • Starting from **₹25,000**)\n  • **PAID ADS:** Meta Reels & Google Search Ad Funnels (4–6 Weeks • Starting with **₹20,000**)\n  • **LOCAL SEO:** Google Business Profile & Search SEO (2–4 Weeks • Starting from **₹15,000**)\n• Which capability matches your immediate business goal?',
       needsHumanFallback: false,
       showFallbackActions: false,
     };
   }
 
+  // Strict domain boundary response for off-topic or unrecognized messages
+  const snippet = query.trim().slice(0, 48);
   return {
     reply: isHi
-      ? '• **SkyLine Digital Agency (₹10,000 starting • Negotiable pricing):** Hum clinics, D2C brands, aur startups ke liye fast Next.js websites, 24/7 WhatsApp bots, aur Google Maps growth systems banate hain.\n• **Direct Connect:** Sachin Sahu (WhatsApp **+91 86430 02478**) ya Aashif Khan (Direct Call **+91 89591 44686**) se seedhe baat karein. Aapka primary business goal kya hai?'
-      : '• **SkyLine Digital Agency (₹10,000 starting • Negotiable pricing):** We engineer fast Next.js websites, 24/7 WhatsApp booking bots, and Google Maps growth systems with 30-day free post-launch support.\n• **Direct Connect:** Reach Sachin Sahu on WhatsApp (**+91 86430 02478**) or Aashif Khan via Direct Call (**+91 89591 44686**). What would you like to build?',
+      ? `• **SkyBot Domain Notice ("${snippet}"):** Main sirf **SkyLine Digital Agency** ki services (Web/SaaS, WhatsApp AI Bots, Paid Ads, Local SEO), live projects (\`360views.services\`, \`gridweaver-virid.vercel.app\`, \`localloom-nu.vercel.app\`, \`shivangi-hair-salon.vercel.app\`), aur pricing (**₹10,000 – ₹1,00,000+**) ke baare mein help kar sakta hoon.\n• **Direct Founder Connect:** Sachin Sahu (WhatsApp **+91 89591 44686**) ya Aashif Khan (Direct Call **+91 86430 02478**). Bataiye, aapke business project mein main kaise madad karoon?`
+      : `• **SkyBot Scope Notice ("${snippet}"):** I am configured exclusively to assist with **SkyLine Digital Agency** services (Web/SaaS from ₹30K, WhatsApp AI Bots from ₹25K, Paid Ads from ₹20K, Local Maps SEO from ₹15K, Starter setups from ₹10K), our live projects, and founder consultations.\n• **Direct Connect:** Reach **Sachin Sahu** on WhatsApp (**+91 89591 44686**) or **Aashif Khan** via Direct Call (**+91 86430 02478**). Which digital system can we help you build today?`,
     needsHumanFallback: true,
     showFallbackActions: true,
   };
@@ -887,7 +934,7 @@ export function evaluateLocalSkylineIntent(query: string): {
 
 /**
  * Silent Multi-Model Fallback Cascade:
- * Tries each Gemini Flash model in order (`gemini-2.5-flash` -> `gemini-2.0-flash` -> `gemini-1.5-flash`).
+ * Tries `gemini-3.1-flash-lite` first, then `gemini-4-hydrogen`.
  * If one model fails (quota, 404, timeout, network), it automatically and silently tries the next model,
  * and falls back to `evaluateLocalSkylineIntent` if all remote models fail or no API key is present.
  */
@@ -988,7 +1035,6 @@ export async function generateSkyBotReplyWithFallback(params: {
           contents: historyContents,
           config: {
             systemInstruction: SKYLINE_SYSTEM_INSTRUCTION,
-            temperature: 0.35,
             maxOutputTokens: MAX_CHAT_OUTPUT_TOKENS,
           },
         });

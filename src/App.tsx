@@ -281,7 +281,7 @@ export function App() {
         onToggleTheme={handleToggleTheme}
       />
 
-      <main key={activePage} className="pt-24 sm:pt-28 flex-1 animate-page-enter">
+      <main key={activePage} className="pt-20 sm:pt-22 flex-1 animate-page-enter">
         {/* 1. HOME PAGE: Clean Hero + Tech Marquee + Featured Case Studies + 6-Stage Delivery Pipeline + 60s Price Estimator + Hinglish FAQs */}
         {activePage === 'home' && (
           <>
@@ -387,7 +387,7 @@ export function App() {
       >
         {/* 1st (TOP): WhatsApp Floating CTA (#25D366 Official WhatsApp Green) */}
         <a
-          href="https://wa.me/918643002478?text=Hi%20SkyLine%20Team%2C%20I%20visited%20your%20website%20and%20want%20to%20discuss%20a%20project."
+          href="https://wa.me/918959144686?text=Hi%20SkyLine%20Team%2C%20I%20visited%20your%20website%20and%20want%20to%20discuss%20a%20project."
           target="_blank"
           rel="noopener noreferrer"
           data-testid="floating-whatsapp-cta"
@@ -419,7 +419,7 @@ export function App() {
 
         {/* 2nd (MIDDLE): Direct Voice Call Floating CTA (#000000 Pure Full Black) */}
         <a
-          href="tel:+918959144686"
+          href="tel:+918643002478"
           data-testid="floating-call-cta"
           aria-label="Direct Voice Call • Aashif Khan (Co-Founder & System Architect)"
           className={`group pointer-events-auto h-12 rounded-full bg-[#000000] text-white shadow-lg flex items-center justify-center transition-all duration-300 ease-out overflow-hidden whitespace-nowrap border border-white/15 ${

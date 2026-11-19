@@ -83,13 +83,13 @@ test('Admin auth password hashing and HMAC token verification work end-to-end', 
   assert.equal(verifyToken(`${token}tampered`), null);
 });
 
-test('computeAdminOverviewStats aggregates seeded database state accurately with 9 photographic projects and 5 Hinglish FAQs', () => {
+test('computeAdminOverviewStats aggregates seeded database state accurately with 11 photographic projects and 5 Hinglish FAQs', () => {
   const seed = createInitialSeedDatabase();
   const stats = computeAdminOverviewStats(seed);
   assert.equal(stats.totalLeads, 3);
   assert.equal(stats.totalReferrals, 2);
   assert.equal(stats.totalCommissionVolume, 60000);
-  assert.equal(seed.projects.length, 9);
+  assert.equal(seed.projects.length, 11);
   for (const proj of seed.projects) {
     assert.ok(proj.imageUrl && proj.imageUrl.startsWith('https://images.unsplash.com/'));
     assert.ok((proj.techStack ?? []).length <= 3, `Expected <= 3 tech tags on ${proj.title}`);
@@ -101,17 +101,16 @@ test('computeAdminOverviewStats aggregates seeded database state accurately with
 
 test('generateSkyBotReplyWithFallback silently cascades across models and falls back cleanly on total failure', async () => {
   assert.deepEqual(SKYBOT_MODEL_FALLBACK_CASCADE, [
-    'gemini-2.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-4-hydrogen',
   ]);
 
-  // Case 1: First two models fail, third model (gemini-1.5-flash) succeeds
+  // Case 1: First model fails, second model (gemini-4-hydrogen) succeeds
   const cascadeSuccess = await generateSkyBotReplyWithFallback({
     cleanMessage: 'Mere business ke liye website aur bot ka kharcha kitna aayega?',
     currentSection: 'Price Estimator',
     customInvoker: async (modelName) => {
-      if (modelName === 'gemini-2.5-flash' || modelName === 'gemini-2.0-flash') {
+      if (modelName === 'gemini-3.1-flash-lite') {
         throw new Error(`Simulated quota error on ${modelName}`);
       }
       return 'Hamare packages ₹10,000 se shuru hote hain.';
@@ -123,12 +122,11 @@ test('generateSkyBotReplyWithFallback silently cascades across models and falls 
     'Hamare packages ₹10,000 se shuru hote hain.'
   );
   assert.deepEqual(cascadeSuccess.attemptedModels, [
-    'gemini-2.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-4-hydrogen',
   ]);
 
-  // Case 2: All 3 models fail -> silently returns local Hinglish/English intent reply
+  // Case 2: All models fail -> silently returns local Hinglish/English intent reply
   const totalFallback = await generateSkyBotReplyWithFallback({
     cleanMessage: 'Mere business ke liye website aur bot ka kharcha kitna aayega?',
     customInvoker: async (modelName) => {
@@ -136,7 +134,7 @@ test('generateSkyBotReplyWithFallback silently cascades across models and falls 
     },
   });
 
-  assert.equal(totalFallback.attemptedModels.length, 3);
+  assert.equal(totalFallback.attemptedModels.length, 2);
   assert.ok(totalFallback.reply.includes('₹10,000'));
 });
 

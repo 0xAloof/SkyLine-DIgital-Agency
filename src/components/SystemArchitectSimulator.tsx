@@ -36,31 +36,51 @@ const DOMAIN_OPTIONS: {
   id: SimulatorDomain;
   label: string;
   tag: string;
+  timelineLabel: string;
+  priceLabel: string;
+  startingPriceInr: number;
+  autoTier: SimulatorScale;
   desc: string;
 }[] = [
   {
     id: 'web-saas',
     label: 'Website, Web App or SaaS',
     tag: 'WEB / SAAS',
-    desc: 'Fast Next.js business website, custom portal, or D2C online store',
+    timelineLabel: '2 to 6 Weeks',
+    priceLabel: 'Starting from ₹30,000',
+    startingPriceInr: 30000,
+    autoTier: 'enterprise',
+    desc: 'Fast Next.js business website, custom web app, or multi-user SaaS portal',
   },
   {
     id: 'ai-automation',
     label: 'WhatsApp Bot & Lead Automation',
     tag: 'WHATSAPP AI',
-    desc: 'WhatsApp appointment booking, brochure PDF dispatch & lead alerts',
+    timelineLabel: '1 to 4 Weeks',
+    priceLabel: 'Starting from ₹25,000',
+    startingPriceInr: 25000,
+    autoTier: 'growth',
+    desc: '24/7 WhatsApp appointment booking, brochure PDF dispatch & instant lead alerts',
   },
   {
     id: 'paid-ads',
     label: 'Meta & Google Ads Funnel',
     tag: 'PAID ADS',
-    desc: 'Targeted Instagram Reels & Google Search ads with landing pages',
+    timelineLabel: '4 to 6 Weeks',
+    priceLabel: 'Starting with ₹20,000',
+    startingPriceInr: 20000,
+    autoTier: 'growth',
+    desc: 'Targeted Instagram Reels & Google Search ad funnels paired with landing pages',
   },
   {
     id: 'seo-content',
     label: 'Local Maps & Search SEO',
     tag: 'LOCAL SEO',
-    desc: 'Google Business Profile optimization, digital review link & search SEO',
+    timelineLabel: '2 to 4 Weeks',
+    priceLabel: 'Starting from ₹15,000',
+    startingPriceInr: 15000,
+    autoTier: 'launch',
+    desc: 'Google Business Profile optimization, digital WhatsApp review link & search SEO',
   },
 ];
 
@@ -72,17 +92,17 @@ const SCALE_OPTIONS: {
   {
     id: 'launch',
     label: 'Starter / Local Business',
-    sub: 'Starts at ₹10,000 – ₹18,000 (Clinics, shops, landing pages)',
+    sub: 'Starts at ₹10,000 – ₹20,000 (Local Maps SEO, clinics, shops & landing pages)',
   },
   {
     id: 'growth',
     label: 'Growth Brand / D2C Store',
-    sub: '₹18,000 – ₹40,000 (Custom store, 1-Tap UPI & WhatsApp bot)',
+    sub: '₹20,000 – ₹45,000 (WhatsApp Bot, Paid Ads Funnel & 1-Tap UPI Store)',
   },
   {
     id: 'enterprise',
     label: 'Custom Web App / SaaS',
-    sub: '₹40,000 – ₹85,000+ (Multi-user dashboard, APIs & database)',
+    sub: '₹30,000 – ₹1,00,000+ (Custom Website, Web App, SaaS Portal & APIs)',
   },
 ];
 
@@ -91,9 +111,34 @@ const URGENCY_OPTIONS: {
   label: string;
   sub: string;
 }[] = [
-  { id: 'standard', label: 'Standard Delivery', sub: '2 to 4 Weeks' },
-  { id: 'accelerated', label: 'Fast-Track Launch', sub: '7 to 14 Days' },
+  { id: 'standard', label: 'Standard Delivery', sub: '2 to 6 Weeks' },
+  { id: 'accelerated', label: 'Fast-Track Launch', sub: '1 to 3 Weeks' },
 ];
+
+const PRICE_LINE_STOPS: { value: number; label: string; tierHint: string }[] = [
+  { value: 10000, label: '₹10K', tierHint: 'Starter Landing Page / Basic Setup' },
+  { value: 15000, label: '₹15K', tierHint: 'Local Maps & Search SEO (2–4 Weeks)' },
+  { value: 20000, label: '₹20K', tierHint: 'Meta & Google Ads Funnel (4–6 Weeks)' },
+  { value: 25000, label: '₹25K', tierHint: 'WhatsApp Bot & Lead Automation (1–4 Weeks)' },
+  { value: 30000, label: '₹30K', tierHint: 'Website, Web App or SaaS (2–6 Weeks)' },
+  { value: 50000, label: '₹50K', tierHint: 'Full-Stack Web App + WhatsApp AI + UPI' },
+  { value: 75000, label: '₹75K', tierHint: 'Multi-Module SaaS Portal + Admin Dashboard' },
+  { value: 100000, label: '₹1L+', tierHint: 'Enterprise SaaS + AI Automation + Growth Stack' },
+];
+
+const DOMAIN_BASE_PRICE_MAP: Record<SimulatorDomain, number> = {
+  'seo-content': 15000,
+  'paid-ads': 20000,
+  'ai-automation': 25000,
+  'web-saas': 30000,
+};
+
+const DOMAIN_TIMELINE_MAP: Record<SimulatorDomain, string> = {
+  'seo-content': '2 to 4 Weeks',
+  'paid-ads': '4 to 6 Weeks',
+  'ai-automation': '1 to 4 Weeks',
+  'web-saas': '2 to 6 Weeks',
+};
 
 function computeScopeBlueprint(config: {
   domains: SimulatorDomain[];
@@ -104,40 +149,54 @@ function computeScopeBlueprint(config: {
   const domainCount = domains.length;
 
   const headlineParts: string[] = [];
-  if (domains.includes('web-saas')) headlineParts.push('Next.js Website / Web App');
-  if (domains.includes('ai-automation')) headlineParts.push('WhatsApp Booking Bot');
-  if (domains.includes('paid-ads')) headlineParts.push('Meta & Google Ad Funnel');
-  if (domains.includes('seo-content')) headlineParts.push('Google Maps & Search SEO');
+  if (domains.includes('web-saas')) headlineParts.push('Website, Web App or SaaS');
+  if (domains.includes('ai-automation')) headlineParts.push('WhatsApp Bot & Lead Automation');
+  if (domains.includes('paid-ads')) headlineParts.push('Meta & Google Ads Funnel');
+  if (domains.includes('seo-content')) headlineParts.push('Local Maps & Search SEO');
 
   const headline = headlineParts.join(' + ');
 
-  // Realistic pricing starting from ₹10,000 – ₹18,000 (Open to Discussion & Negotiation)
-  let minInr = 10000;
-  let maxInr = 18000;
+  // Calculate base starting price from selected domains and tier
+  const highestSelectedDomainBase = domains.reduce(
+    (max, d) => Math.max(max, DOMAIN_BASE_PRICE_MAP[d]),
+    15000,
+  );
+  const additionalDomainsAddon = Math.max(0, domainCount - 1) * 7000;
 
-  if (scale === 'launch') {
-    minInr = 10000 + Math.max(0, domainCount - 1) * 3000;
-    maxInr = 18000 + Math.max(0, domainCount - 1) * 4000;
-  } else if (scale === 'growth') {
-    minInr = 18000 + Math.max(0, domainCount - 1) * 5000;
-    maxInr = 35000 + Math.max(0, domainCount - 1) * 7000;
-  } else {
-    minInr = 40000 + Math.max(0, domainCount - 1) * 10000;
-    maxInr = 75000 + Math.max(0, domainCount - 1) * 15000;
+  let minInr = highestSelectedDomainBase + additionalDomainsAddon;
+  if (scale === 'launch' && domainCount === 1 && domains[0] === 'seo-content') {
+    minInr = 15000;
+  } else if (scale === 'launch' && domainCount === 1) {
+    minInr = Math.min(highestSelectedDomainBase, 15000);
+  } else if (scale === 'enterprise') {
+    minInr = Math.max(30000, highestSelectedDomainBase + additionalDomainsAddon);
   }
 
+  const maxInr =
+    scale === 'launch'
+      ? Math.max(minInr + 10000, 25000)
+      : scale === 'growth'
+        ? Math.max(minInr + 18000, 45000)
+        : Math.max(minInr + 35000, 85000);
+
   const estimatedRange = `₹${minInr.toLocaleString('en-IN')} – ₹${maxInr.toLocaleString('en-IN')}`;
+
+  // Determine timeline based on selected service(s)
+  let baseTimeline = '2 to 6 Weeks';
+  if (domainCount === 1) {
+    baseTimeline = DOMAIN_TIMELINE_MAP[domains[0]];
+  } else if (domains.includes('web-saas') || domains.includes('paid-ads')) {
+    baseTimeline = '2 to 6 Weeks';
+  } else {
+    baseTimeline = '2 to 4 Weeks';
+  }
 
   const estimatedWeeks =
     urgency === 'accelerated'
       ? scale === 'launch'
-        ? '7 to 12 Days'
-        : '2 to 3 Weeks'
-      : scale === 'launch'
         ? '1 to 2 Weeks'
-        : scale === 'growth'
-          ? '2 to 4 Weeks'
-          : '4 to 6 Weeks';
+        : '2 to 3 Weeks'
+      : baseTimeline;
 
   const sprintCount = scale === 'launch' ? 2 : scale === 'growth' ? 3 : 4;
 
@@ -158,23 +217,23 @@ function computeScopeBlueprint(config: {
   const primaryDeliverables: string[] = [];
   if (domains.includes('web-saas')) {
     primaryDeliverables.push(
-      'Fast mobile-first website or web app with clean modern UI',
+      'Fast mobile-first website, web app, or SaaS portal (2 to 6 Weeks • From ₹30,000)',
       'Clean admin dashboard & 100% GitHub source code ownership'
     );
   }
   if (domains.includes('ai-automation')) {
     primaryDeliverables.push(
-      'WhatsApp bot for common FAQs, brochure sharing, slot booking & team handover'
+      'WhatsApp bot for 24/7 FAQs, brochure sharing & slot booking (1 to 4 Weeks • From ₹25,000)'
     );
   }
   if (domains.includes('paid-ads')) {
     primaryDeliverables.push(
-      'Targeted ad campaigns paired with a dedicated conversion landing page'
+      'Targeted Meta & Google ad funnels with dedicated landing page (4 to 6 Weeks • From ₹20,000)'
     );
   }
   if (domains.includes('seo-content')) {
     primaryDeliverables.push(
-      'Google Business Profile optimization, local citations & digital WhatsApp review link'
+      'Google Business Profile SEO, local citations & WhatsApp review link (2 to 4 Weeks • From ₹15,000)'
     );
   }
 
@@ -191,6 +250,8 @@ function computeScopeBlueprint(config: {
 
   return {
     headline,
+    minInr,
+    maxInr,
     estimatedRange,
     architectureSummary,
     estimatedWeeks,
@@ -206,8 +267,9 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
   onSubmitLead,
 }) => {
   const [domains, setDomains] = useState<SimulatorDomain[]>(['web-saas']);
-  const [scale, setScale] = useState<SimulatorScale>('launch');
+  const [scale, setScale] = useState<SimulatorScale>('enterprise');
   const [urgency, setUrgency] = useState<SimulatorUrgency>('standard');
+  const [sliderBudgetInr, setSliderBudgetInr] = useState<number>(30000);
 
   // Dedicated Client Custom Requirements Input State
   const [clientName, setClientName] = useState<string>('');
@@ -216,7 +278,18 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
   const [submittingQuote, setSubmittingQuote] = useState<boolean>(false);
   const [quoteSubmittedMessage, setQuoteSubmittedMessage] = useState<string | null>(null);
 
+  const applyAutoTierForDomain = (domainId: SimulatorDomain) => {
+    const matchedOption = DOMAIN_OPTIONS.find((d) => d.id === domainId);
+    if (matchedOption) {
+      setScale(matchedOption.autoTier);
+      setSliderBudgetInr(matchedOption.startingPriceInr);
+    }
+  };
+
   const toggleDomain = (id: SimulatorDomain) => {
+    // Always automatically select the mapped Project Tier when a user clicks a service card
+    applyAutoTierForDomain(id);
+
     setDomains((prev) => {
       if (prev.includes(id)) {
         if (prev.length === 1) return prev;
@@ -224,6 +297,28 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
       }
       return [...prev, id];
     });
+  };
+
+  const handleManualScaleSelect = (nextScale: SimulatorScale) => {
+    setScale(nextScale);
+    if (nextScale === 'launch') {
+      setSliderBudgetInr(15000);
+    } else if (nextScale === 'growth') {
+      setSliderBudgetInr(25000);
+    } else {
+      setSliderBudgetInr(30000);
+    }
+  };
+
+  const handleBudgetSliderChange = (nextVal: number) => {
+    setSliderBudgetInr(nextVal);
+    if (nextVal <= 18000) {
+      setScale('launch');
+    } else if (nextVal < 30000) {
+      setScale('growth');
+    } else {
+      setScale('enterprise');
+    }
   };
 
   const blueprint = useMemo(
@@ -236,6 +331,21 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
     [domains, scale, urgency]
   );
 
+  const activePriceStop = useMemo(() => {
+    let closest = PRICE_LINE_STOPS[0];
+    for (const stop of PRICE_LINE_STOPS) {
+      if (sliderBudgetInr >= stop.value) {
+        closest = stop;
+      }
+    }
+    return closest;
+  }, [sliderBudgetInr]);
+
+  const formattedSliderBudget =
+    sliderBudgetInr >= 100000
+      ? '₹1,00,000+'
+      : `₹${sliderBudgetInr.toLocaleString('en-IN')}`;
+
   const selectedLabels = useMemo(
     () =>
       DOMAIN_OPTIONS.filter((d) => domains.includes(d.id)).map((d) => d.label),
@@ -244,7 +354,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
 
   const buildCombinedSummaryText = () => {
     const parts = [
-      `Estimated Range: ${blueprint.estimatedRange} (Open to Discussion & Negotiation)`,
+      `Target Budget Line: ${formattedSliderBudget} (Estimated Range: ${blueprint.estimatedRange} • Flexible & Negotiable)`,
       `Selected Services: ${selectedLabels.join(', ')}`,
       `Timeline: ${blueprint.estimatedWeeks}`,
     ];
@@ -269,10 +379,10 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
           name: clientName.trim(),
           phoneOrEmail: clientPhone.trim(),
           selectedPillars: selectedLabels,
-          budgetTier: `${blueprint.estimatedRange} (Open to Discussion & Negotiation)`,
+          budgetTier: `${formattedSliderBudget} (${blueprint.estimatedRange} • Open to Negotiation)`,
           projectSummary:
             customRequirements.trim().length >= 10
-              ? `${customRequirements.trim()} — [Estimated: ${blueprint.estimatedRange} | Services: ${selectedLabels.join(', ')}]`
+              ? `${customRequirements.trim()} — [Target Budget: ${formattedSliderBudget} | Services: ${selectedLabels.join(', ')}]`
               : summary,
         });
         setQuoteSubmittedMessage(
@@ -294,7 +404,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
       'Hello SkyLine Digital Agency,',
       'I scoped my project on your Price & Roadmap Estimator:',
       `• Selected Services: ${selectedLabels.join(', ')}`,
-      `• Estimated Range: ${blueprint.estimatedRange} (Open to Discussion & Negotiation)`,
+      `• Selected Budget Line: ${formattedSliderBudget} (Range: ${blueprint.estimatedRange})`,
       `• Est. Timeline: ${blueprint.estimatedWeeks}`,
     ];
     if (clientName.trim()) {
@@ -308,7 +418,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
     }
     lines.push('Let us discuss the features and finalize a practical quote.');
     return `https://wa.me/${SKYLINE_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
-  }, [selectedLabels, blueprint, clientName, clientPhone, customRequirements]);
+  }, [selectedLabels, blueprint, formattedSliderBudget, clientName, clientPhone, customRequirements]);
 
   return (
     <section
@@ -336,7 +446,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
             </h2>
           </div>
           <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-md leading-relaxed">
-            Starter websites and setups begin from ₹10,000 – ₹18,000. Select what you need, write your custom requirements, and send your roadmap directly on WhatsApp.
+            Starter setups begin at ₹10,000. Select your service below to auto-match the ideal project tier, slide the interactive ₹10K–₹1L+ price line, and send your roadmap on WhatsApp.
           </p>
         </div>
 
@@ -347,7 +457,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
             <div>
               <div className="flex items-center justify-between mb-3">
                 <label className="font-mono-tech text-xs uppercase tracking-wider text-[var(--text-primary)] font-semibold">
-                  1. Select What You Need (Pick 1 or More)
+                  1. Select What You Need (Auto-Matches Project Tier)
                 </label>
                 <span className="font-mono-tech text-[11px] px-2.5 py-0.5 rounded-full badge-platinum font-semibold">
                   {domains.length} Selected
@@ -360,21 +470,24 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
                     <button
                       key={opt.id}
                       type="button"
+                      data-testid={`simulator-domain-${opt.id}`}
                       onClick={() => toggleDomain(opt.id)}
-                      className={`p-4 rounded-2xl text-left transition-all cursor-pointer border ${
+                      className={`p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer border hover:-translate-y-1.5 hover:shadow-xl ${
                         selected
                           ? 'btn-platinum-primary shadow-md'
                           : 'surface-elevated hover:border-[var(--border-strong)]'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
-                        <span
-                          className={`font-mono-tech text-[10px] uppercase tracking-widest ${
-                            selected ? 'opacity-80' : 'text-[var(--text-muted)]'
+                        <strong
+                          className={`font-mono-tech text-[11px] uppercase tracking-widest font-extrabold ${
+                            selected
+                              ? 'text-current'
+                              : 'text-[var(--text-primary)]'
                           }`}
                         >
                           {opt.tag}
-                        </span>
+                        </strong>
                         <span
                           className={`w-4 h-4 rounded-full flex items-center justify-center border ${
                             selected
@@ -385,13 +498,33 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
                           {selected && <Check className="w-2.5 h-2.5" />}
                         </span>
                       </div>
-                      <div className="font-display font-bold text-sm mb-1">
+                      <div className="font-display font-bold text-sm mb-1.5">
                         {opt.label}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                        <span
+                          className={`font-mono-tech text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                            selected
+                              ? 'bg-white/15 text-current'
+                              : 'bg-[#09090B] text-white dark:bg-white dark:text-[#09090B]'
+                          }`}
+                        >
+                          {opt.priceLabel}
+                        </span>
+                        <span
+                          className={`font-mono-tech text-[10px] font-semibold px-2 py-0.5 rounded-md border ${
+                            selected
+                              ? 'border-current/30 text-current'
+                              : 'border-[var(--border-strong)] text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {opt.timelineLabel}
+                        </span>
                       </div>
                       <div
                         className={`text-xs leading-snug ${
                           selected
-                            ? 'opacity-80'
+                            ? 'opacity-85'
                             : 'text-[var(--text-secondary)]'
                         }`}
                       >
@@ -406,7 +539,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
             {/* Step 2: Scale */}
             <div>
               <label className="block font-mono-tech text-xs uppercase tracking-wider text-[var(--text-primary)] font-semibold mb-3">
-                2. Your Project Tier (All Prices Flexible &amp; Negotiable)
+                2. Your Project Tier (Auto-Selected • Or Pick Manually)
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {SCALE_OPTIONS.map((opt) => {
@@ -415,8 +548,9 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
                     <button
                       key={opt.id}
                       type="button"
-                      onClick={() => setScale(opt.id)}
-                      className={`p-3.5 rounded-2xl text-left transition-all cursor-pointer border ${
+                      data-testid={`simulator-tier-${opt.id}`}
+                      onClick={() => handleManualScaleSelect(opt.id)}
+                      className={`p-3.5 rounded-2xl text-left transition-all duration-200 cursor-pointer border hover:-translate-y-1.5 hover:shadow-lg ${
                         selected
                           ? 'btn-platinum-primary'
                           : 'surface-elevated hover:border-[var(--border-strong)]'
@@ -428,7 +562,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
                       <div
                         className={`text-[11px] leading-tight ${
                           selected
-                            ? 'opacity-80'
+                            ? 'opacity-85'
                             : 'text-[var(--text-secondary)]'
                         }`}
                       >
@@ -453,7 +587,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
                       key={opt.id}
                       type="button"
                       onClick={() => setUrgency(opt.id)}
-                      className={`p-3.5 rounded-2xl text-left transition-all cursor-pointer border flex items-center justify-between ${
+                      className={`p-3.5 rounded-2xl text-left transition-all duration-200 cursor-pointer border flex items-center justify-between hover:-translate-y-1 hover:shadow-md ${
                         selected
                           ? 'btn-platinum-primary'
                           : 'surface-elevated hover:border-[var(--border-strong)]'
@@ -514,7 +648,7 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
             </div>
           </div>
 
-          {/* Right Column: Estimated Project Roadmap + Dedicated Client Custom Requirements Input */}
+          {/* Right Column: Estimated Project Roadmap + Interactive Price Line Calculator + Custom Requirements */}
           <div className="lg:col-span-6 surface-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden space-y-6">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-[var(--border-hairline)]">
@@ -529,8 +663,8 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
                 </span>
               </div>
 
-              {/* Estimated Range Box (Open to Discussion & Negotiation) */}
-              <div className="my-5 p-4 sm:p-5 rounded-2xl surface-elevated border border-[var(--border-strong)] space-y-1.5">
+              {/* Estimated Range Box + Interactive Price Line Calculator (₹10,000 to ₹1,00,000+) */}
+              <div className="my-5 p-4 sm:p-5 rounded-2xl surface-elevated border border-[var(--border-strong)] space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-mono-tech text-[11px] uppercase tracking-wider font-bold text-[var(--text-primary)]">
                     Estimated Range (Open to Discussion &amp; Negotiation)
@@ -539,9 +673,63 @@ export const SystemArchitectSimulator: React.FC<SystemArchitectSimulatorProps> =
                     Timeline: <strong>{blueprint.estimatedWeeks}</strong>
                   </span>
                 </div>
-                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)]">
-                  {blueprint.estimatedRange}
+
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <div className="font-display text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)]">
+                    {blueprint.estimatedRange}
+                  </div>
+                  <div className="font-mono-tech text-xs font-bold px-2.5 py-1 rounded-lg bg-[#09090B] text-white dark:bg-white dark:text-[#09090B]">
+                    Selected Line: {formattedSliderBudget}
+                  </div>
                 </div>
+
+                {/* INTERACTIVE PRICE LINE / BUDGET CALCULATOR SLIDER (₹10K to ₹1L+) */}
+                <div
+                  data-testid="interactive-price-line-calculator"
+                  className="pt-2 border-t border-[var(--border-hairline)] space-y-2.5"
+                >
+                  <div className="flex items-center justify-between text-[11px] font-mono-tech">
+                    <span className="font-bold uppercase tracking-wider text-[var(--text-primary)]">
+                      Interactive Estimator Price Line (₹10K → ₹1L+)
+                    </span>
+                    <span className="text-[var(--text-secondary)] font-semibold">
+                      {activePriceStop.tierHint}
+                    </span>
+                  </div>
+
+                  <input
+                    type="range"
+                    min={10000}
+                    max={100000}
+                    step={5000}
+                    value={sliderBudgetInr}
+                    data-testid="interactive-price-line-slider"
+                    aria-label="Interactive Project Budget Estimator Line from 10,000 INR to 1,00,000+ INR"
+                    onChange={(e) => handleBudgetSliderChange(Number(e.target.value))}
+                    className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-[#D4D4D8] dark:bg-[#27272A] accent-[#09090B] dark:accent-[#F4F4F5]"
+                  />
+
+                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-1 pt-0.5">
+                    {PRICE_LINE_STOPS.map((stop) => {
+                      const isCurrent = sliderBudgetInr === stop.value;
+                      return (
+                        <button
+                          key={stop.value}
+                          type="button"
+                          onClick={() => handleBudgetSliderChange(stop.value)}
+                          className={`py-1 px-1.5 rounded-md font-mono-tech text-[10px] font-bold transition-all cursor-pointer text-center ${
+                            isCurrent
+                              ? 'bg-[#09090B] text-white dark:bg-white dark:text-[#09090B] shadow-xs'
+                              : 'bg-black/5 dark:bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {stop.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <p className="text-xs text-[var(--text-secondary)]">
                   {blueprint.headline} — Every quote is flexible and tailored to your exact features on a quick call or WhatsApp chat.
                 </p>

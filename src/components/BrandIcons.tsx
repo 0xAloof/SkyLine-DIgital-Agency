@@ -710,38 +710,58 @@ export const TECH_STACK_OFFICIAL_LOGOS: TechStackOfficialLogoItem[] = [
 ];
 
 export const OfficialTechStackFloatingBar: React.FC = () => {
+  const rowOneItems = TECH_STACK_OFFICIAL_LOGOS.slice(0, 8);
+  const rowTwoItems = TECH_STACK_OFFICIAL_LOGOS.slice(8, 16);
+
+  const renderTechCard = (
+    item: OfficialTechStackLogoItem,
+    idx: number,
+    rowIndex: 0 | 1,
+  ) => {
+    const floatClass =
+      (idx + rowIndex) % 2 === 0 ? 'animate-tech-float-a' : 'animate-tech-float-b';
+    return (
+      <div
+        key={item.id}
+        data-testid={`tech-stack-card-${item.id}`}
+        style={{ animationDelay: `${idx * 240 + rowIndex * 180}ms` }}
+        className={`${floatClass} group p-3.5 rounded-2xl bg-[#E4E4E7] dark:bg-[#18181B] text-[#09090B] dark:text-[#F4F4F5] border border-[#D4D4D8] dark:border-[#27272A] hover:bg-[#09090B] hover:text-[#FFFFFF] dark:hover:bg-[#F4F4F5] dark:hover:text-[#09090B] hover:border-[#09090B] dark:hover:border-[#F4F4F5] hover:-translate-y-1.5 hover:shadow-xl transition-all duration-200 flex flex-col justify-between gap-2.5 cursor-default shadow-xs`}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <span className="w-8 h-8 rounded-xl bg-[#09090B] text-[#FFFFFF] dark:bg-[#F4F4F5] dark:text-[#09090B] group-hover:bg-[#FFFFFF] group-hover:text-[#09090B] dark:group-hover:bg-[#09090B] dark:group-hover:text-[#FFFFFF] flex items-center justify-center shrink-0 transition-colors">
+            {item.renderSvg('w-4 h-4')}
+          </span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#09090B] dark:bg-[#F4F4F5] group-hover:bg-[#FFFFFF] dark:group-hover:bg-[#09090B]" />
+        </div>
+        <div>
+          <div className="font-display font-bold text-xs sm:text-[13px] leading-tight text-current">
+            {item.name}
+          </div>
+          <div className="font-mono-tech text-[10px] sm:text-[11px] text-[#52525B] dark:text-[#A1A1AA] group-hover:text-[#E4E4E7] dark:group-hover:text-[#3F3F46] mt-0.5 truncate transition-colors">
+            {item.category}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div
       data-testid="tech-stack-floating-grid"
-      className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 py-2"
+      className="space-y-3.5 py-2"
     >
-      {TECH_STACK_OFFICIAL_LOGOS.map((item, idx) => {
-        const floatClass =
-          idx % 2 === 0 ? 'animate-tech-float-a' : 'animate-tech-float-b';
-        return (
-          <div
-            key={item.id}
-            data-testid={`tech-stack-card-${item.id}`}
-            style={{ animationDelay: `${(idx % 8) * 260}ms` }}
-            className={`${floatClass} group p-3 rounded-2xl surface-card border border-[var(--border-hairline)] hover:bg-[#09090B] hover:text-white dark:hover:bg-[#F4F4F5] dark:hover:text-[#09090B] transition-colors duration-200 flex flex-col justify-between gap-2.5 cursor-default shadow-xs`}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <span className="w-7 h-7 rounded-xl bg-[#18181B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] group-hover:bg-white/15 group-hover:text-white dark:group-hover:bg-[#18181B] dark:group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
-                {item.renderSvg('w-4 h-4')}
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#18181B] dark:bg-[#F4F4F5] group-hover:bg-white dark:group-hover:bg-[#09090B]" />
-            </div>
-            <div>
-              <div className="font-display font-bold text-xs leading-tight">
-                {item.name}
-              </div>
-              <div className="font-mono-tech text-[10px] opacity-75 mt-0.5 truncate">
-                {item.category}
-              </div>
-            </div>
-          </div>
-        );
-      })}
+      <div
+        data-testid="tech-stack-floating-row-1"
+        className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3"
+      >
+        {rowOneItems.map((item, idx) => renderTechCard(item, idx, 0))}
+      </div>
+      <div
+        data-testid="tech-stack-floating-row-2"
+        className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3"
+      >
+        {rowTwoItems.map((item, idx) => renderTechCard(item, idx, 1))}
+      </div>
     </div>
   );
 };

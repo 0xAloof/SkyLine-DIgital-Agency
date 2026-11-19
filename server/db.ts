@@ -142,6 +142,11 @@ export function getDb(): DatabaseSchema {
             p.imageUrl?.includes('photo-1582407947304-fd86f028f716') &&
             'leadArchitect' in p
         ) &&
+        parsed.projects.some(
+          (p) => p.id === 'proj-shivangi-salon' && p.liveSiteUrl === 'https://shivangi-hair-salon.vercel.app/'
+        ) &&
+        Array.isArray(parsed.testimonials) &&
+        parsed.testimonials.some((t) => t.projectOrSystem.includes('Shivangi Hair Salon')) &&
         Array.isArray(parsed.faqs) &&
         parsed.faqs.some((f) => f.answer.includes('₹10,000'));
       memoryDb = {

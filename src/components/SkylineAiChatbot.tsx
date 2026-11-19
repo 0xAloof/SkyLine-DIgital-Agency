@@ -55,8 +55,8 @@ const CONTEXTUAL_CHIPS = [
 ];
 
 const SACHIN_WHATSAPP_URL =
-  'https://wa.me/918643002478?text=Hi%20SkyLine%20Team%2C%20I%20visited%20your%20website%20and%20want%20to%20discuss%20a%20project.';
-const AASHIF_CALL_URL = 'tel:+918959144686';
+  'https://wa.me/918959144686?text=Hi%20SkyLine%20Team%2C%20I%20visited%20your%20website%20and%20want%20to%20discuss%20a%20project.';
+const AASHIF_CALL_URL = 'tel:+918643002478';
 
 /**
  * Formats markdown-like bullet points and **bold** spans cleanly for "Gemini in Chrome" readability.
@@ -272,7 +272,7 @@ export const SkylineAiChatbot: React.FC<SkylineAiChatbotProps> = ({
       const botMsg: ChatMessage = {
         id: `bot-${Date.now() + 1}`,
         sender: 'bot',
-        text: '• **₹10,000 starting (Negotiable pricing):** Starter websites & Google Maps SEO start at **₹10,000 – ₹18,000** (1–2 Weeks), and Custom Web Apps + WhatsApp Bots range from **₹18,000 – ₹45,000** (2–3 Weeks).\n• **Direct Connect:** Reach Sachin Sahu on WhatsApp (**+91 86430 02478**) or Aashif Khan via Direct Call (**+91 89591 44686**).',
+        text: '• **₹10,000 starting (Negotiable pricing):** Local Maps & Search SEO starts from **₹15,000** (2–4 Weeks), Meta & Google Ads Funnel from **₹20,000** (4–6 Weeks), WhatsApp Bot & Lead Automation from **₹25,000** (1–4 Weeks), and Website / Web App / SaaS from **₹30,000** (2–6 Weeks).\n• **Direct Connect:** Reach Sachin Sahu on WhatsApp (**+91 89591 44686**) or Aashif Khan via Direct Call (**+91 86430 02478**).',
         showFallbackActions: true,
       };
       setMessages((prev) => [...prev, botMsg]);

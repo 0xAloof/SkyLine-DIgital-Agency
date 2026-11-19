@@ -63,8 +63,11 @@ export const FaqSection: React.FC<FaqSectionProps> = ({
                   aria-expanded={isOpen}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                    <span className="font-mono-tech text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-md badge-platinum w-fit font-semibold">
-                      {faq.category}
+                    <span
+                      data-testid={`faq-category-badge-${faq.id}`}
+                      className="font-mono-tech text-[10px] sm:text-[11px] uppercase tracking-widest px-3 py-1 rounded-md bg-[#09090B] text-[#FFFFFF] dark:bg-[#FFFFFF] dark:text-[#09090B] w-fit font-extrabold shadow-xs"
+                    >
+                      {faq.category.toUpperCase()}
                     </span>
                     <span className="font-display font-bold text-base sm:text-lg text-[var(--text-primary)]">
                       {faq.question}

@@ -97,8 +97,25 @@ const PROTOTYPE_SITES: PrototypeSiteMeta[] = [
     id: 'gridweaver-iot',
     name: 'GridWeaver · Smart Microgrid Platform',
     category: 'CleanTech GIS & Java 21 Telemetry',
-    url: 'https://gridweaver.io',
+    url: 'https://gridweaver-virid.vercel.app',
+    liveExternalUrl: 'https://gridweaver-virid.vercel.app/',
     architect: 'Sachin Sahu (Founder & CEO)',
+  },
+  {
+    id: 'shivangi-salon',
+    name: 'Shivangi Hair Salon · Online Styling Studio',
+    category: 'React & Node.js Salon Website & Slot Booking',
+    url: 'https://shivangi-hair-salon.vercel.app',
+    liveExternalUrl: 'https://shivangi-hair-salon.vercel.app/',
+    architect: 'Aashif Khan & Sachin Sahu (Reviewed by Pradeep Sen)',
+  },
+  {
+    id: 'localloom-store',
+    name: 'LocalLoom · Handloom Store & Admin Portal',
+    category: 'Admin Panel & Handloom E-Commerce Marketplace',
+    url: 'https://localloom-nu.vercel.app',
+    liveExternalUrl: 'https://localloom-nu.vercel.app/',
+    architect: 'Aashif Khan & Sachin Sahu (Reviewed by Akram Khan)',
   },
   {
     id: 'shadowbase-cdc',
@@ -323,6 +340,54 @@ export const InteractiveArtifactModal: React.FC<InteractiveArtifactModalProps> =
   const [seoCity, setSeoCity] = useState<string>('Indore (Vijay Nagar)');
   const [seoCurrentReviews, setSeoCurrentReviews] = useState<number>(38);
   const [seoReviewDispatched, setSeoReviewDispatched] = useState<boolean>(false);
+
+  // 12. Shivangi Hair Salon State (Pradeep Sen • React & Node.js)
+  const [salonSelectedPackage, setSalonSelectedPackage] = useState<string>(
+    'Keratin Smooth & Hair Spa Package (₹2,499)'
+  );
+  const [salonSelectedStylist, setSalonSelectedStylist] = useState<string>(
+    'Pradeep Sen (Master Stylist & Founder)'
+  );
+  const [salonSelectedSlot, setSalonSelectedSlot] = useState<string>('Today • 4:00 PM');
+  const [salonClientName, setSalonClientName] = useState<string>('Riya Sharma');
+  const [salonClientPhone, setSalonClientPhone] = useState<string>('+91 98260 54321');
+  const [salonBookingConfirmed, setSalonBookingConfirmed] = useState<boolean>(false);
+
+  // 13. LocalLoom Handloom Store & Admin Panel State (Akram Khan)
+  const [loomViewMode, setLoomViewMode] = useState<'storefront' | 'admin-panel'>('storefront');
+  const [loomProducts, setLoomProducts] = useState<
+    { id: string; sku: string; title: string; weave: string; price: number; stock: number; image: string }[]
+  >([
+    {
+      id: 'loom-1',
+      sku: 'LL-CHN-101',
+      title: 'Royal Chanderi Silk Zari Saree',
+      weave: 'Chanderi Handloom • Pure Silk Warp',
+      price: 6490,
+      stock: 14,
+      image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 'loom-2',
+      sku: 'LL-MHS-204',
+      title: 'Heritage Maheshwari Temple Border Weave',
+      weave: 'Maheshwar Artisan Loom • Cotton Silk',
+      price: 4850,
+      stock: 19,
+      image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 'loom-3',
+      sku: 'LL-TUS-309',
+      title: 'Artisanal Tussar Block-Printed Dupatta Set',
+      weave: 'Natural Dye Handblock • MP Weavers',
+      price: 3290,
+      stock: 22,
+      image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80',
+    },
+  ]);
+  const [loomCartCount, setLoomCartCount] = useState<number>(2);
+  const [loomOrderConfirmed, setLoomOrderConfirmed] = useState<boolean>(false);
 
   useEffect(() => {
     if (artifactId) {
@@ -3223,6 +3288,684 @@ export const InteractiveArtifactModal: React.FC<InteractiveArtifactModalProps> =
                   <strong className="text-white">SearchPulse Local SEO Engine</strong> · Engineered by Sachin Sahu &amp; Aashif Khan (SkyLine Digital Agency)
                 </div>
                 <div>Google Business Profile Optimization · Automated WhatsApp Review Flow</div>
+              </footer>
+            </div>
+          )}
+
+          {/* =================================================================
+              12. SHIVANGI HAIR SALON — FULL SINGLE-PAGE HTML LANDING WEBSITE
+                 (Pradeep Sen • React & Node.js • https://shivangi-hair-salon.vercel.app/)
+             ================================================================= */}
+          {currentId === 'shivangi-salon' && (
+            <div
+              data-testid="prototype-page-shivangi-salon"
+              className="min-h-full bg-[#FAF9F6] text-zinc-900 flex flex-col font-sans"
+            >
+              {/* Top Salon Navigation Bar */}
+              <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-6 sm:px-12 py-4 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-zinc-950 text-white font-display font-extrabold text-sm flex items-center justify-center">
+                    SH
+                  </div>
+                  <div>
+                    <div className="font-display font-extrabold text-base tracking-tight text-zinc-950">
+                      Shivangi Hair Salon &amp; Bridal Studio
+                    </div>
+                    <div className="text-[11px] font-mono text-zinc-500">
+                      Founded by Pradeep Sen • React &amp; Node.js Online Booking Portal
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700">
+                  <a href="#shivangi-services" className="hover:text-zinc-950">
+                    Styling Menu &amp; Packages
+                  </a>
+                  <a href="#shivangi-booking" className="hover:text-zinc-950">
+                    Book Chair Slot
+                  </a>
+                  <a href="#shivangi-reviews" className="hover:text-zinc-950">
+                    Client Reviews
+                  </a>
+                </nav>
+
+                <div className="flex items-center gap-2.5">
+                  <a
+                    href="https://shivangi-hair-salon.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-bold inline-flex items-center gap-1.5"
+                  >
+                    <span>Visit Live Vercel Site</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                  <a
+                    href="#shivangi-booking"
+                    className="px-4 py-2 rounded-xl bg-zinc-950 text-white text-xs font-bold"
+                  >
+                    Book Appointment
+                  </a>
+                </div>
+              </header>
+
+              {/* Section 1: Hero Banner */}
+              <div className="bg-zinc-950 text-white py-14 px-6 sm:px-12 border-b border-zinc-800">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-200">
+                      <span>★ 4.9 RATED UNISEX HAIR &amp; BRIDAL STUDIO</span>
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-[1.12] tracking-tight">
+                      Signature Hair Styling, Keratin Therapy &amp; Luxury Bridal Makeovers.
+                    </h1>
+                    <p className="text-sm sm:text-base text-zinc-300 max-w-2xl leading-relaxed">
+                      Skip the waiting lounge. Browse transparent service packages curated by Master Stylist Pradeep Sen, reserve your preferred chair time slot online, and receive instant WhatsApp booking confirmation.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3 pt-1">
+                      <a
+                        href="#shivangi-booking"
+                        className="px-6 py-3.5 rounded-full bg-white text-zinc-950 font-display font-bold text-xs sm:text-sm"
+                      >
+                        Reserve Stylist Slot Now
+                      </a>
+                      <a
+                        href="https://shivangi-hair-salon.vercel.app/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-5 py-3.5 rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/20 font-display font-semibold text-xs sm:text-sm inline-flex items-center gap-2"
+                      >
+                        <span>Open shivangi-hair-salon.vercel.app</span>
+                        <ArrowUpRight className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-5">
+                    <div className="rounded-3xl overflow-hidden border border-white/15 bg-zinc-900 shadow-2xl">
+                      <img
+                        src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=85"
+                        alt="Shivangi Hair Salon Interior"
+                        className="w-full h-56 object-cover"
+                      />
+                      <div className="p-5 grid grid-cols-3 gap-3 text-center bg-zinc-900">
+                        <div>
+                          <div className="font-display font-extrabold text-lg text-white">2,800+</div>
+                          <div className="text-[11px] text-zinc-400">Happy Clients</div>
+                        </div>
+                        <div>
+                          <div className="font-display font-extrabold text-lg text-white">100%</div>
+                          <div className="text-[11px] text-zinc-400">Authentic Products</div>
+                        </div>
+                        <div>
+                          <div className="font-display font-extrabold text-lg text-white">Instant</div>
+                          <div className="text-[11px] text-zinc-400">WhatsApp Slot Lock</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Interactive Service Menu & Chair Slot Booking */}
+              <div
+                id="shivangi-services"
+                className="max-w-7xl mx-auto py-12 px-6 sm:px-12 space-y-12"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  {/* Left: Salon Packages Catalog */}
+                  <div className="lg:col-span-7 space-y-4">
+                    <div>
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500">
+                        01 · TRANSPARENT SALON SERVICE MENU
+                      </div>
+                      <h2 className="font-display text-2xl font-extrabold text-zinc-950 mt-1">
+                        Select Your Styling or Treatment Package
+                      </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {[
+                        {
+                          title: 'Signature Haircut, Wash & Blowdry',
+                          price: '₹699',
+                          duration: '45 Mins',
+                          tag: 'BESTSELLER',
+                          desc: ' precision haircut, nourishing argan wash, scalp massage & professional blowdry finish.',
+                        },
+                        {
+                          title: 'Keratin Smooth & Hair Spa Package (₹2,499)',
+                          price: '₹2,499',
+                          duration: '90 Mins',
+                          tag: 'FRIZZ CONTROL',
+                          desc: 'Deep protein keratin infusion, steam hydration therapy & mirror-shine smoothing.',
+                        },
+                        {
+                          title: 'Global Balayage & Gloss Color Studio',
+                          price: '₹3,999',
+                          duration: '120 Mins',
+                          tag: 'COLOR STUDIO',
+                          desc: 'Ammonia-free dimensional highlights, bond-protection treatment & gloss toner.',
+                        },
+                        {
+                          title: 'HD Bridal & Groom Makeover Suite',
+                          price: '₹8,499',
+                          duration: '180 Mins',
+                          tag: 'BRIDAL SUITE',
+                          desc: 'Complete HD airbrush makeup, floral/classic hairstyling, draping & pre-bridal glow facial.',
+                        },
+                      ].map((pkg) => {
+                        const isChosen = salonSelectedPackage.includes(pkg.title.split(' ')[0]);
+                        return (
+                          <button
+                            key={pkg.title}
+                            type="button"
+                            onClick={() => {
+                              setSalonSelectedPackage(`${pkg.title} (${pkg.price})`);
+                              setSalonBookingConfirmed(false);
+                            }}
+                            className={`p-5 rounded-3xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                              isChosen
+                                ? 'bg-zinc-950 text-white border-zinc-950 shadow-xl'
+                                : 'bg-white text-zinc-900 border-zinc-200 hover:border-zinc-900'
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between gap-2 mb-2">
+                                <span
+                                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                                    isChosen
+                                      ? 'bg-white/15 text-white'
+                                      : 'bg-zinc-100 text-zinc-800'
+                                  }`}
+                                >
+                                  {pkg.tag} · {pkg.duration}
+                                </span>
+                                <span className="font-display font-extrabold text-base">
+                                  {pkg.price}
+                                </span>
+                              </div>
+                              <div className="font-display font-bold text-sm mb-1">
+                                {pkg.title}
+                              </div>
+                              <p
+                                className={`text-xs leading-relaxed ${
+                                  isChosen ? 'text-zinc-300' : 'text-zinc-600'
+                                }`}
+                              >
+                                {pkg.desc}
+                              </p>
+                            </div>
+                            <div className="text-[11px] font-mono font-bold">
+                              {isChosen ? '✓ Selected for Booking' : 'Select Package →'}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Right: Live Appointment Slot Booker */}
+                  <div
+                    id="shivangi-booking"
+                    className="lg:col-span-5 p-6 sm:p-7 rounded-3xl bg-white border-2 border-zinc-900 shadow-xl space-y-4"
+                  >
+                    <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+                      <div>
+                        <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500">
+                          02 · INSTANT CHAIR RESERVATION
+                        </div>
+                        <h3 className="font-display font-extrabold text-lg text-zinc-950">
+                          Book Your Salon Time Slot
+                        </h3>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-md bg-zinc-950 text-white font-mono text-[10px] font-bold">
+                        React + Node.js API
+                      </span>
+                    </div>
+
+                    <div className="space-y-3 text-xs">
+                      <div>
+                        <label className="block font-bold text-zinc-700 mb-1">
+                          Selected Service Package
+                        </label>
+                        <div className="p-3 rounded-xl bg-zinc-100 font-bold text-zinc-950">
+                          {salonSelectedPackage}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-zinc-700 mb-1">
+                          Choose Master Stylist
+                        </label>
+                        <select
+                          value={salonSelectedStylist}
+                          onChange={(e) => setSalonSelectedStylist(e.target.value)}
+                          className="w-full p-3 rounded-xl bg-zinc-50 border border-zinc-300 font-semibold text-zinc-900"
+                        >
+                          <option value="Pradeep Sen (Master Stylist & Founder)">
+                            Pradeep Sen (Master Stylist &amp; Founder)
+                          </option>
+                          <option value="Shivangi Senior Bridal & Color Specialist">
+                            Shivangi Senior Bridal &amp; Color Specialist
+                          </option>
+                          <option value="Aryan Keratin & Hair Spa Expert">
+                            Aryan Keratin &amp; Hair Spa Expert
+                          </option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-zinc-700 mb-1">
+                          Pick Chair Time Slot
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            'Today • 11:30 AM',
+                            'Today • 4:00 PM',
+                            'Today • 6:30 PM',
+                            'Tomorrow • 12:00 PM',
+                          ].map((slot) => (
+                            <button
+                              key={slot}
+                              type="button"
+                              onClick={() => {
+                                setSalonSelectedSlot(slot);
+                                setSalonBookingConfirmed(false);
+                              }}
+                              className={`py-2 px-3 rounded-xl font-mono text-[11px] font-bold border cursor-pointer ${
+                                salonSelectedSlot === slot
+                                  ? 'bg-zinc-950 text-white border-zinc-950'
+                                  : 'bg-zinc-50 text-zinc-800 border-zinc-300'
+                              }`}
+                            >
+                              {slot}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block font-bold text-zinc-700 mb-1">Your Name</label>
+                          <input
+                            type="text"
+                            value={salonClientName}
+                            onChange={(e) => setSalonClientName(e.target.value)}
+                            className="w-full p-2.5 rounded-xl bg-zinc-50 border border-zinc-300 font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-zinc-700 mb-1">
+                            WhatsApp Number
+                          </label>
+                          <input
+                            type="text"
+                            value={salonClientPhone}
+                            onChange={(e) => setSalonClientPhone(e.target.value)}
+                            className="w-full p-2.5 rounded-xl bg-zinc-50 border border-zinc-300 font-semibold"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      data-testid="shivangi-confirm-slot-btn"
+                      onClick={() => setSalonBookingConfirmed(true)}
+                      className="w-full py-3.5 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-display font-bold text-xs sm:text-sm cursor-pointer"
+                    >
+                      {salonBookingConfirmed
+                        ? `✓ Chair Reserved for ${salonClientName} (${salonSelectedSlot})`
+                        : 'Confirm Salon Appointment & Send WhatsApp Pass'}
+                    </button>
+
+                    {salonBookingConfirmed && (
+                      <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs space-y-1">
+                        <div className="font-bold">
+                          ✓ Appointment Pass Generated (#SHV-2026-419)
+                        </div>
+                        <div>
+                          Stylist: <strong>{salonSelectedStylist}</strong> · Slot:{' '}
+                          <strong>{salonSelectedSlot}</strong>. WhatsApp confirmation dispatched to{' '}
+                          {salonClientPhone}.
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Section 3: Customer Reviews Strip */}
+                <div
+                  id="shivangi-reviews"
+                  className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-zinc-200"
+                >
+                  {[
+                    {
+                      name: 'Priya Chouhan',
+                      service: 'Keratin & Hair Spa',
+                      text: 'Booked my 4 PM slot online in 30 seconds and walked straight into the chair. My hair feels super silky!',
+                    },
+                    {
+                      name: 'Rohit Patidar',
+                      service: 'Groom Styling Package',
+                      text: 'Pradeep Sen gave the best fade and beard contour before my engagement ceremony. Super clean website!',
+                    },
+                    {
+                      name: 'Neha Sharma',
+                      service: 'HD Bridal Makeover',
+                      text: 'Transparent pricing on the website helped me pick our complete bridal and family styling package easily.',
+                    },
+                  ].map((r) => (
+                    <div
+                      key={r.name}
+                      className="p-5 rounded-3xl bg-white border border-zinc-200 space-y-2"
+                    >
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span>{r.name}</span>
+                        <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-zinc-100">
+                          {r.service}
+                        </span>
+                      </div>
+                      <p className="text-xs text-zinc-600 leading-relaxed">"{r.text}"</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">Shivangi Hair Salon (Pradeep Sen)</strong> · React &amp; Node.js Production Website by SkyLine Digital Agency
+                </div>
+                <a
+                  href="https://shivangi-hair-salon.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white hover:underline font-mono"
+                >
+                  https://shivangi-hair-salon.vercel.app/ ↗
+                </a>
+              </footer>
+            </div>
+          )}
+
+          {/* =================================================================
+              13. LOCALLOOM — FULL SINGLE-PAGE HTML LANDING WEBSITE + ADMIN PANEL
+                 (Akram Khan • Admin Panel & E-Commerce • https://localloom-nu.vercel.app/)
+             ================================================================= */}
+          {currentId === 'localloom-store' && (
+            <div
+              data-testid="prototype-page-localloom-store"
+              className="min-h-full bg-[#F8F8F7] text-zinc-900 flex flex-col font-sans"
+            >
+              {/* Top LocalLoom Navbar with Storefront / Admin Panel Switcher */}
+              <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-6 sm:px-12 py-4 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-zinc-950 text-white font-display font-extrabold text-sm flex items-center justify-center">
+                    LL
+                  </div>
+                  <div>
+                    <div className="font-display font-extrabold text-base tracking-tight text-zinc-950">
+                      LocalLoom · Artisanal Handloom &amp; Weaver Portal
+                    </div>
+                    <div className="text-[11px] font-mono text-zinc-500">
+                      Founded by Akram Khan • Storefront &amp; Live Inventory Admin Panel
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live View Switcher: Customer Storefront vs Weaver Admin Panel */}
+                <div className="inline-flex items-center rounded-xl p-1 bg-zinc-100 border border-zinc-300">
+                  <button
+                    type="button"
+                    data-testid="localloom-tab-storefront"
+                    onClick={() => setLoomViewMode('storefront')}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${
+                      loomViewMode === 'storefront'
+                        ? 'bg-zinc-950 text-white shadow-xs'
+                        : 'text-zinc-700 hover:text-zinc-950'
+                    }`}
+                  >
+                    Handloom Storefront
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="localloom-tab-admin"
+                    onClick={() => setLoomViewMode('admin-panel')}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${
+                      loomViewMode === 'admin-panel'
+                        ? 'bg-zinc-950 text-white shadow-xs'
+                        : 'text-zinc-700 hover:text-zinc-950'
+                    }`}
+                  >
+                    Admin Inventory Panel
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <a
+                    href="https://localloom-nu.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-bold inline-flex items-center gap-1.5"
+                  >
+                    <span>Visit Live Vercel Site</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                  <span className="px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-mono font-bold">
+                    Cart ({loomCartCount})
+                  </span>
+                </div>
+              </header>
+
+              {/* Section 1: Hero Banner */}
+              <div className="bg-zinc-950 text-white py-12 px-6 sm:px-12 border-b border-zinc-800">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-8 space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-200">
+                      <span>DIRECT FROM CHANDERI &amp; MAHESHWAR MASTER WEAVERS</span>
+                    </div>
+                    <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-[1.12] tracking-tight">
+                      Authentic Handloom Weaves Paired with Real-Time Weaver Inventory Control.
+                    </h1>
+                    <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
+                      LocalLoom connects heritage Indian handloom clusters directly to modern buyers with 1-Tap UPI checkout and a dedicated Admin Panel for SKU stock synchronization, order fulfillment, and weaver payouts.
+                    </p>
+                  </div>
+                  <div className="lg:col-span-4 p-5 rounded-3xl bg-white/10 border border-white/15 space-y-2 text-xs">
+                    <div className="font-mono font-bold text-zinc-300">LIVE PRODUCTION DEPLOYMENT</div>
+                    <div className="font-display text-2xl font-extrabold text-white">
+                      localloom-nu.vercel.app
+                    </div>
+                    <div className="text-zinc-300">
+                      Switch between <strong>Handloom Storefront</strong> and <strong>Admin Inventory Panel</strong> in the top bar.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Storefront OR Admin Panel */}
+              <div className="max-w-7xl mx-auto py-12 px-6 sm:px-12 w-full space-y-10">
+                {loomViewMode === 'storefront' ? (
+                  <>
+                    <div className="flex flex-wrap items-end justify-between gap-4">
+                      <div>
+                        <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500">
+                          01 · CURATED HANDLOOM COLLECTION
+                        </div>
+                        <h2 className="font-display text-2xl font-extrabold text-zinc-950 mt-1">
+                          Shop Heritage Chanderi, Maheshwari &amp; Tussar Weaves
+                        </h2>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setLoomViewMode('admin-panel')}
+                        className="px-4 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold cursor-pointer"
+                      >
+                        Open Admin Inventory Panel →
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {loomProducts.map((prod) => (
+                        <div
+                          key={prod.id}
+                          className="rounded-3xl bg-white border border-zinc-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl transition-all"
+                        >
+                          <div>
+                            <div className="relative h-52 bg-zinc-100 overflow-hidden">
+                              <img
+                                src={prod.image}
+                                alt={prod.title}
+                                className="w-full h-full object-cover"
+                              />
+                              <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-zinc-950/85 text-white font-mono text-[10px] font-bold">
+                                SKU: {prod.sku}
+                              </span>
+                              <span className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white/95 text-zinc-950 font-mono text-[10px] font-bold">
+                                {prod.stock} in Stock
+                              </span>
+                            </div>
+                            <div className="p-5 space-y-2">
+                              <div className="text-[11px] font-mono text-zinc-500">
+                                {prod.weave}
+                              </div>
+                              <h3 className="font-display font-bold text-base text-zinc-950">
+                                {prod.title}
+                              </h3>
+                              <div className="font-display font-extrabold text-xl text-zinc-950">
+                                ₹{prod.price.toLocaleString('en-IN')}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="p-5 pt-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLoomCartCount((c) => c + 1);
+                                setLoomOrderConfirmed(true);
+                              }}
+                              className="w-full py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-display font-bold text-xs cursor-pointer"
+                            >
+                              Add to Handloom Bag + 1-Tap UPI
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {loomOrderConfirmed && (
+                      <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs flex flex-wrap items-center justify-between gap-2">
+                        <span>
+                          ✓ Item added to LocalLoom Cart ({loomCartCount} items). Weaver authenticity certificate &amp; GST invoice ready for 1-Tap UPI checkout.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setLoomViewMode('admin-panel')}
+                          className="px-3 py-1.5 rounded-lg bg-zinc-950 text-white font-bold cursor-pointer"
+                        >
+                          Inspect in Admin Panel
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  /* LOCALLOOM ADMIN INVENTORY & ORDER DISPATCH PANEL */
+                  <div
+                    data-testid="localloom-admin-inventory-view"
+                    className="p-6 sm:p-8 rounded-3xl bg-white border-2 border-zinc-900 shadow-xl space-y-6"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-zinc-200">
+                      <div>
+                        <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500">
+                          LOCALLOOM ADMIN PANEL · AKRAM KHAN · LIVE SKU LEDGER
+                        </div>
+                        <h2 className="font-display text-2xl font-extrabold text-zinc-950 mt-0.5">
+                          Handloom Inventory, Weaver Stock &amp; Dispatch Console
+                        </h2>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setLoomViewMode('storefront')}
+                        className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-bold cursor-pointer"
+                      >
+                        ← Back to Storefront
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
+                        <div className="text-xs text-zinc-500">Total Active Handloom SKUs</div>
+                        <div className="font-display text-2xl font-extrabold text-zinc-950 mt-1">
+                          {loomProducts.reduce((acc, p) => acc + p.stock, 0)} Units
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
+                        <div className="text-xs text-zinc-500">Verified Weaver Clusters</div>
+                        <div className="font-display text-2xl font-extrabold text-zinc-950 mt-1">
+                          Chanderi &amp; Maheshwar
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-zinc-950 text-white">
+                        <div className="text-xs text-zinc-400">Live Cart / Orders Queued</div>
+                        <div className="font-display text-2xl font-extrabold mt-1">
+                          {loomCartCount} Active Orders
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      {loomProducts.map((item, idx) => (
+                        <div
+                          key={item.id}
+                          className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-wrap items-center justify-between gap-4"
+                        >
+                          <div>
+                            <div className="font-mono text-[11px] text-zinc-500">
+                              {item.sku} · {item.weave}
+                            </div>
+                            <div className="font-display font-bold text-sm text-zinc-950">
+                              {item.title}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono text-xs font-bold px-3 py-1 rounded-lg bg-white border border-zinc-300">
+                              Stock: {item.stock} Looms
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setLoomProducts((prev) =>
+                                  prev.map((p, i) =>
+                                    i === idx ? { ...p, stock: p.stock + 5 } : p
+                                  )
+                                )
+                              }
+                              className="px-3 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-bold cursor-pointer"
+                            >
+                              +5 Restock Batch
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <footer className="mt-auto bg-zinc-950 text-zinc-400 py-8 px-6 sm:px-12 border-t border-zinc-800 text-xs flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <strong className="text-white">LocalLoom (Akram Khan)</strong> · Admin Panel &amp; Handloom Storefront by SkyLine Digital Agency
+                </div>
+                <a
+                  href="https://localloom-nu.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white hover:underline font-mono"
+                >
+                  https://localloom-nu.vercel.app/ ↗
+                </a>
               </footer>
             </div>
           )}

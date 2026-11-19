@@ -508,7 +508,7 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                       <span>Call</span>
                     </a>
                     <a
-                      href={SKYLINE_SECONDARY_WHATSAPP_URL}
+                      href={SKYLINE_WHATSAPP_DIRECT_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3.5 py-2 rounded-xl btn-whatsapp-official text-xs font-semibold flex items-center gap-1.5"
@@ -543,7 +543,7 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                       <span>Call</span>
                     </a>
                     <a
-                      href={SKYLINE_WHATSAPP_DIRECT_URL}
+                      href={SKYLINE_SECONDARY_WHATSAPP_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3.5 py-2 rounded-xl btn-whatsapp-official text-xs font-semibold flex items-center gap-1.5"
@@ -969,7 +969,7 @@ export const ContactDispatchFooter: React.FC<ContactDispatchFooterProps> = ({
                   </a>
                   <span className="text-[#71717A]">•</span>
                   <a
-                    href={SKYLINE_SECONDARY_WHATSAPP_URL}
+                    href={SKYLINE_WHATSAPP_DIRECT_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"

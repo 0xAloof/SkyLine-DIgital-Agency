@@ -30,9 +30,9 @@ import {
 import { PageId } from './Navbar';
 import {
   WhatsAppBrandBadge,
+  WhatsAppLogoIcon,
   GmailBrandIcon,
   OfficialTechStackFloatingBar,
-  TECH_STACK_OFFICIAL_LOGOS,
 } from './BrandIcons';
 import { InteractiveArtifactModal } from './InteractiveArtifactModal';
 import {
@@ -166,7 +166,7 @@ const VISION_STATEMENT_WORDS =
   );
 
 const SACHIN_WHATSAPP_DIRECT =
-  'https://wa.me/918643002478?text=Hi%20SkyLine%20Team%2C%20I%20visited%20your%20website%20and%20want%20to%20discuss%20a%20project.';
+  'https://wa.me/918959144686?text=Hi%20SkyLine%20Team%2C%20I%20visited%20your%20website%20and%20want%20to%20discuss%20a%20project.';
 
 const FIBONACCI_SPHERE_NODES = computeFibonacciSphereNodes(
   HERO_ORBS.map((o) => ({ id: o.id, label: o.label })),
@@ -206,11 +206,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const [isAutoCycling, setIsAutoCycling] = useState<boolean>(true);
   const [illuminatedWordCount, setIlluminatedWordCount] = useState<number>(12);
   const [hoveredVisionIndex, setHoveredVisionIndex] = useState<number | null>(null);
-  const [spotlightPos, setSpotlightPos] = useState<{ x: number; y: number; active: boolean }>({
-    x: 0,
-    y: 0,
-    active: false,
-  });
+  const [revealedFounderId, setRevealedFounderId] = useState<string>('sachin-sahu');
 
   const activeCard = HERO_CAPABILITY_CARDS[activeCardIndex] || HERO_CAPABILITY_CARDS[0];
   const activeOrb = HERO_ORBS[activeOrbIndex] || HERO_ORBS[0];
@@ -234,7 +230,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const prevPointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const hoverParallaxRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const visionRef = useRef<HTMLDivElement | null>(null);
-  const techDockRef = useRef<HTMLDivElement | null>(null);
 
   const kinematicStateRef = useRef<UseFrameKinematicState>({
     elapsedSeconds: 0,
@@ -667,7 +662,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <section
       id="home"
-      className="relative pt-28 sm:pt-32 pb-16 overflow-hidden select-none bg-[var(--bg-canvas)]"
+      className="relative pt-3 sm:pt-5 pb-16 overflow-hidden select-none bg-[var(--bg-canvas)]"
     >
       {/* Subtle Monochromatic Studio Lighting Backdrop */}
       <div
@@ -846,7 +841,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   className="relative z-10 w-full h-full"
                 />
 
-                {/* 3D-Projected Floating Capability Pills Orbiting in 3D Space */}
+                {/* 3D-Projected Floating Capability Pills Orbiting in 3D Space (Cursor-Follow onMouseEnter) */}
                 <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
                   {HERO_ORBS.map((orb, idx) => {
                     const isOrbActive = idx === activeOrbIndex;
@@ -857,6 +852,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                           floatingPillElsRef.current[idx] = el;
                         }}
                         type="button"
+                        data-testid={`hero-3d-floating-pill-${orb.id}`}
+                        onMouseEnter={() => selectHeroOrb(idx)}
+                        onFocus={() => selectHeroOrb(idx)}
                         onClick={(e) => {
                           e.stopPropagation();
                           selectHeroOrb(idx);
@@ -866,14 +864,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                           top: 0,
                           transform: 'translate3d(240px, 160px, 0) translate(-50%, -50%)',
                         }}
-                        className={`pointer-events-auto absolute inline-flex items-center gap-1.5 rounded-full whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                        className={`pointer-events-auto absolute inline-flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-colors duration-200 cursor-pointer ${
                           isOrbActive
                             ? 'px-4 py-1.5 bg-[#FFFFFF] text-[#09090B] border-2 border-[#18181B] dark:border-[#FFFFFF] font-display font-extrabold text-xs shadow-lg'
-                            : 'px-3 py-1 bg-[#E4E4E7]/90 dark:bg-[#18181B]/90 text-[#09090B] dark:text-[#F4F4F5] border border-[#52525B]/60 dark:border-[#52525B] font-display font-bold text-[11px] backdrop-blur-xs hover:bg-[#09090B] hover:text-[#FFFFFF] dark:hover:bg-[#FFFFFF] dark:hover:text-[#09090B]'
+                            : 'px-3 py-1 bg-[#E4E4E7]/95 dark:bg-[#18181B]/95 text-[#09090B] dark:text-[#F4F4F5] border border-[#52525B]/60 dark:border-[#52525B] font-display font-bold text-[11px] backdrop-blur-xs hover:bg-[#09090B] hover:text-[#FFFFFF] dark:hover:bg-[#FFFFFF] dark:hover:text-[#09090B]'
                         }`}
                       >
-                        {renderHeroOrbIcon(orb.id, isOrbActive ? 'w-3.5 h-3.5' : 'w-3 h-3')}
-                        <span>{orb.label}</span>
+                        {renderHeroOrbIcon(orb.id, isOrbActive ? 'w-3.5 h-3.5 shrink-0' : 'w-3 h-3 shrink-0')}
+                        <span className="whitespace-nowrap">{orb.label}</span>
                       </button>
                     );
                   })}
@@ -886,10 +884,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 />
               </div>
 
-              {/* BOTTOM 7-PILL CAPABILITY SELECTOR BAR (5 on Row 1 + 2 on Row 2 Left/Right) */}
+              {/* BOTTOM 7-PILL CAPABILITY SELECTOR BAR (5 on Row 1 + 2 on Row 2 Left/Right • Cursor-Follow onMouseEnter) */}
               <div className="pt-4 border-t border-[#D4D4D8] dark:border-[#27272A] space-y-2.5 relative z-20">
                 {/* Row 1: 5 Capability Pills (AI Agents, Paid Ads, SaaS & Cloud, Web & Apps, SEO & AEO) */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-1.5">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
                   {topFiveOrbs.map((orb, idx) => {
                     const isOrbActive = idx === activeOrbIndex;
                     return (
@@ -897,15 +895,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         key={orb.id}
                         type="button"
                         data-testid={`hero-orb-pill-${orb.id}`}
+                        onMouseEnter={() => selectHeroOrb(idx)}
+                        onFocus={() => selectHeroOrb(idx)}
                         onClick={() => selectHeroOrb(idx)}
-                        className={`flex-1 px-2.5 py-2.5 rounded-2xl font-display text-[11px] font-bold inline-flex items-center justify-center gap-1.5 whitespace-nowrap transition-all duration-200 cursor-pointer border ${
+                        className={`px-2.5 py-2.5 rounded-2xl font-display text-[11px] font-bold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-all duration-200 cursor-pointer border hover:-translate-y-0.5 ${
                           isOrbActive
                             ? 'bg-[#09090B] text-[#FFFFFF] border-[#09090B] dark:bg-[#FFFFFF] dark:text-[#09090B] dark:border-[#FFFFFF] shadow-md'
-                            : 'bg-[#D4D4D8]/80 text-[#18181B] border-transparent dark:bg-[#1F1F24] dark:text-[#A1A1AA] hover:bg-[#09090B] hover:text-[#FFFFFF] dark:hover:bg-[#09090B] dark:hover:text-[#FFFFFF] dark:hover:border-[#3F3F46]'
+                            : 'bg-[#D4D4D8]/85 text-[#18181B] border-transparent dark:bg-[#1F1F24] dark:text-[#E4E4E7] hover:bg-[#09090B] hover:text-[#FFFFFF] dark:hover:bg-[#FFFFFF] dark:hover:text-[#09090B]'
                         }`}
                       >
                         {renderHeroOrbIcon(orb.id, 'w-3.5 h-3.5 shrink-0')}
-                        <span>{orb.label}</span>
+                        <span className="whitespace-nowrap">{orb.label}</span>
                       </button>
                     );
                   })}
@@ -921,15 +921,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         key={orb.id}
                         type="button"
                         data-testid={`hero-orb-pill-${orb.id}`}
+                        onMouseEnter={() => selectHeroOrb(actualIdx)}
+                        onFocus={() => selectHeroOrb(actualIdx)}
                         onClick={() => selectHeroOrb(actualIdx)}
-                        className={`px-4 py-2.5 rounded-2xl font-display text-xs font-bold inline-flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer border min-w-[140px] sm:min-w-[165px] ${
+                        className={`px-4 py-2.5 rounded-2xl font-display text-xs font-bold inline-flex items-center justify-center gap-2 whitespace-nowrap shrink-0 transition-all duration-200 cursor-pointer border min-w-[140px] sm:min-w-[165px] hover:-translate-y-0.5 ${
                           isOrbActive
                             ? 'bg-[#09090B] text-[#FFFFFF] border-[#09090B] dark:bg-[#FFFFFF] dark:text-[#09090B] dark:border-[#FFFFFF] shadow-md'
-                            : 'bg-[#D4D4D8]/80 text-[#18181B] border-transparent dark:bg-[#1F1F24] dark:text-[#A1A1AA] hover:bg-[#09090B] hover:text-[#FFFFFF] dark:hover:bg-[#09090B] dark:hover:text-[#FFFFFF] dark:hover:border-[#3F3F46]'
+                            : 'bg-[#D4D4D8]/85 text-[#18181B] border-transparent dark:bg-[#1F1F24] dark:text-[#E4E4E7] hover:bg-[#09090B] hover:text-[#FFFFFF] dark:hover:bg-[#FFFFFF] dark:hover:text-[#09090B]'
                         }`}
                       >
                         {renderHeroOrbIcon(orb.id, 'w-3.5 h-3.5 shrink-0')}
-                        <span>{orb.label}</span>
+                        <span className="whitespace-nowrap">{orb.label}</span>
                       </button>
                     );
                   })}
@@ -940,7 +942,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
 
         {/* =====================================================================
-            4 INTERACTIVE VISUAL CAPABILITY SWITCHER CARDS BELOW HERO
+            4 INTERACTIVE VISUAL CAPABILITY SWITCHER CARDS BELOW HERO (CURSOR-FOLLOW + OFFICIAL WHATSAPP LOGO + CRISP CONTRAST)
            ===================================================================== */}
         <div
           data-testid="hero-capability-switcher-grid"
@@ -948,6 +950,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         >
           {HERO_CAPABILITY_CARDS.map((card, idx) => {
             const isSelected = idx === activeCardIndex;
+            const isWhatsAppCard = card.id === 'whatsapp-ai';
             const CardIcon =
               idx === 0
                 ? Layers
@@ -957,57 +960,67 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 ? MapPin
                 : ShoppingBag;
 
+            const activateCapabilityCard = () => {
+              setIsAutoCycling(false);
+              setActiveCardIndex(idx);
+              setActiveOrbIndex(card.orbIndex);
+            };
+
             return (
               <button
                 key={card.id}
                 type="button"
                 data-testid={`hero-switcher-card-${card.id}`}
-                onClick={() => {
-                  setIsAutoCycling(false);
-                  setActiveCardIndex(idx);
-                  setActiveOrbIndex(card.orbIndex);
-                }}
-                className={`group text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer border ${
+                onMouseEnter={activateCapabilityCard}
+                onFocus={activateCapabilityCard}
+                onClick={activateCapabilityCard}
+                className={`group text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer border hover:-translate-y-1.5 hover:shadow-xl ${
                   isSelected
-                    ? 'bg-[#09090B] text-white dark:bg-white dark:text-[#09090B] border-[#09090B] dark:border-white shadow-lg scale-[1.01]'
-                    : 'surface-card border-[var(--border-hairline)] hover:bg-[#09090B] hover:text-white dark:hover:bg-white dark:hover:text-[#09090B]'
+                    ? 'bg-[#09090B] text-[#FFFFFF] dark:bg-[#F4F4F5] dark:text-[#09090B] border-[#09090B] dark:border-[#F4F4F5] shadow-lg'
+                    : 'bg-[#E4E4E7] text-[#09090B] dark:bg-[#18181B] dark:text-[#F4F4F5] border-[#D4D4D8] dark:border-[#27272A] hover:bg-[#09090B] hover:text-[#FFFFFF] dark:hover:bg-[#F4F4F5] dark:hover:text-[#09090B] hover:border-[#09090B] dark:hover:border-[#F4F4F5]'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2 mb-2.5">
                   <div className="inline-flex items-center gap-2">
                     <span
                       className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                        isSelected
-                          ? 'bg-white/15 text-white dark:bg-black/15 dark:text-[#09090B]'
-                          : 'bg-[#18181B] text-white dark:bg-[#F4F4F5] dark:text-[#09090B] group-hover:bg-white/15 group-hover:text-white dark:group-hover:bg-black/15 dark:group-hover:text-[#09090B]'
+                        isWhatsAppCard
+                          ? 'bg-[#25D366] text-[#FFFFFF] shadow-xs'
+                          : isSelected
+                          ? 'bg-[#FFFFFF] text-[#09090B] dark:bg-[#09090B] dark:text-[#FFFFFF]'
+                          : 'bg-[#09090B] text-[#FFFFFF] dark:bg-[#F4F4F5] dark:text-[#09090B] group-hover:bg-[#FFFFFF] group-hover:text-[#09090B] dark:group-hover:bg-[#09090B] dark:group-hover:text-[#FFFFFF]'
                       }`}
                     >
-                      <CardIcon className="w-3.5 h-3.5" />
+                      {isWhatsAppCard ? (
+                        <WhatsAppLogoIcon className="w-4 h-4 text-[#FFFFFF]" />
+                      ) : (
+                        <CardIcon className="w-3.5 h-3.5" />
+                      )}
                     </span>
-                    <span className="font-display font-bold text-xs sm:text-sm">
+                    <span className="font-display font-bold text-xs sm:text-sm text-current">
                       {card.shortTitle}
                     </span>
                   </div>
 
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-mono-tech font-semibold ${
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-mono-tech font-bold transition-colors ${
                       isSelected
-                        ? 'bg-white/15 text-white dark:bg-black/10 dark:text-[#09090B]'
-                        : 'surface-elevated text-[var(--text-secondary)] group-hover:bg-white/15 group-hover:text-white dark:group-hover:bg-black/10 dark:group-hover:text-[#09090B]'
+                        ? 'bg-white/15 text-[#FFFFFF] dark:bg-black/15 dark:text-[#09090B]'
+                        : 'bg-[#D4D4D8] text-[#09090B] dark:bg-[#27272A] dark:text-[#F4F4F5] group-hover:bg-white/15 group-hover:text-[#FFFFFF] dark:group-hover:bg-black/15 dark:group-hover:text-[#09090B]'
                     }`}
                   >
                     ₹10,000+
                   </span>
                 </div>
 
-                <div className="text-xs font-semibold mb-1 truncate">
+                <div className="text-xs font-bold mb-1 truncate text-current">
                   {card.miniPreviewTitle}
                 </div>
                 <div
-                  className={`text-[11px] truncate ${
+                  className={`text-[11px] truncate transition-colors ${
                     isSelected
-                      ? 'text-zinc-300 dark:text-zinc-600'
-                      : 'text-[var(--text-secondary)] group-hover:text-zinc-300 dark:group-hover:text-zinc-600'
+                      ? 'text-[#D4D4D8] dark:text-[#3F3F46]'
+                      : 'text-[#52525B] dark:text-[#A1A1AA] group-hover:text-[#D4D4D8] dark:group-hover:text-[#3F3F46]'
                   }`}
                 >
                   {card.miniPreviewSub} • {card.miniPreviewStat}
@@ -1063,60 +1076,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               );
             })}
           </p>
-
-          {/* Interactive Spotlight Tech Dock */}
-          <div
-            ref={techDockRef}
-            onMouseMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              setSpotlightPos({
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
-                active: true,
-              });
-            }}
-            onMouseLeave={() => setSpotlightPos((prev) => ({ ...prev, active: false }))}
-            className="mt-6 pt-5 border-t border-[var(--border-hairline)] relative overflow-hidden rounded-2xl"
-          >
-            {spotlightPos.active && (
-              <div
-                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 w-44 h-44 rounded-full transition-opacity duration-200"
-                style={{
-                  left: spotlightPos.x,
-                  top: spotlightPos.y,
-                  background:
-                    'radial-gradient(circle, rgba(113,113,122,0.16) 0%, rgba(161,161,170,0.06) 50%, transparent 75%)',
-                }}
-              />
-            )}
-            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5">
-              {TECH_STACK_OFFICIAL_LOGOS.slice(0, 8).map((tech) => (
-                <div
-                  key={tech.id}
-                  className="group px-3.5 py-2 rounded-xl surface-elevated border border-[var(--border-hairline)] hover:bg-[#09090B] hover:text-white dark:hover:bg-white dark:hover:text-[#09090B] transition-all flex items-center gap-2 cursor-default"
-                >
-                  <span className="w-5 h-5 flex items-center justify-center shrink-0">
-                    {tech.renderSvg('w-4 h-4')}
-                  </span>
-                  <span className="font-mono-tech text-xs font-semibold">
-                    {tech.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* =====================================================================
-            NON-LINEAR SPRING-PHYSICS FLOATING TECH STACK SHOWCASE
+            TWO-LINE FLOATING TECH STACK SHOWCASE (16 OFFICIAL LOGOS & NAMES)
            ===================================================================== */}
         <div className="mt-10 pt-6 border-t border-[var(--border-hairline)]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-            <span className="font-mono-tech text-[11px] uppercase tracking-widest text-[var(--text-muted)] font-semibold">
-              PRODUCTION ENGINEERING STACK • HOVER ANY CARD TO FOCUS
+            <span className="font-mono-tech text-[11px] uppercase tracking-widest text-[var(--text-primary)] font-bold">
+              PRODUCTION ENGINEERING STACK • TWO-LINE FLOATING ARCHITECTURE
             </span>
             <span className="font-mono-tech text-[11px] text-[var(--text-secondary)]">
-              Next.js 15 • TypeScript • Java 21 • Spring Boot • Python • PostgreSQL • AWS
+              Next.js 16 • TypeScript • Java 21 • Spring Boot • FastAPI &amp; SQL • PostgreSQL • AWS
             </span>
           </div>
           <OfficialTechStackFloatingBar />
@@ -1157,6 +1128,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   ? 'shadowbase-cdc'
                   : proj.id.includes('grid')
                   ? 'gridweaver-iot'
+                  : proj.id.includes('shivangi')
+                  ? 'shivangi-salon'
+                  : proj.id.includes('localloom')
+                  ? 'localloom-store'
                   : proj.id.includes('fileguard')
                   ? 'fileguard-security'
                   : proj.id.includes('career')
@@ -1174,7 +1149,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               return (
                 <article
                   key={proj.id}
-                  className="rounded-3xl surface-card overflow-hidden flex flex-col justify-between group hover:border-[var(--text-primary)] transition-all"
+                  data-testid={`project-card-${proj.id}`}
+                  className="rounded-3xl surface-card overflow-hidden flex flex-col justify-between group hover:border-[var(--text-primary)] hover:-translate-y-2 hover:shadow-2xl transition-all duration-250"
                 >
                   <div>
                     {/* Project Cover Image */}
@@ -1191,7 +1167,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         }}
                         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
 
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
                         <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-white font-mono-tech text-[10px] font-semibold uppercase tracking-wider">
@@ -1209,23 +1185,30 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                           <h3 className="font-display text-lg font-bold text-white leading-snug">
                             {proj.title}
                           </h3>
-                          <p className="text-[11px] text-zinc-200 font-mono-tech">
+                          <p className="text-[11px] text-zinc-200 font-mono-tech mt-0.5">
                             {proj.locationTag} · <span className="text-white font-semibold">{proj.metricsHeadline}</span>
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Card Body — Hallmark Zero-Pill Editorial Metadata */}
-                    <div className="p-5 space-y-3">
-                      <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+                    {/* Card Body — Crisp Readable Body Typography & Tech Stack Line */}
+                    <div className="p-5 space-y-3.5">
+                      <p className="font-sans-body text-[13.5px] sm:text-sm font-medium text-[var(--text-primary)] leading-relaxed">
                         {proj.metricsSub}
                       </p>
 
-                      <div className="pt-2 border-t border-[var(--border-hairline)] font-mono-tech text-[11px] text-[var(--text-muted)] truncate">
+                      <div className="pt-3 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-1.5">
                         {(proj.techStack ?? proj.stackPills ?? proj.tags.split('•').map((s) => s.trim()))
                           .slice(0, 3)
-                          .join(' · ')}
+                          .map((stackItem) => (
+                            <span
+                              key={stackItem}
+                              className="px-2.5 py-1 rounded-lg surface-elevated font-mono-tech text-[11px] font-bold text-[var(--text-primary)] border border-[var(--border-hairline)]"
+                            >
+                              {stackItem}
+                            </span>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -1282,120 +1265,207 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {FOUNDER_PROFILES.map((founder) => (
-              <div
-                key={founder.id}
-                className="p-6 sm:p-7 rounded-3xl surface-card border border-[var(--border-hairline)] flex flex-col justify-between space-y-5"
-              >
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-12 h-12 rounded-2xl bg-[#09090B] text-white dark:bg-white dark:text-[#09090B] font-display font-extrabold text-base flex items-center justify-center shrink-0">
-                        {founder.avatarMonogram}
-                      </div>
-                      <div>
-                        <div className="font-mono-tech text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-                          {founder.role}
-                        </div>
-                        <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">
-                          {founder.name}
-                        </h3>
-                        <div className="text-xs text-[var(--text-secondary)]">
-                          {founder.headline}
-                        </div>
-                      </div>
-                    </div>
+            {FOUNDER_PROFILES.map((founder) => {
+              const isRevealed = revealedFounderId === founder.id;
+              const revealButtonLabel =
+                founder.id === 'aashif-khan'
+                  ? 'Reveal Co-Founder & System Architect'
+                  : 'Reveal Founder & CEO';
 
-                    <a
-                      href={`mailto:${founder.email}`}
-                      className="px-3 py-1.5 rounded-xl surface-elevated border border-[var(--border-hairline)] text-xs font-mono-tech text-[var(--text-primary)] hover:underline inline-flex items-center gap-2"
-                    >
-                      <GmailBrandIcon size="sm" />
-                      <span>{founder.email}</span>
-                    </a>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                    {founder.bio}
-                  </p>
-
-                  {/* Signature Projects with Live Interactive Prototype Launchers */}
-                  <div className="space-y-2.5 pt-2">
-                    <div className="font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-bold">
-                      SIGNATURE ARCHITECTED SYSTEMS (CLICK TO LAUNCH LIVE PROTOTYPE)
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                      {founder.projects.map((fp) => {
-                        const targetId: InteractiveArtifactId =
-                          fp.artifactId ||
-                          (fp.name.toLowerCase().includes('360')
-                            ? '360-views'
-                            : fp.name.toLowerCase().includes('shadow')
-                            ? 'shadowbase-cdc'
-                            : fp.name.toLowerCase().includes('grid')
-                            ? 'gridweaver-iot'
-                            : fp.name.toLowerCase().includes('fileguard')
-                            ? 'fileguard-security'
-                            : fp.name.toLowerCase().includes('career')
-                            ? 'ai-career-mentor'
-                            : 'socialite-network');
-                        return (
-                          <button
-                            key={fp.name}
-                            type="button"
-                            onClick={() => setActiveArtifact(targetId)}
-                            className="p-3 rounded-2xl surface-elevated border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-left transition-all cursor-pointer flex flex-col justify-between gap-2"
-                          >
-                            <div>
-                              <div className="font-display font-bold text-xs text-[var(--text-primary)] flex items-center justify-between gap-1">
-                                <span className="truncate">{fp.name}</span>
-                                <Eye className="w-3 h-3 text-[var(--text-primary)] shrink-0" />
+              return (
+                <div
+                  key={founder.id}
+                  data-testid={`founder-flip-card-${founder.id}`}
+                  style={{ perspective: '1400px' }}
+                  className="relative min-h-[430px] rounded-3xl"
+                >
+                  <div
+                    className={`w-full h-full rounded-3xl transition-all duration-500 ${
+                      isRevealed
+                        ? 'opacity-100 scale-100'
+                        : 'opacity-100 scale-[0.99]'
+                    }`}
+                  >
+                    {isRevealed ? (
+                      /* REVEALED FOUNDER CHARACTER CARD */
+                      <div
+                        data-testid={`founder-card-revealed-${founder.id}`}
+                        className="p-6 sm:p-7 rounded-3xl surface-card border-2 border-[var(--text-primary)] flex flex-col justify-between space-y-5 h-full shadow-xl"
+                      >
+                        <div className="space-y-4">
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div className="flex items-center gap-3.5">
+                              <div className="w-12 h-12 rounded-2xl bg-[#09090B] text-white dark:bg-white dark:text-[#09090B] font-display font-extrabold text-base flex items-center justify-center shrink-0 shadow-sm">
+                                {founder.avatarMonogram}
                               </div>
-                              <div className="text-[10px] text-[var(--text-secondary)] line-clamp-2 mt-0.5">
-                                {fp.subtitle}
+                              <div>
+                                <div className="font-mono-tech text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                                  {founder.role} • ACTIVE CHARACTER CARD
+                                </div>
+                                <h3 className="font-display text-xl sm:text-2xl font-extrabold text-[var(--text-primary)]">
+                                  {founder.name}
+                                </h3>
+                                <div
+                                  data-testid={`founder-headline-${founder.id}`}
+                                  className="font-display text-xs sm:text-sm font-bold text-[var(--text-primary)] mt-0.5"
+                                >
+                                  {founder.headline}
+                                </div>
                               </div>
                             </div>
-                            <span className="text-[10px] font-mono-tech font-bold text-[var(--text-primary)]">
-                              Launch Prototype →
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
 
-                <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex flex-wrap gap-1.5">
-                    {founder.frameworksAndTools.slice(0, 4).map((tool) => (
-                      <span
-                        key={tool}
-                        className="px-2.5 py-0.5 rounded-md surface-elevated font-mono-tech text-[10px] text-[var(--text-secondary)]"
+                            <a
+                              href={`mailto:${founder.email}`}
+                              className="px-3 py-1.5 rounded-xl surface-elevated border border-[var(--border-hairline)] text-xs font-mono-tech text-[var(--text-primary)] hover:underline inline-flex items-center gap-2"
+                            >
+                              <GmailBrandIcon size="sm" />
+                              <span>{founder.email}</span>
+                            </a>
+                          </div>
+
+                          <p className="font-sans-body text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                            {founder.bio}
+                          </p>
+
+                          {/* Signature Projects with Live Interactive Prototype Launchers */}
+                          <div className="space-y-2.5 pt-2">
+                            <div className="font-mono-tech text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-bold">
+                              SIGNATURE ARCHITECTED SYSTEMS (CLICK TO LAUNCH LIVE PROTOTYPE)
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                              {founder.projects.slice(0, 3).map((fp) => {
+                                const targetId: InteractiveArtifactId =
+                                  fp.artifactId ||
+                                  (fp.name.toLowerCase().includes('360')
+                                    ? '360-views'
+                                    : fp.name.toLowerCase().includes('shadow')
+                                    ? 'shadowbase-cdc'
+                                    : fp.name.toLowerCase().includes('grid')
+                                    ? 'gridweaver-iot'
+                                    : fp.name.toLowerCase().includes('fileguard')
+                                    ? 'fileguard-security'
+                                    : fp.name.toLowerCase().includes('career')
+                                    ? 'ai-career-mentor'
+                                    : 'socialite-network');
+                                return (
+                                  <button
+                                    key={fp.name}
+                                    type="button"
+                                    onClick={() => setActiveArtifact(targetId)}
+                                    className="p-3 rounded-2xl surface-elevated border border-[var(--border-hairline)] hover:border-[var(--text-primary)] hover:-translate-y-1 hover:shadow-md text-left transition-all cursor-pointer flex flex-col justify-between gap-2"
+                                  >
+                                    <div>
+                                      <div className="font-display font-bold text-xs text-[var(--text-primary)] flex items-center justify-between gap-1">
+                                        <span className="truncate">{fp.name}</span>
+                                        <Eye className="w-3 h-3 text-[var(--text-primary)] shrink-0" />
+                                      </div>
+                                      <div className="text-[11px] text-[var(--text-secondary)] line-clamp-2 mt-0.5 leading-snug">
+                                        {fp.subtitle}
+                                      </div>
+                                    </div>
+                                    <span className="text-[10px] font-mono-tech font-bold text-[var(--text-primary)]">
+                                      Launch Prototype →
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-3">
+                          <div
+                            data-testid={`founder-tech-stack-${founder.id}`}
+                            className="flex flex-wrap gap-1.5"
+                          >
+                            {founder.frameworksAndTools.map((tool) => (
+                              <span
+                                key={tool}
+                                className="px-2.5 py-1 rounded-lg bg-[#09090B] text-[#FFFFFF] dark:bg-[#F4F4F5] dark:text-[#09090B] font-mono-tech text-[11px] font-bold"
+                              >
+                                {tool}
+                              </span>
+                            ))}
+                          </div>
+
+                          <a
+                            href={`https://wa.me/${founder.whatsappNumber}?text=${encodeURIComponent(
+                              `Hi ${founder.name}, I visited SkyLine Digital Agency and want to discuss a project.`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3.5 py-2 rounded-xl btn-whatsapp-official text-xs font-semibold inline-flex items-center gap-1.5"
+                          >
+                            <WhatsAppBrandBadge size="sm" className="border border-white/30" />
+                            <span>WhatsApp {founder.name.split(' ')[0]}</span>
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      /* HIDDEN / COVER STATE FOR THE OTHER FOUNDER CARD (CLICK BUTTON TO FLIP & REVEAL) */
+                      <div
+                        data-testid={`founder-card-hidden-${founder.id}`}
+                        className="p-7 sm:p-9 rounded-3xl bg-[#09090B] text-[#FFFFFF] dark:bg-[#18181B] dark:text-[#F4F4F5] border-2 border-[#27272A] flex flex-col items-center justify-between text-center h-full min-h-[430px] shadow-2xl relative overflow-hidden"
                       >
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
+                        <div className="w-full flex items-center justify-between text-[10px] font-mono-tech uppercase tracking-widest text-[#A1A1AA]">
+                          <span>SKYLINE CHARACTER DOSSIER</span>
+                          <span>{founder.role.toUpperCase()}</span>
+                        </div>
 
-                  <a
-                    href={`https://wa.me/${founder.whatsappNumber}?text=${encodeURIComponent(
-                      `Hi ${founder.name}, I visited SkyLine Digital Agency and want to discuss a project.`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3.5 py-2 rounded-xl btn-whatsapp-official text-xs font-semibold inline-flex items-center gap-1.5"
-                  >
-                    <WhatsAppBrandBadge size="sm" className="border border-white/30" />
-                    <span>WhatsApp {founder.name.split(' ')[0]}</span>
-                  </a>
+                        <div className="my-auto py-6 space-y-4 max-w-md flex flex-col items-center">
+                          <div className="w-16 h-16 rounded-2xl bg-[#FFFFFF] text-[#09090B] font-display font-extrabold text-xl flex items-center justify-center shadow-lg">
+                            {founder.avatarMonogram}
+                          </div>
+
+                          <div>
+                            <div className="font-mono-tech text-[11px] uppercase tracking-widest text-[#A1A1AA] font-bold">
+                              {founder.role}
+                            </div>
+                            <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-[#FFFFFF] mt-1">
+                              {founder.name}
+                            </h3>
+                            <p className="font-display text-xs sm:text-sm font-semibold text-[#D4D4D8] mt-1">
+                              {founder.headline}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                            {founder.frameworksAndTools.map((tool) => (
+                              <span
+                                key={tool}
+                                className="px-2.5 py-1 rounded-lg bg-white/10 text-[#E4E4E7] border border-white/15 font-mono-tech text-[10.5px] font-semibold"
+                              >
+                                {tool}
+                              </span>
+                            ))}
+                          </div>
+
+                          <button
+                            type="button"
+                            data-testid={`reveal-founder-btn-${founder.id}`}
+                            onClick={() => setRevealedFounderId(founder.id)}
+                            className="mt-3 px-6 py-3.5 rounded-full bg-[#FFFFFF] text-[#09090B] hover:bg-[#E4E4E7] font-display font-extrabold text-xs sm:text-sm inline-flex items-center gap-2 shadow-xl hover:-translate-y-1 transition-all cursor-pointer"
+                          >
+                            <Sparkles className="w-4 h-4 text-[#09090B]" />
+                            <span>{revealButtonLabel}</span>
+                          </button>
+                        </div>
+
+                        <div className="w-full pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono-tech text-[#A1A1AA]">
+                          <span>{founder.phone}</span>
+                          <span>Click button above to flip card</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* =====================================================================
-            CLIENT REVIEWS & VERIFIED OUTCOMES
+            CLIENT REVIEWS & VERIFIED OUTCOMES (ALL 6 UPDATED TESTIMONIALS)
            ===================================================================== */}
         <div className="mt-16 pt-12 border-t border-[var(--border-hairline)]">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -1409,7 +1479,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </span>
               </div>
               <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-                Trusted by Founders, Clinics &amp; D2C Brands
+                Trusted by Founders, Salons, Handloom Brands &amp; D2C Stores
               </h2>
             </div>
 
@@ -1423,15 +1493,34 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {testimonials.slice(0, 3).map((rev) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {testimonials.slice(0, 6).map((rev) => (
               <div
                 key={rev.id}
-                className="p-6 rounded-3xl surface-card flex flex-col justify-between space-y-4"
+                data-testid={`hero-testimonial-card-${rev.id}`}
+                className="p-6 rounded-3xl surface-card flex flex-col justify-between space-y-4 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-200"
               >
-                <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed italic">
-                  "{rev.quote}"
-                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-1 rounded-lg bg-[#09090B] text-[#FFFFFF] dark:bg-[#F4F4F5] dark:text-[#09090B] font-mono-tech text-[10.5px] font-bold">
+                      {rev.verifiedOutcome}
+                    </span>
+                    {rev.liveSiteUrl && (
+                      <a
+                        href={rev.liveSiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono-tech text-[10px] font-bold text-[var(--text-primary)] hover:underline inline-flex items-center gap-1 shrink-0"
+                      >
+                        <span>Live</span>
+                        <ArrowUpRight className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+                  <p className="font-sans-body text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed italic">
+                    "{rev.quote}"
+                  </p>
+                </div>
                 <div className="pt-3 border-t border-[var(--border-hairline)] flex items-center justify-between gap-2">
                   <div>
                     <div className="font-display text-xs sm:text-sm font-bold text-[var(--text-primary)]">
@@ -1439,9 +1528,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     </div>
                     <div className="text-[11px] text-[var(--text-muted)]">{rev.role}</div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-lg badge-platinum font-mono-tech text-[10px] font-semibold">
-                    {rev.verifiedOutcome}
-                  </span>
+                  {rev.artifactId && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveArtifact(rev.artifactId || null)}
+                      className="px-2.5 py-1 rounded-lg surface-elevated border border-[var(--border-hairline)] hover:border-[var(--text-primary)] font-mono-tech text-[10px] font-bold text-[var(--text-primary)] cursor-pointer"
+                    >
+                      Prototype →
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
